@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="GalleryFound.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:GalleryFound"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="clr-namespace:GalleryFound.Helpers"
+    mc:Ignorable="d">
+
+    <!--<ScrollView>
+        <GraphicsView VerticalOptions="Center"
+                      HorizontalOptions="Center"
+                      x:Name="figmaMainPage"/>
+    </ScrollView>-->
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="IconButton" TargetType="Button">
+                <Setter Property="HeightRequest" Value="50" />
+                <Setter Property="WidthRequest" Value="50" />
+                <Setter Property="CornerRadius" Value="20"/>
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="FontSize" Value="20"/>
+                <Setter Property="Margin" Value="10"/>
+                <Setter Property="Command" Value="{Binding ButtonCommand}"/>
+                <Setter Property="FontFamily" Value="MaterialDesignIcons"/>
+                <Setter Property="FontSize" Value="24"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid
+        Margin="50">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Button
+            Grid.Row="1"
+            Grid.Column="2"
+            Style="{StaticResource IconButton}"
+            Text="{x:Static md:MaterialDesignIconFonts.Account}"
+            CommandParameter="people"
+            BackgroundColor="Purple">
+        </Button>
+        <Button
+            Grid.Row="2"
+            Grid.Column="1"
+            Style="{StaticResource IconButton}"
+            Text="{x:Static md:MaterialDesignIconFonts.FountainPen}"
+            CommandParameter="pen"
+            BackgroundColor="Red"/>
+        <Button
+            Grid.Row="2"
+            Grid.Column="3"
+            Style="{StaticResource IconButton}"
+            Text="{x:Static md:MaterialDesignIconFonts.BookOpenPageVariantOutline}"
+            CommandParameter="book"
+            BackgroundColor="Blue"/>
+        <Button
+            Grid.Row="3"
+            Grid.Column="2"
+            Style="{StaticResource IconButton}"
+            Text="{x:Static md:MaterialDesignIconFonts.MapMarker}"
+            CommandParameter="place"
+            BackgroundColor="Green"/>
+    </Grid>
+    
+</ContentPage>
