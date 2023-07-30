@@ -4,41 +4,39 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:GalleryFound.Views"
-    Title="ListPage">
+    Title="一覧">
 
-    <CollectionView
-        ItemsLayout="VerticalList"
-        ItemsSource="{Binding ViewList}">
+    <ContentPage.BindingContext>
+        <views:ListPageVm />
+    </ContentPage.BindingContext>
+
+    <CollectionView ItemsLayout="VerticalList" ItemsSource="{Binding ViewList}">
 
         <CollectionView.ItemTemplate>
             <DataTemplate>
 
                 <Grid Padding="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <Image
-                        Grid.RowSpan="2"
                         Aspect="AspectFill"
-                        HeightRequest="60"
-                        Source="{Binding ImageUrl}"
+                        HeightRequest="80"
+                        Source="{Binding Image}"
                         WidthRequest="60" />
-                    <Label
+
+                    <VerticalStackLayout
                         Grid.Column="1"
-                        FontAttributes="Bold"
-                        Text="{Binding Name}" />
-                    <Label
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        FontAttributes="Italic"
-                        Text="{Binding Location}"
-                        VerticalOptions="End" />
+                        Padding="10,0"
+                        Spacing="5">
+
+                        <Label Text="{Binding DisplayDate}" />
+                        <Label Text="{Binding Gallery.Name}" />
+                        <Label Text="{Binding Author.Name}" />
+
+                    </VerticalStackLayout>
                 </Grid>
 
             </DataTemplate>
