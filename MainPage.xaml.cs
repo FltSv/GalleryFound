@@ -1,5 +1,4 @@
 ﻿using System.Windows.Input;
-using GalleryFound.Views;
 
 namespace GalleryFound;
 
@@ -13,18 +12,15 @@ public partial class MainPage : ContentPage
 
         //figmaMainPage.Drawable = new Draw();
 
-		ButtonCommand = new Command<string>(s =>
+		ButtonCommand = new Command<Type>(x =>
 		{
-			switch (s)
-			{
-				case "place":
-                    Shell.Current.Navigation.PushAsync(new MapPage());
-					break;
-				case "book":
-                    Shell.Current.Navigation.PushAsync(new ListPage());
-					break;
-                default: return;
-			}
+            if (x is null)
+            {
+                return;
+            }
+
+            var page = (Page)Activator.CreateInstance(x);
+            Shell.Current.Navigation.PushAsync(page);
 		});
 
 		BindingContext = this;

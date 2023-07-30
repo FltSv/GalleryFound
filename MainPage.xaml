@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:GalleryFound"
+    xmlns:views="clr-namespace:GalleryFound.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:md="clr-namespace:GalleryFound.Helpers"
     mc:Ignorable="d">
@@ -56,7 +57,7 @@
             Grid.Column="2"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.Account}"
-            CommandParameter="people"
+            CommandParameter="{x:Null}"
             BackgroundColor="Purple">
         </Button>
         <Button
@@ -64,22 +65,22 @@
             Grid.Column="1"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.FountainPen}"
-            CommandParameter="pen"
+            CommandParameter="{x:Type views:ListViewPage}"
             BackgroundColor="Red"/>
         <Button
             Grid.Row="2"
             Grid.Column="3"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.BookOpenPageVariantOutline}"
-            CommandParameter="book"
-            BackgroundColor="Blue"/>
+            CommandParameter="{x:Type views:GridViewPage}"
+            BackgroundColor="Green"/>
         <Button
             Grid.Row="3"
             Grid.Column="2"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.MapMarker}"
-            CommandParameter="place"
-            BackgroundColor="Green"/>
+            CommandParameter="{x:Type views:MapPage}"
+            BackgroundColor="Blue"/>
     </Grid>
     
 </ContentPage>

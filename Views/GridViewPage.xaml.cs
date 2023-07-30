@@ -1,21 +1,20 @@
-﻿using GalleryFound.Models;
+using GalleryFound.Models;
 
 namespace GalleryFound.Views;
 
-public partial class ListPage : ContentPage
+public partial class GridViewPage : ContentPage
 {
-	public ListPage()
+	public GridViewPage()
 	{
 		InitializeComponent();
-		BindingContext = new ListPageVm();
 	}
 }
 
-public class ListPageVm
+public class GridViewPageVm
 {
     public List<Product> ViewList { get; } = new();
 
-    public ListPageVm()
+    public GridViewPageVm()
     {
         ViewList.AddRange(StaticValues.Authors.SelectMany(x => x.Products));
     }
