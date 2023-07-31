@@ -3,9 +3,11 @@
     x:Class="GalleryFound.Views.MapPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="MapPage">
+    xmlns:views="clr-namespace:GalleryFound.Views"
+    Title="MapPage"
+    x:DataType="views:MapPageVm">
 
-    <WebView Source="https://goo.gl/maps/eMgnsvkndthT3Be26" />
+    <WebView Source="{Binding Source}" />
     <!--<iframe
         allowfullscreen=""
         height="450"

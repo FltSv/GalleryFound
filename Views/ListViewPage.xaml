@@ -10,7 +10,12 @@
         <views:ListViewPageVm />
     </ContentPage.BindingContext>
 
-    <CollectionView ItemsLayout="VerticalList" ItemsSource="{Binding ViewList}">
+    <CollectionView
+        ItemsLayout="VerticalList"
+        ItemsSource="{Binding ViewList}"
+        SelectedItem="{Binding SelectedItem}"
+        SelectionChangedCommand="{Binding OpenDetailCommand}"
+        SelectionMode="Single">
 
         <CollectionView.ItemTemplate>
             <DataTemplate>
