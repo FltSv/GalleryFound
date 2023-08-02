@@ -8,15 +8,19 @@ public partial class ListViewPage : ContentPage
 	public ListViewPage()
 	{
 		InitializeComponent();
-		BindingContext = new ListViewPageVm();
 	}
 }
 
-public class ListViewPageVm
+public class ListViewPageVm : VmBase
 {
     public List<Product> ViewList { get; } = new();
 
-    public Product SelectedItem { get; set; }
+    private Product _selectedItem;
+    public Product SelectedItem
+    {
+        get => _selectedItem;
+        set => SetProperty(ref _selectedItem, value);
+    }
 
     public ICommand OpenDetailCommand { get; }
 
@@ -24,7 +28,7 @@ public class ListViewPageVm
     {
         ViewList.AddRange(StaticValues.Authors.SelectMany(x => x.Products));
 
-        OpenDetailCommand = new Command(() =>
+        OpenDetailCommand = new Command(async () =>
         {
             if (SelectedItem is null)
             {
@@ -32,7 +36,8 @@ public class ListViewPageVm
             }
 
             var page = new GalleryDetailPage(SelectedItem);
-            Shell.Current.Navigation.PushAsync(page);
+            await Shell.Current.Navigation.PushAsync(page);
+            SelectedItem = null;
         });
     }
 }
