@@ -7,12 +7,15 @@
     Title="一覧">
 
     <ContentPage.BindingContext>
-        <views:ListViewPageVm />
+        <views:GridViewPageVm />
     </ContentPage.BindingContext>
 
     <CollectionView
         HorizontalOptions="CenterAndExpand"
-        ItemsSource="{Binding ViewList}">
+        ItemsSource="{Binding ViewList}"
+        SelectedItem="{Binding SelectedItem}"
+        SelectionChangedCommand="{Binding OpenDetailCommand}"
+        SelectionMode="Single">
 
         <CollectionView.ItemsLayout>
             <GridItemsLayout Orientation="Vertical" Span="2" />
