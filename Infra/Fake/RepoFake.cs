@@ -4,19 +4,39 @@ namespace GalleryFound.Infra.Fake;
 
 public class RepoFake
 {
-    private readonly Author[] _authors = new[]
+    private readonly Author[] _authors = new (string, string)[]
     {
-        "村上 春樹",
-        "太宰 治",
-        "芥川 龍之介",
-        "三島 由紀夫",
-        "川端 康成",
-        "井上 雄彦",
-        "樋口 一葉",
-        "吉本 ばなな",
-        "谷崎 潤一郎",
-        "伊坂 幸太郎"
-    }.Select(x => new Author() { Name = x }).ToArray();
+        ("村上 春樹", "むらかみ はるき"),
+        ("太宰 治", "だざい おさむ"),
+        ("芥川 龍之介", "あくたがわ りゅうのすけ"),
+        ("三島 由紀夫", "みしま ゆきお"),
+        ("川端 康成", "かわばた やすなり"),
+        ("井上 雄彦", "いのうえ たけひこ"),
+        ("樋口 一葉", "ひぐち いちよう"),
+        ("吉本 ばなな", "よしもと ばなな"),
+        ("谷崎 潤一郎", "たにざき じゅんいちろう"),
+        ("伊坂 幸太郎", "いさか こうたろう"),
+        ("Ernest Hemingway", null),
+        ("Virginia Woolf", null),
+        ("George Orwell", null),
+        ("F. Scott Fitzgerald", null),
+        ("Mark Twain", null),
+        ("Charles Dickens", null),
+        ("Jane Austen", null),
+        ("J.D. Salinger", null),
+        ("Harper Lee", null),
+        ("J.R.R. Tolkien", null),
+        ("J.K. Rowling", null),
+        ("Stephen King", null),
+        ("Agatha Christie", null),
+        ("James Joyce", null),
+        ("Oscar Wilde", null),
+        ("Leo Tolstoy", null),
+        ("Fyodor Dostoevsky", null),
+        ("Edgar Allan Poe", null),
+        ("William Shakespeare", null),
+        ("Arthur Conan Doyle", null)
+    }.Select(x => new Author() { Name = x.Item1, Reading = x.Item2 }).ToArray();
 
     private readonly Gallery[] _galleries = new[]
     {
