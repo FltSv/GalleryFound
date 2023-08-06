@@ -18,14 +18,22 @@ public class GalleryDetailPageVm
 
     public ICommand OpenGalleryMapCommand { get; }
 
+    public ICommand OpenAuthorCommand { get; }
+
     public GalleryDetailPageVm(Product product)
     {
         Product = product;
 
-        OpenGalleryMapCommand = new Command(() =>
+        OpenGalleryMapCommand = new Command(async () =>
         {
             var page = new MapPage(product.Gallery.Name);
-            Shell.Current.Navigation.PushAsync(page);
+            await Shell.Current.Navigation.PushAsync(page);
+        });
+
+        OpenAuthorCommand = new Command(async () =>
+        {
+            var page = new AuthorListPage(product.Author);
+            await Shell.Current.Navigation.PushAsync(page);
         });
     }
 }

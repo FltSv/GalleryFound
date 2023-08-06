@@ -7,6 +7,15 @@
     Title="GalleryDetailPage"
     x:DataType="views:GalleryDetailPageVm">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="LinkLabelStyle" TargetType="{x:Type Label}">
+                <Setter Property="TextColor" Value="DeepSkyBlue" />
+                <Setter Property="TextDecorations" Value="Underline" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <Grid Margin="50">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -23,18 +32,19 @@
             Margin="10"
             Spacing="10">
 
-            <Label Text=""/>
+            <Label Text="" />
             <Label Text="{Binding Product.DisplayDate}" />
-            <Label
-                Text="{Binding Product.Gallery.Name}"
-                TextColor="DeepSkyBlue" 
-                TextDecorations="Underline">
-
+            <Label Style="{StaticResource LinkLabelStyle}" Text="{Binding Product.Gallery.Name}">
                 <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding OpenGalleryMapCommand}" CommandParameter="{Binding Product.Gallery}" />
+                    <TapGestureRecognizer Command="{Binding OpenGalleryMapCommand}" />
                 </Label.GestureRecognizers>
             </Label>
-            <Label Text="{Binding Product.Author.Name}" />
+            
+            <Label Style="{StaticResource LinkLabelStyle}" Text="{Binding Product.Author.Name}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenAuthorCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
         </VerticalStackLayout>
     </Grid>
 </ContentPage>

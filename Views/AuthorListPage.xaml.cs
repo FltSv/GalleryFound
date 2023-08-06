@@ -5,11 +5,19 @@ namespace GalleryFound.Views;
 
 public partial class AuthorListPage : ContentPage
 {
-	public AuthorListPage()
+    public AuthorListPage()
 	{
 		InitializeComponent();
         ((AuthorListPageVm)BindingContext).ScrollAuthorListAction += ScrollToAuthor;
-	}
+    }
+
+    public AuthorListPage(Author author) : this()
+    {
+        authorListCollectionView.Loaded += (s, e) =>
+        {
+            ScrollToAuthor(author);
+        };
+    }
 
     /// <summary>
     /// 作家一覧の中から <paramref name="author"/> で指定した要素までジャンプ（スクロール）
