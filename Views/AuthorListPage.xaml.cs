@@ -93,8 +93,8 @@ public class AuthorListPageVm : VmBase
                 return;
             }
 
-            //var page = new GalleryDetailPage(SelectedItem);
-            //await Shell.Current.Navigation.PushAsync(page);
+            var page = new AuthorDetailPage(SelectedAuthor);
+            await Shell.Current.Navigation.PushAsync(page);
             SelectedAuthor = null;
         });
 

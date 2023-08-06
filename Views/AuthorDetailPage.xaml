@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="GalleryFound.Views.AuthorDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:GalleryFound.Models"
+    xmlns:views="clr-namespace:GalleryFound.Views"
+    Title="AuthorDetailPage"
+    x:DataType="views:AuthorDetailPageVm">
+
+    <ContentPage.Resources>
+        <DataTemplate x:Key="EmptyViewTemplate">
+            <StackLayout>
+                <Label
+                    Margin="10,25,10,10"
+                    HorizontalTextAlignment="Center"
+                    Text="結果はありません。" />
+            </StackLayout>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <ScrollView Orientation="Vertical">
+        <Grid Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <!--  作家名  -->
+            <Label
+                Grid.Row="0"
+                FontAttributes="Bold"
+                FontSize="24"
+                Text="{Binding Author.Name}" />
+
+            <!--  展示歴  -->
+            <VerticalStackLayout Grid.Row="1" Margin="0,10">
+                <Label
+                    Margin="0,10"
+                    FontSize="18"
+                    Text="展示歴" />
+                <CollectionView EmptyView="{StaticResource EmptyViewTemplate}" ItemsSource="{Binding Author.Products}">
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Product">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="3*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Column="0" Text="{Binding DisplayDate}" />
+                                <Label Grid.Column="1" Text="{Binding Gallery.Name}" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+            </VerticalStackLayout>
+
+            <!--  発表作品  -->
+            <VerticalStackLayout Grid.Row="2" Margin="0,10">
+                <Label
+                    Margin="0,10"
+                    FontSize="18"
+                    Text="発表作品" />
+                <CollectionView EmptyView="{StaticResource EmptyViewTemplate}" ItemsSource="{Binding Author.Products}">
+
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout
+                            Orientation="Vertical"
+                            Span="2"
+                            VerticalItemSpacing="30" />
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Product">
+                            <Image
+                                Aspect="AspectFill"
+                                HeightRequest="160"
+                                Source="{Binding Image}"
+                                WidthRequest="120" />
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+            </VerticalStackLayout>
+
+        </Grid>
+    </ScrollView>
+</ContentPage>
