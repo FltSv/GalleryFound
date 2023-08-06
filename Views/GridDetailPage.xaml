@@ -38,14 +38,14 @@
                             <Image
                                 Grid.Column="0"
                                 Aspect="AspectFit"
-                                BackgroundColor="White"
                                 HeightRequest="20"
-                                Source="{Binding Shop.Logo}">
-                                <!--HeightRequest="{Binding Source={x:Reference label}, Path=Height}"-->
+                                Source="{Binding Icon}">
+                                <!--  HeightRequest="{Binding Source={x:Reference label}, Path=Height}"  -->
                             </Image>
                             <Label
-                                x:Name="label" Margin="5"
+                                x:Name="label"
                                 Grid.Column="1"
+                                Margin="5"
                                 Text="{Binding Shop}"
                                 TextColor="DeepSkyBlue"
                                 TextDecorations="Underline">
