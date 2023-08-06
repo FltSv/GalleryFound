@@ -38,5 +38,5 @@ public record class Product
     /// <summary>
     /// 通販情報
     /// </summary>
-    public List<ShopUriPair> ShopUriPairs { get; } = new();
+    public List<ShopUri> ShopUriPairs { get; } = new();
 }

@@ -46,7 +46,7 @@
                                 x:Name="label"
                                 Grid.Column="1"
                                 Margin="5"
-                                Text="{Binding Shop}"
+                                Text="{Binding DisplayUrl}"
                                 TextColor="DeepSkyBlue"
                                 TextDecorations="Underline">
 

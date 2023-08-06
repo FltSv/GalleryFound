@@ -89,7 +89,7 @@ public class RepoFake
         var rnd = new Random();
 
         var products = new List<Product>();
-        var amazonUri = new ShopUriPair() { Shop = Shops.Amazon, Uri = "https://www.amazon.co.jp" };
+        var amazonUri = new ShopUri() { Uri = "https://www.amazon.co.jp" };
 
         for (int i = 0; i < 50; i++)
         {
