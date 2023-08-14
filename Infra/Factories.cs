@@ -2,7 +2,7 @@
 using GalleryFound.Infra.Fake;
 using GalleryFound.Infra.Gcp;
 using GalleryFound.Infra.Storage;
-using GalleryFound.Models;
+using GalleryFound.Models.Repositories;
 
 namespace GalleryFound.Infra;
 
@@ -11,18 +11,19 @@ public static class Factories
     /// <summary>
     /// 模擬データ参照フラグ
     /// </summary>
-    public static bool IsDebug { get; } = true;
+    public static bool IsFake { get; } = true;
 
-    public static Author[] GetAuthors()
+    public static async Task<IAuthorsRepo> GetRepo()
     {
-        if (IsDebug)
+#if DEBUG
+        if (IsFake)
         {
-            return new RepoFake().GetAuthors();
+            return new RepoFake();
         }
-        else
-        {
-            throw new NotImplementedException();
-        }
+#endif
+
+        var firestore = await AuthDb();
+        return new RepoGcp(firestore);
     }
 
     public static async Task<FirestoreDb> AuthDb()

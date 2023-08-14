@@ -7,5 +7,15 @@ namespace GalleryFound.Models;
 /// </summary>
 public static class StaticValues
 {
-    public static Author[] Authors { get; } = Factories.GetAuthors();
+    public static bool IsLoaded { get; private set; }
+
+    public static Author[] Authors { get; private set; }
+
+    public static async void LoadValues()
+    {
+        var repo = await Factories.GetRepo();
+        Authors = await repo.GetAuthorsAsync();
+
+        IsLoaded = true;
+    }
 }

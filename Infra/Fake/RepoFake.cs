@@ -1,8 +1,9 @@
 ﻿using GalleryFound.Models;
+using GalleryFound.Models.Repositories;
 
 namespace GalleryFound.Infra.Fake;
 
-public class RepoFake
+public class RepoFake : IAuthorsRepo
 {
     private readonly Author[] _authors = new (string, string)[]
     {
@@ -82,6 +83,8 @@ public class RepoFake
         @"https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Semnopithèque_blanchâtre_mâle.JPG/192px-Semnopithèque_blanchâtre_mâle.JPG",
         @"https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Gelada-Pavian.jpg/320px-Gelada-Pavian.jpg",
     }.Select(x => new Uri(x)).ToArray();
+
+    public Task<Author[]> GetAuthorsAsync() => Task.Run(GetAuthors);
 
     public Author[] GetAuthors()
     {

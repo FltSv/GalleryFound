@@ -6,10 +6,11 @@ using Google.Cloud.Firestore;
 using Google.Cloud.Firestore.V1;
 using Google.Cloud.Storage.V1;
 using GalleryFound.Models;
+using GalleryFound.Models.Repositories;
 
 namespace GalleryFound.Infra.Gcp;
 
-public class RepoGcp
+public class RepoGcp : IAuthorsRepo
 {
     private const string _authorsCollection = "authors";
     private const string _dataCollection = "data";
@@ -19,6 +20,11 @@ public class RepoGcp
     public RepoGcp(FirestoreDb firestore)
     {
         _firestore = firestore;
+    }
+
+    public async Task<Author[]> GetAuthorsAsync()
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<string> GetLatestUpdate()
