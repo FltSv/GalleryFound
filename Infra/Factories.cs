@@ -84,4 +84,30 @@ public static class Factories
             return value;
         }
     }
+
+    /// <summary>
+    /// ストレージとサーバーの更新日時の比較を行う
+    /// </summary>
+    public static async Task<bool> HasUpdateDbCheck()
+    {
+        try
+        {
+            // ストレージから更新日時を取得
+            var storage = new RepoStorage();
+            var localDate = storage.GetDataLatestUpdate();
+
+            // サーバーから更新日時を取得
+            var remote = await Factories.GetRepo();
+            var remoteInfo = await remote.GetDbInfoAsync();
+            var remoteDate = remoteInfo.LatestUpdate;
+
+            // サーバー側の更新日時がストレージを超えていれば、更新が必要とする
+            return remoteDate > localDate;
+        }
+        catch
+        {
+            // 例外発生時は更新を必要とする
+            return true;
+        }
+    }
 }

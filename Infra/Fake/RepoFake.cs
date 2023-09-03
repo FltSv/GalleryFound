@@ -120,4 +120,9 @@ public class RepoFake : IAuthorsRepo
             return x.Key;
         }).ToArray();
     }
+
+    public Task<DbInfo> GetDbInfoAsync() => Task.Run(() => new DbInfo
+    {
+        LatestUpdate = DateTime.MinValue
+    });
 }

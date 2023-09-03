@@ -17,6 +17,11 @@ public class RepoGcp : IAuthorsRepo
 
     private readonly FirestoreDb _firestore;
 
+    private static readonly Dictionary<string, string> _keyDict = new()
+    {
+        { nameof(DbInfo.LatestUpdate), "latestUpdate" },
+    };
+
     public RepoGcp(FirestoreDb firestore)
     {
         _firestore = firestore;
@@ -27,7 +32,7 @@ public class RepoGcp : IAuthorsRepo
         throw new NotImplementedException();
     }
 
-    public async Task<string> GetLatestUpdate()
+    public async Task<DbInfo> GetDbInfoAsync()
     {
         var collection = _firestore.Collection(_dataCollection);
         var docRef = collection.Document("data");
@@ -35,10 +40,12 @@ public class RepoGcp : IAuthorsRepo
 
         if (!snapshot.Exists)
         {
-            return null;
+            throw new Exception("データベース情報の取得時にエラーが発生しました。");
         }
 
-        Dictionary<string, object> dataDict = snapshot.ToDictionary();
-        return dataDict["latestUpdate"].ToString();
+        return new()
+        {
+            LatestUpdate = snapshot.GetValue<DateTime>(_keyDict[nameof(DbInfo.LatestUpdate)])
+        };
     }
 }
