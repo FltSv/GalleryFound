@@ -1,0 +1,102 @@
+﻿@startuml name
+skinparam linetype ortho
+
+package CollectorView <<Rectangle>> {
+    class ギャラリー一覧画面{}
+    class 作家一覧画面{}
+    class 雑誌一覧画面{}
+    class 地図画面{}
+}
+note top of CollectorView : 閲覧者側のスマホアプリ
+
+package CreatorView <<Rectangle>> {
+    class 未定{}
+}
+note top of CreatorView: クリエイター側の登録画面など
+
+package Models <<Rectangle>> {
+    class StaticValues {
+    }
+    note left of StaticValues
+    トップディレクトリ・ルートフォルダ的な
+    end note
+
+    class Magazine <<雑誌>> {
+        作家: string
+        画像: Image
+    }
+
+    class Gallery <<ギャラリー>> {
+        ギャラリー名: string
+        場所: string
+        展示の開示HP: Uri
+        展示料金: int
+    }
+    note left of Gallery::展示料金
+    クリエイターのみ表示
+    end note
+
+    class Map <<地図>> {
+        検索: ?
+        現在地: ?
+    }
+    note left of Map
+    地図クラスはGoogleMapに
+    統合予定なので不要かも？
+    end note
+
+
+    class Creator <<クリエイター>> {
+        作家名: string
+        作品: List<Product>
+        経歴: string
+        登録情報: ?
+    }
+
+    class Product <<作品>> {
+        画像: string
+        ギャラリー: Gallery
+        クリエイター: Creator
+        通販一覧: List<ShopUriPair>
+    }
+
+    class ShopUriPair <<通販>> {
+        通販名: string
+        URL: Uri
+    }
+
+    class Admin <<管理>> {
+        課金: int
+        管理: ?
+        登録管理()
+        アップデート()
+    }
+}
+note top of Models: メモリ上のデータ構造を示す
+
+
+Models -[hidden]- CollectorView
+Models -[hidden]- CreatorView
+
+
+StaticValues "1" o-- "*" Gallery
+StaticValues "1" o-- "*" Creator 
+StaticValues "1" o-- "*" Magazine
+StaticValues "1" - "1" Admin
+
+Gallery -[hidden] Creator
+
+Creator "1" *-- "*" Product
+Creator "1" -- "1" Product
+Product "1" -- "1" Gallery
+Gallery "1" -- "1" Map
+
+Product "1" *-- "*" ShopUriPair
+
+
+Gallery <.. ギャラリー一覧画面
+Creator <.. 作家一覧画面
+Magazine <.. 雑誌一覧画面
+Map <.. 地図画面
+
+@enduml

@@ -13,3 +13,5 @@ Windows11上で、WindowsアプリとAndroidアプリとして動作すること
 todo: MacでビルドしたらiPhone版も作れる？<br>
 [.NET MAUI とは - Microsoft Learn](https://learn.microsoft.com/ja-jp/dotnet/maui/what-is-maui)
 
+## クラス図
+![class-diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/FltSv/GalleryFound/master/ClassDiag.pu)
