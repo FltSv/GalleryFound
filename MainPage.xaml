@@ -57,7 +57,7 @@
             Grid.Column="2"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.Account}"
-            CommandParameter="{x:Type views:AuthorListPage}"
+            CommandParameter="{x:Type views:CreatorListPage}"
             BackgroundColor="Purple">
         </Button>
         <Button

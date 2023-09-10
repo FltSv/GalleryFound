@@ -33,7 +33,7 @@ public record class Product
     /// <summary>
     /// 作家情報
     /// </summary>
-    public Author Author { get; set; }
+    public Creator Creator { get; set; }
 
     /// <summary>
     /// 通販情報

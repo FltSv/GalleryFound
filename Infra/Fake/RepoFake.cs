@@ -3,9 +3,9 @@ using GalleryFound.Models.Repositories;
 
 namespace GalleryFound.Infra.Fake;
 
-public class RepoFake : IAuthorsRepo
+public class RepoFake : ICreatorsRepo
 {
-    private readonly Author[] _authors = new (string, string)[]
+    private readonly Creator[] _creators = new (string, string)[]
     {
         ("村上 春樹", "むらかみ はるき"),
         ("太宰 治", "だざい おさむ"),
@@ -37,7 +37,7 @@ public class RepoFake : IAuthorsRepo
         ("Edgar Allan Poe", null),
         ("William Shakespeare", null),
         ("Arthur Conan Doyle", null)
-    }.Select(x => new Author() { Name = x.Item1, Reading = x.Item2 }).ToArray();
+    }.Select(x => new Creator() { Name = x.Item1, Reading = x.Item2 }).ToArray();
 
     private readonly Gallery[] _galleries = new[]
     {
@@ -84,9 +84,9 @@ public class RepoFake : IAuthorsRepo
         @"https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Gelada-Pavian.jpg/320px-Gelada-Pavian.jpg",
     }.Select(x => new Uri(x)).ToArray();
 
-    public Task<Author[]> GetAuthorsAsync() => Task.Run(GetAuthors);
+    public Task<Creator[]> GetCreatorsAsync() => Task.Run(GetCreators);
 
-    public Author[] GetAuthors()
+    public Creator[] GetCreators()
     {
         const int daysInHalfYear = 182; // 半年を近似
         var rnd = new Random();
@@ -105,7 +105,7 @@ public class RepoFake : IAuthorsRepo
             var product = new Product()
             {
                 Image = _imageUris[rnd.Next(_imageUris.Length)],
-                Author = _authors[rnd.Next(_authors.Length)],
+                Creator = _creators[rnd.Next(_creators.Length)],
                 Gallery = _galleries[rnd.Next(_galleries.Length)],
                 ReleaseDate = randomDate,
             };
@@ -114,7 +114,7 @@ public class RepoFake : IAuthorsRepo
             products.Add(product);
         }
 
-        return products.GroupBy(x => x.Author).Select(x =>
+        return products.GroupBy(x => x.Creator).Select(x =>
         {
             x.Key.Products.AddRange(x);
             return x.Key;

@@ -9,12 +9,12 @@ public static class StaticValues
 {
     public static bool IsLoaded { get; private set; }
 
-    public static Author[] Authors { get; private set; }
+    public static Creator[] Creators { get; private set; }
 
     public static async void LoadValues()
     {
         var repo = await Factories.GetRepo();
-        Authors = await repo.GetAuthorsAsync();
+        Creators = await repo.GetCreatorsAsync();
 
         IsLoaded = true;
     }

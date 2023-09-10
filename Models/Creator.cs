@@ -2,7 +2,7 @@
 
 namespace GalleryFound.Models;
 
-public record class Author
+public record class Creator
 {
     private static readonly char[] _spaceDelimiters = new[] { ' ', '　' };
 

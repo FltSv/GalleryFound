@@ -39,10 +39,10 @@
                     <TapGestureRecognizer Command="{Binding OpenGalleryMapCommand}" />
                 </Label.GestureRecognizers>
             </Label>
-            
-            <Label Style="{StaticResource LinkLabelStyle}" Text="{Binding Product.Author.Name}">
+
+            <Label Style="{StaticResource LinkLabelStyle}" Text="{Binding Product.Creator.Name}">
                 <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding OpenAuthorCommand}" />
+                    <TapGestureRecognizer Command="{Binding OpenCreatorCommand}" />
                 </Label.GestureRecognizers>
             </Label>
         </VerticalStackLayout>

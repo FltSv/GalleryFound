@@ -1,8 +1,8 @@
 ﻿namespace GalleryFound.Models.Repositories;
 
-public interface IAuthorsRepo
+public interface ICreatorsRepo
 {
-    public Task<Author[]> GetAuthorsAsync();
+    public Task<Creator[]> GetCreatorsAsync();
 
     /// <summary>
     /// データベース上のメタデータ等を取得

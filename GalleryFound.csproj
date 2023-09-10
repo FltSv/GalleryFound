@@ -62,16 +62,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\CreatorsListPage.xaml.cs">
+	    <DependentUpon>CreatorsListPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CreatorDetailPage.xaml.cs">
+	    <DependentUpon>CreatorDetailPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\ListViewPage.xaml.cs">
 	    <DependentUpon>ListViewPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\AuthorDetailPage.xaml">
+	  <MauiXaml Update="Views\CreatorDetailPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\AuthorListPage.xaml">
+	  <MauiXaml Update="Views\CreatorsListPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\GalleryDetailPage.xaml">

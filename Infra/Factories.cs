@@ -13,7 +13,7 @@ public static class Factories
     /// </summary>
     public static bool IsFake { get; } = true;
 
-    public static async Task<IAuthorsRepo> GetRepo()
+    public static async Task<ICreatorsRepo> GetRepo()
     {
 #if DEBUG
         if (IsFake)

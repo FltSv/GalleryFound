@@ -39,7 +39,7 @@
 
                         <Label Text="{Binding DisplayDate}" />
                         <Label Text="{Binding Gallery.Name}" />
-                        <Label Text="{Binding Author.Name}" />
+                        <Label Text="{Binding Creator.Name}" />
 
                     </VerticalStackLayout>
                 </Grid>

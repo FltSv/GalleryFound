@@ -3,32 +3,32 @@ using System.Windows.Input;
 
 namespace GalleryFound.Views;
 
-public partial class AuthorListPage : ContentPage
+public partial class CreatorListPage : ContentPage
 {
-    public AuthorListPage()
+    public CreatorListPage()
 	{
 		InitializeComponent();
-        ((AuthorListPageVm)BindingContext).ScrollAuthorListAction += ScrollToAuthor;
+        ((CreatorListPageVm)BindingContext).ScrollCreatorListAction += ScrollToCreator;
     }
 
-    public AuthorListPage(Author author) : this()
+    public CreatorListPage(Creator creator) : this()
     {
-        authorListCollectionView.Loaded += (s, e) =>
+        creatorListCollectionView.Loaded += (s, e) =>
         {
-            ScrollToAuthor(author);
+            ScrollToCreator(creator);
         };
     }
 
     /// <summary>
-    /// 作家一覧の中から <paramref name="author"/> で指定した要素までジャンプ（スクロール）
+    /// 作家一覧の中から <paramref name="creator"/> で指定した要素までジャンプ（スクロール）
     /// </summary>
-    private void ScrollToAuthor(Author author)
+    private void ScrollToCreator(Creator creator)
     {
-        authorListCollectionView.ScrollTo(author);
+        creatorListCollectionView.ScrollTo(creator);
     }
 }
 
-public class AuthorListPageVm : VmBase
+public class CreatorListPageVm : VmBase
 {
     /// <summary>
     /// 検索ボックスに入力されたテキスト
@@ -39,7 +39,7 @@ public class AuthorListPageVm : VmBase
         set
         {
             _searchText = value;
-            OnPropertyChanged(nameof(AuthorList));
+            OnPropertyChanged(nameof(CreatorList));
             OnPropertyChanged(nameof(InitialList));
         }
     }
@@ -48,24 +48,24 @@ public class AuthorListPageVm : VmBase
     /// <summary>
     /// 作者の名前リスト
     /// </summary>
-	public List<Author> AuthorList =>
+	public List<Creator> CreatorList =>
         GetSearchedList(SearchText).OrderBy(x => x.Reading).ToList();
 
     /// <summary>
     /// 名前の頭文字リスト
     /// </summary>
     public List<string> InitialList =>
-        AuthorList.Select(x => x.Initial).Distinct().ToList();
+        CreatorList.Select(x => x.Initial).Distinct().ToList();
 
     /// <summary>
     /// 作者一覧で選択された要素
     /// </summary>
-	public Author SelectedAuthor
+	public Creator SelectedCreator
 	{
-		get => _selectedAuthor;
-		set => SetProperty(ref _selectedAuthor, value);
+		get => _selectedCreator;
+		set => SetProperty(ref _selectedCreator, value);
 	}
-	private Author _selectedAuthor;
+	private Creator _selectedCreator;
 
     /// <summary>
     /// 作者の詳細を開くコマンド
@@ -90,20 +90,20 @@ public class AuthorListPageVm : VmBase
     /// <summary>
     /// 作者リストのスクロールを行うメソッドを格納しておく
     /// </summary>
-    public Action<Author> ScrollAuthorListAction { get; set; }
+    public Action<Creator> ScrollCreatorListAction { get; set; }
 
-    public AuthorListPageVm()
+    public CreatorListPageVm()
     {
         OpenDetailCommand = new Command(async () =>
         {
-            if (SelectedAuthor is null)
+            if (SelectedCreator is null)
             {
                 return;
             }
 
-            var page = new AuthorDetailPage(SelectedAuthor);
+            var page = new CreatorDetailPage(SelectedCreator);
             await Shell.Current.Navigation.PushAsync(page);
-            SelectedAuthor = null;
+            SelectedCreator = null;
         });
 
         SelectInitialCommand = new Command(() =>
@@ -113,21 +113,21 @@ public class AuthorListPageVm : VmBase
                 return;
             }
 
-            var targetAuthor = AuthorList.FirstOrDefault(x => x.Initial == SelectedInitial);
+            var targetCreator = CreatorList.FirstOrDefault(x => x.Initial == SelectedInitial);
 
-            if (targetAuthor is null)
+            if (targetCreator is null)
             {
                 return;
             }
 
-            ScrollAuthorListAction?.Invoke(targetAuthor);
+            ScrollCreatorListAction?.Invoke(targetCreator);
 
             SelectedInitial = null;
         });
     }
 
-    public static IEnumerable<Author> GetSearchedList(string searchText)
+    public static IEnumerable<Creator> GetSearchedList(string searchText)
     {
-        return StaticValues.Authors.Where(x => x.IsMatch(searchText));
+        return StaticValues.Creators.Where(x => x.IsMatch(searchText));
     }
 }

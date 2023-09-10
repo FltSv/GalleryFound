@@ -10,9 +10,9 @@ using GalleryFound.Models.Repositories;
 
 namespace GalleryFound.Infra.Gcp;
 
-public class RepoGcp : IAuthorsRepo
+public class RepoGcp : ICreatorsRepo
 {
-    private const string _authorsCollection = "authors";
+    private const string _creatorsCollection = "creators";
     private const string _dataCollection = "data";
 
     private readonly FirestoreDb _firestore;
@@ -27,7 +27,7 @@ public class RepoGcp : IAuthorsRepo
         _firestore = firestore;
     }
 
-    public async Task<Author[]> GetAuthorsAsync()
+    public async Task<Creator[]> GetCreatorsAsync()
     {
         throw new NotImplementedException();
     }
