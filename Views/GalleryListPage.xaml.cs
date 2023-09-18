@@ -4,15 +4,15 @@ using System.Windows.Input;
 
 namespace GalleryFound.Views;
 
-public partial class ListViewPage : ContentPage
+public partial class GalleryListPage : ContentPage
 {
-	public ListViewPage()
+	public GalleryListPage()
 	{
 		InitializeComponent();
 	}
 }
 
-public class ListViewPageVm : VmBase
+public class GalleryListPageVm : VmBase
 {
     public List<Product> ViewList { get; } = new();
 
@@ -25,7 +25,7 @@ public class ListViewPageVm : VmBase
 
     public ICommand OpenDetailCommand { get; }
 
-    public ListViewPageVm()
+    public GalleryListPageVm()
     {
         ViewList.AddRange(Creators.GetAllCreatorsProducts());
 

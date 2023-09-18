@@ -4,15 +4,15 @@ using System.Windows.Input;
 
 namespace GalleryFound.Views;
 
-public partial class GridViewPage : ContentPage
+public partial class MagazineListPage : ContentPage
 {
-	public GridViewPage()
+	public MagazineListPage()
 	{
 		InitializeComponent();
 	}
 }
 
-public class GridViewPageVm : VmBase
+public class MagazineListPageVm : VmBase
 {
     public List<Magazine> ViewList { get; } = new();
 
@@ -25,7 +25,7 @@ public class GridViewPageVm : VmBase
 
     public ICommand OpenDetailCommand { get; }
 
-    public GridViewPageVm()
+    public MagazineListPageVm()
     {
         ViewList.AddRange(Magazines.Instance);
 
@@ -36,7 +36,7 @@ public class GridViewPageVm : VmBase
                 return;
             }
 
-            var page = new GridDetailPage(SelectedItem);
+            var page = new MagazineDetailPage(SelectedItem);
             await Shell.Current.Navigation.PushAsync(page);
             SelectedItem = null;
         });

@@ -65,14 +65,14 @@
             Grid.Column="1"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.FountainPen}"
-            CommandParameter="{x:Type views:ListViewPage}"
+            CommandParameter="{x:Type views:GalleryListPage}"
             BackgroundColor="Red"/>
         <Button
             Grid.Row="2"
             Grid.Column="3"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.BookOpenPageVariantOutline}"
-            CommandParameter="{x:Type views:GridViewPage}"
+            CommandParameter="{x:Type views:MagazineListPage}"
             BackgroundColor="Green"/>
         <Button
             Grid.Row="3"

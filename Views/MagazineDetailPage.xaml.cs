@@ -3,22 +3,22 @@ using System.Windows.Input;
 
 namespace GalleryFound.Views;
 
-public partial class GridDetailPage : ContentPage
+public partial class MagazineDetailPage : ContentPage
 {
-	public GridDetailPage(Magazine magazine)
+	public MagazineDetailPage(Magazine magazine)
     {
         InitializeComponent();
-        BindingContext = new GridDetailPageVm(magazine);
+        BindingContext = new MagazineDetailPageVm(magazine);
     }
 }
 
-public class GridDetailPageVm
+public class MagazineDetailPageVm
 {
     public Magazine Magazine { get; }
 
     public List<ShopUriItem> List { get; } = new();
 
-    public GridDetailPageVm(Magazine magazine)
+    public MagazineDetailPageVm(Magazine magazine)
     {
         Magazine = magazine;
         List.AddRange(magazine.Shops.Select(x => new ShopUriItem(x)));
