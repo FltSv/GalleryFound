@@ -1,4 +1,4 @@
-﻿using GalleryFound.Models;
+﻿using GalleryFound.Models.Services;
 using System.Windows.Input;
 
 namespace GalleryFound;
@@ -12,7 +12,7 @@ public partial class MainPage : ContentPage
 		InitializeComponent();
 
 		// メイン画面描画後、各種値のロード
-        StaticValues.LoadValues();
+		Loaded += async (s, e) => await StaticValuesService.AllLoadAsync();
 
 		ButtonCommand = new Command<Type>(x =>
 		{

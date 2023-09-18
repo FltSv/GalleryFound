@@ -1,4 +1,5 @@
 using GalleryFound.Models;
+using GalleryFound.Models.StaticValues;
 using System.Windows.Input;
 
 namespace GalleryFound.Views;
@@ -128,6 +129,6 @@ public class CreatorListPageVm : VmBase
 
     public static IEnumerable<Creator> GetSearchedList(string searchText)
     {
-        return StaticValues.Creators.Where(x => x.IsMatch(searchText));
+        return Creators.Instance.Where(x => x.IsMatch(searchText));
     }
 }

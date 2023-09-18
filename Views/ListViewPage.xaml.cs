@@ -1,4 +1,5 @@
 ﻿using GalleryFound.Models;
+using GalleryFound.Models.StaticValues;
 using System.Windows.Input;
 
 namespace GalleryFound.Views;
@@ -26,7 +27,7 @@ public class ListViewPageVm : VmBase
 
     public ListViewPageVm()
     {
-        ViewList.AddRange(StaticValues.Creators.SelectMany(x => x.Products));
+        ViewList.AddRange(Creators.Instance.SelectMany(x => x.Products));
 
         OpenDetailCommand = new Command(async () =>
         {
