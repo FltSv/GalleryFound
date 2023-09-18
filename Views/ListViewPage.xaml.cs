@@ -27,7 +27,7 @@ public class ListViewPageVm : VmBase
 
     public ListViewPageVm()
     {
-        ViewList.AddRange(Creators.Instance.SelectMany(x => x.Products));
+        ViewList.AddRange(Creators.GetAllCreatorsProducts());
 
         OpenDetailCommand = new Command(async () =>
         {

@@ -16,7 +16,7 @@
         <Image
             Grid.Row="0"
             HorizontalOptions="Start"
-            Source="{Binding Product.Image}" />
+            Source="{Binding Magazine.Image}" />
 
         <VerticalStackLayout
             Grid.Row="1"
@@ -45,7 +45,7 @@
                             <Label
                                 x:Name="label"
                                 Grid.Column="1"
-                                Margin="5"
+                                Margin="5,0"
                                 Text="{Binding DisplayUrl}"
                                 TextColor="DeepSkyBlue"
                                 TextDecorations="Underline">

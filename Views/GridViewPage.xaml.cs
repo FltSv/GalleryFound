@@ -14,10 +14,10 @@ public partial class GridViewPage : ContentPage
 
 public class GridViewPageVm : VmBase
 {
-    public List<Product> ViewList { get; } = new();
+    public List<Magazine> ViewList { get; } = new();
 
-    private Product _selectedItem;
-    public Product SelectedItem
+    private Magazine _selectedItem;
+    public Magazine SelectedItem
     {
         get => _selectedItem;
         set => SetProperty(ref _selectedItem, value);
@@ -27,7 +27,7 @@ public class GridViewPageVm : VmBase
 
     public GridViewPageVm()
     {
-        ViewList.AddRange(Creators.Instance.SelectMany(x => x.Products));
+        ViewList.AddRange(Magazines.Instance);
 
         OpenDetailCommand = new Command(async () =>
         {

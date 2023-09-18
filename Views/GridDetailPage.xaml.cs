@@ -5,23 +5,23 @@ namespace GalleryFound.Views;
 
 public partial class GridDetailPage : ContentPage
 {
-	public GridDetailPage(Product product)
+	public GridDetailPage(Magazine magazine)
     {
         InitializeComponent();
-        BindingContext = new GridDetailPageVm(product);
+        BindingContext = new GridDetailPageVm(magazine);
     }
 }
 
 public class GridDetailPageVm
 {
-    public Product Product { get; }
+    public Magazine Magazine { get; }
 
     public List<ShopUriItem> List { get; } = new();
 
-    public GridDetailPageVm(Product product)
+    public GridDetailPageVm(Magazine magazine)
     {
-        Product = product;
-        List.AddRange(product.ShopUriPairs.Select(x => new ShopUriItem(x)));
+        Magazine = magazine;
+        List.AddRange(magazine.Shops.Select(x => new ShopUriItem(x)));
     }
 }
 
