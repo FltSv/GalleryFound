@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
-    x:Class="GalleryFound.Views.AuthorDetailPage"
+    x:Class="GalleryFound.Views.CreatorDetailPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:models="clr-namespace:GalleryFound.Models"
     xmlns:views="clr-namespace:GalleryFound.Views"
-    Title="AuthorDetailPage"
-    x:DataType="views:AuthorDetailPageVm">
+    Title="CreatorDetailPage"
+    x:DataType="views:CreatorDetailPageVm">
 
     <ContentPage.Resources>
         <DataTemplate x:Key="EmptyViewTemplate">
@@ -32,7 +32,7 @@
                 Grid.Row="0"
                 FontAttributes="Bold"
                 FontSize="24"
-                Text="{Binding Author.Name}" />
+                Text="{Binding Creator.Name}" />
 
             <!--  展示歴  -->
             <VerticalStackLayout Grid.Row="1" Margin="0,10">
@@ -40,7 +40,7 @@
                     Margin="0,10"
                     FontSize="18"
                     Text="展示歴" />
-                <CollectionView EmptyView="{StaticResource EmptyViewTemplate}" ItemsSource="{Binding Author.Products}">
+                <CollectionView EmptyView="{StaticResource EmptyViewTemplate}" ItemsSource="{Binding Creator.Products}">
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:Product">
@@ -65,7 +65,7 @@
                     Margin="0,10"
                     FontSize="18"
                     Text="発表作品" />
-                <CollectionView EmptyView="{StaticResource EmptyViewTemplate}" ItemsSource="{Binding Author.Products}">
+                <CollectionView EmptyView="{StaticResource EmptyViewTemplate}" ItemsSource="{Binding Creator.Products}">
 
                     <CollectionView.ItemsLayout>
                         <GridItemsLayout

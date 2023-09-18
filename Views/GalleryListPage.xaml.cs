@@ -1,17 +1,18 @@
-using GalleryFound.Models;
+﻿using GalleryFound.Models;
+using GalleryFound.Models.StaticValues;
 using System.Windows.Input;
 
 namespace GalleryFound.Views;
 
-public partial class GridViewPage : ContentPage
+public partial class GalleryListPage : ContentPage
 {
-	public GridViewPage()
+	public GalleryListPage()
 	{
 		InitializeComponent();
 	}
 }
 
-public class GridViewPageVm : VmBase
+public class GalleryListPageVm : VmBase
 {
     public List<Product> ViewList { get; } = new();
 
@@ -24,9 +25,9 @@ public class GridViewPageVm : VmBase
 
     public ICommand OpenDetailCommand { get; }
 
-    public GridViewPageVm()
+    public GalleryListPageVm()
     {
-        ViewList.AddRange(StaticValues.Authors.SelectMany(x => x.Products));
+        ViewList.AddRange(Creators.GetAllCreatorsProducts());
 
         OpenDetailCommand = new Command(async () =>
         {
@@ -35,7 +36,7 @@ public class GridViewPageVm : VmBase
                 return;
             }
 
-            var page = new GridDetailPage(SelectedItem);
+            var page = new GalleryDetailPage(SelectedItem);
             await Shell.Current.Navigation.PushAsync(page);
             SelectedItem = null;
         });

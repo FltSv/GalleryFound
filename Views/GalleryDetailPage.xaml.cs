@@ -18,7 +18,7 @@ public class GalleryDetailPageVm
 
     public ICommand OpenGalleryMapCommand { get; }
 
-    public ICommand OpenAuthorCommand { get; }
+    public ICommand OpenCreatorCommand { get; }
 
     public GalleryDetailPageVm(Product product)
     {
@@ -30,9 +30,9 @@ public class GalleryDetailPageVm
             await Shell.Current.Navigation.PushAsync(page);
         });
 
-        OpenAuthorCommand = new Command(async () =>
+        OpenCreatorCommand = new Command(async () =>
         {
-            var page = new AuthorListPage(product.Author);
+            var page = new CreatorListPage(product.Creator);
             await Shell.Current.Navigation.PushAsync(page);
         });
     }

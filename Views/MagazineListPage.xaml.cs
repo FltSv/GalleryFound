@@ -1,22 +1,23 @@
-﻿using GalleryFound.Models;
+using GalleryFound.Models;
+using GalleryFound.Models.StaticValues;
 using System.Windows.Input;
 
 namespace GalleryFound.Views;
 
-public partial class ListViewPage : ContentPage
+public partial class MagazineListPage : ContentPage
 {
-	public ListViewPage()
+	public MagazineListPage()
 	{
 		InitializeComponent();
 	}
 }
 
-public class ListViewPageVm : VmBase
+public class MagazineListPageVm : VmBase
 {
-    public List<Product> ViewList { get; } = new();
+    public List<Magazine> ViewList { get; } = new();
 
-    private Product _selectedItem;
-    public Product SelectedItem
+    private Magazine _selectedItem;
+    public Magazine SelectedItem
     {
         get => _selectedItem;
         set => SetProperty(ref _selectedItem, value);
@@ -24,9 +25,9 @@ public class ListViewPageVm : VmBase
 
     public ICommand OpenDetailCommand { get; }
 
-    public ListViewPageVm()
+    public MagazineListPageVm()
     {
-        ViewList.AddRange(StaticValues.Authors.SelectMany(x => x.Products));
+        ViewList.AddRange(Magazines.Instance);
 
         OpenDetailCommand = new Command(async () =>
         {
@@ -35,7 +36,7 @@ public class ListViewPageVm : VmBase
                 return;
             }
 
-            var page = new GalleryDetailPage(SelectedItem);
+            var page = new MagazineDetailPage(SelectedItem);
             await Shell.Current.Navigation.PushAsync(page);
             SelectedItem = null;
         });

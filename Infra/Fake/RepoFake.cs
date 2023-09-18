@@ -3,9 +3,9 @@ using GalleryFound.Models.Repositories;
 
 namespace GalleryFound.Infra.Fake;
 
-public class RepoFake : IAuthorsRepo
+public class RepoFake : IRepo
 {
-    private readonly Author[] _authors = new (string, string)[]
+    private readonly Creator[] _creators = new (string, string)[]
     {
         ("村上 春樹", "むらかみ はるき"),
         ("太宰 治", "だざい おさむ"),
@@ -37,7 +37,7 @@ public class RepoFake : IAuthorsRepo
         ("Edgar Allan Poe", null),
         ("William Shakespeare", null),
         ("Arthur Conan Doyle", null)
-    }.Select(x => new Author() { Name = x.Item1, Reading = x.Item2 }).ToArray();
+    }.Select(x => new Creator() { Name = x.Item1, Reading = x.Item2 }).ToArray();
 
     private readonly Gallery[] _galleries = new[]
     {
@@ -84,9 +84,33 @@ public class RepoFake : IAuthorsRepo
         @"https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Gelada-Pavian.jpg/320px-Gelada-Pavian.jpg",
     }.Select(x => new Uri(x)).ToArray();
 
-    public Task<Author[]> GetAuthorsAsync() => Task.Run(GetAuthors);
+    private readonly string[] _magazines = new[]
+    {
+        "夜のピクニック",
+        "雪国",
+        "千羽鶴",
+        "ノルウェイの森",
+        "義経記",
+        "こころ",
+        "海辺のカフカ",
+        "風立ちぬ",
+        "春琴抄",
+        "歌壇",
+        "アフターダーク",
+        "硝子の動物園",
+        "砂の女",
+        "秋の町",
+        "幻の光",
+        "花の影",
+        "竹取物語",
+        "月給日記",
+        "地の果ての歌",
+        "猫の事務所"
+    };
 
-    public Author[] GetAuthors()
+    public async Task<Creator[]> GetCreatorsAsync() => await Task.Run(GetCreators);
+
+    public Creator[] GetCreators()
     {
         const int daysInHalfYear = 182; // 半年を近似
         var rnd = new Random();
@@ -105,7 +129,7 @@ public class RepoFake : IAuthorsRepo
             var product = new Product()
             {
                 Image = _imageUris[rnd.Next(_imageUris.Length)],
-                Author = _authors[rnd.Next(_authors.Length)],
+                Creator = _creators[rnd.Next(_creators.Length)],
                 Gallery = _galleries[rnd.Next(_galleries.Length)],
                 ReleaseDate = randomDate,
             };
@@ -114,14 +138,35 @@ public class RepoFake : IAuthorsRepo
             products.Add(product);
         }
 
-        return products.GroupBy(x => x.Author).Select(x =>
+        return products.GroupBy(x => x.Creator).Select(x =>
         {
             x.Key.Products.AddRange(x);
             return x.Key;
         }).ToArray();
     }
 
-    public Task<DbInfo> GetDbInfoAsync() => Task.Run(() => new DbInfo
+    public async Task<Gallery[]> GetGalleriesAsync() => await Task.Run(() => _galleries);
+
+    public async Task<Magazine[]> GetMagazinesAsync() => await Task.Run(() =>
+    {
+        var rnd = new Random();
+        var amazonUri = new ShopUri() { Uri = "https://www.amazon.co.jp" };
+
+        return _magazines.Select(x =>
+        {
+            var magazine = new Magazine
+            {
+                Name = x,
+                Author = _creators[rnd.Next(_creators.Length)].Name,
+                Image = _imageUris[rnd.Next(_imageUris.Length)],
+            };
+            magazine.Shops.Add(amazonUri);
+
+            return magazine;
+        }).ToArray();
+    });
+
+    public async Task<DbInfo> GetDbInfoAsync() => await Task.Run(() => new DbInfo
     {
         LatestUpdate = DateTime.MinValue
     });

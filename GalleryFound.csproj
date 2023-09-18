@@ -62,28 +62,40 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Views\ListViewPage.xaml.cs">
-	    <DependentUpon>ListViewPage.xaml</DependentUpon>
+	  <Compile Update="Views\CreatorsListPage.xaml.cs">
+	    <DependentUpon>CreatorsListPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CreatorDetailPage.xaml.cs">
+	    <DependentUpon>CreatorDetailPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\GalleryListPage.xaml.cs">
+	    <DependentUpon>GalleryListPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\MagazineDetailPage.xaml.cs">
+	    <DependentUpon>MagazineDetailPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\MagazineListPage.xaml.cs">
+	    <DependentUpon>MagazineListPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\AuthorDetailPage.xaml">
+	  <MauiXaml Update="Views\CreatorDetailPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\AuthorListPage.xaml">
+	  <MauiXaml Update="Views\CreatorsListPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\GalleryDetailPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\GridDetailPage.xaml">
+	  <MauiXaml Update="Views\MagazineDetailPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\GridViewPage.xaml">
+	  <MauiXaml Update="Views\MagazineListPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\ListViewPage.xaml">
+	  <MauiXaml Update="Views\GalleryListPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\MapPage.xaml">
