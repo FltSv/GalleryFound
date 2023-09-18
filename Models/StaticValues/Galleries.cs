@@ -1,4 +1,4 @@
-﻿using GalleryFound.Infra;
+﻿using GalleryFound.Models.Repositories;
 
 namespace GalleryFound.Models.StaticValues;
 
@@ -8,10 +8,6 @@ public class Galleries : StaticValueBase<Gallery>
 
     private Galleries() { }
 
-    public override async Task LoadValuesAsync()
-    {
-        //todo
-        var repo = await Factories.GetRepo();
-        //SetCollection(await repo.GetCreatorsAsync());
-    }
+    public override async Task LoadValuesAsync(IRepo repo) => 
+        SetCollection(await repo.GetGalleriesAsync());
 }

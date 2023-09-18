@@ -3,7 +3,7 @@ using GalleryFound.Models.Repositories;
 
 namespace GalleryFound.Infra.Fake;
 
-public class RepoFake : ICreatorsRepo
+public class RepoFake : IRepo
 {
     private readonly Creator[] _creators = new (string, string)[]
     {
@@ -84,7 +84,7 @@ public class RepoFake : ICreatorsRepo
         @"https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Gelada-Pavian.jpg/320px-Gelada-Pavian.jpg",
     }.Select(x => new Uri(x)).ToArray();
 
-    public Task<Creator[]> GetCreatorsAsync() => Task.Run(GetCreators);
+    public async Task<Creator[]> GetCreatorsAsync() => await Task.Run(GetCreators);
 
     public Creator[] GetCreators()
     {
@@ -121,7 +121,17 @@ public class RepoFake : ICreatorsRepo
         }).ToArray();
     }
 
-    public Task<DbInfo> GetDbInfoAsync() => Task.Run(() => new DbInfo
+    public async Task<Gallery[]> GetGalleriesAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<Magazine[]> GetMagazinesAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<DbInfo> GetDbInfoAsync() => await Task.Run(() => new DbInfo
     {
         LatestUpdate = DateTime.MinValue
     });

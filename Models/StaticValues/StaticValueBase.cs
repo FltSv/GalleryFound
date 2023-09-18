@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using GalleryFound.Models.Repositories;
+using System.Collections;
 
 namespace GalleryFound.Models.StaticValues;
 
@@ -13,7 +14,7 @@ public abstract class StaticValueBase<T> : IEnumerable<T>
     /// <summary>
     /// リポジトリから値の取得を行う
     /// </summary>
-    public abstract Task LoadValuesAsync();
+    public abstract Task LoadValuesAsync(IRepo repo);
 
     /// <summary>
     /// 内部コレクションへ値を設定する

@@ -10,7 +10,7 @@ using GalleryFound.Models.Repositories;
 
 namespace GalleryFound.Infra.Gcp;
 
-public class RepoGcp : ICreatorsRepo
+public class RepoGcp : IRepo
 {
     private const string _creatorsCollection = "creators";
     private const string _dataCollection = "data";
@@ -28,6 +28,16 @@ public class RepoGcp : ICreatorsRepo
     }
 
     public async Task<Creator[]> GetCreatorsAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<Gallery[]> GetGalleriesAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<Magazine[]> GetMagazinesAsync()
     {
         throw new NotImplementedException();
     }

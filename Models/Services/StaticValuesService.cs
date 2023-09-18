@@ -1,4 +1,5 @@
-﻿using GalleryFound.Models.StaticValues;
+﻿using GalleryFound.Infra;
+using GalleryFound.Models.StaticValues;
 
 namespace GalleryFound.Models.Services;
 
@@ -12,8 +13,10 @@ public static class StaticValuesService
     /// </summary>
     public static async Task AllLoadAsync()
     {
-        await Creators.Instance.LoadValuesAsync();
-        await Galleries.Instance.LoadValuesAsync();
-        await Magazines.Instance.LoadValuesAsync();
+        var repo = await Factories.GetRepo();
+
+        await Creators.Instance.LoadValuesAsync(repo);
+        await Galleries.Instance.LoadValuesAsync(repo);
+        await Magazines.Instance.LoadValuesAsync(repo);
     }
 }
