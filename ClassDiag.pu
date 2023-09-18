@@ -22,8 +22,10 @@ package Models <<Rectangle>> {
     end note
 
     class Magazine <<雑誌>> {
+        名前: string
         作家: string
         画像: Image
+        通販一覧: List<ShopUriPair>
     }
 
     class Gallery <<ギャラリー>> {
@@ -40,11 +42,6 @@ package Models <<Rectangle>> {
         検索: ?
         現在地: ?
     }
-    note left of Map
-    地図クラスはGoogleMapに
-    統合予定なので不要かも？
-    end note
-
 
     class Creator <<クリエイター>> {
         作家名: string
@@ -84,14 +81,15 @@ StaticValues "1" o-- "*" Creator
 StaticValues "1" o-- "*" Magazine
 StaticValues "1" - "1" Admin
 
+Magazine -[hidden] Gallery
 Gallery -[hidden] Creator
 
 Creator "1" *-- "*" Product
 Creator "1" -- "1" Product
 Product "1" -- "1" Gallery
-Gallery "1" -- "1" Map
 
-Product "1" *-- "*" ShopUriPair
+Product "1" o-- "*" ShopUriPair
+Magazine "1" o-- "*" ShopUriPair
 
 
 Gallery <.. ギャラリー一覧画面
