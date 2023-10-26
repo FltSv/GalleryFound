@@ -1,0 +1,55 @@
+/*
+ * ログイン画面のスタイルを記述
+ */
+
+/* ログインボタン */
+#login-buttons {
+  list-style-type: none;
+  padding: 0;
+  justify-content: center;
+}
+
+.login-button {
+  width: 300px;
+  font-size: 16px;
+  line-height: 1.5;
+  position: relative;
+  display: inline-block;
+  margin: 0.3em;
+  padding: 0.6em 1em 0.6em 1em;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  border-radius: 0.5rem;
+}
+
+.login-iconfont {
+  font-size: 1em;
+  margin: 0 0.5em 0 0;
+}
+
+.login-mail {
+  color: #fff;
+  background-color: #eb6100;
+}
+
+.login-google {
+  color: #fff;
+  background-color: #4285F4;
+}
+
+.login-register {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid black;
+}
+
+/* ログイン時のエラー */
+.login-error {
+  display: flex;
+  color: red;
+}

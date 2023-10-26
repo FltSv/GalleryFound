@@ -1,0 +1,20 @@
+{
+  "name": "galleryfound-hosting",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "suna",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^10.4.0",
+    "firebase-tools": "^12.7.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}

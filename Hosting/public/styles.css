@@ -1,0 +1,150 @@
+body {
+  background: #ECEFF1;
+  color: rgba(0, 0, 0, 0.87);
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* ヘッダーのスタイル */
+header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+/* 角丸ボタンのスタイル */
+.rounded-button {
+  padding: 10px 20px;
+  border: 1px solid black;
+  border-radius: 25px;
+  color: black;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.rounded-button:hover {
+  background-color: #bedff5;
+}
+
+
+/* ページ内メインコンテンツ */
+#contents {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 50px auto 16px;
+}
+
+/* Gallery Found */
+h1, h1 a {
+  text-align: center;
+  color: black;
+  font-size: 64px;
+  margin: 0 0 16px;
+  font-family: 'Dancing Script', cursive;
+  text-decoration: none;
+}
+
+p.desc-message {
+  font-size: 1.2em;      /* フォントサイズを少し大きく */
+  color: #666;           /* 色を薄めのグレーに */
+  max-width: 600px;      /* 最大幅を制限 */
+  margin: 2em auto;        /* 中央寄せ */
+}
+
+
+/* アプリ紹介 */
+.app-description {
+  display: flex;
+  align-items: center;
+}
+
+/* 画像が左側の場合 */
+.left-align .screenshot {
+  margin-right: 20px;
+}
+
+/* 画像が右側の場合 */
+.right-align {
+  flex-direction: row-reverse;
+}
+
+.right-align .screenshot {
+  margin-left: 20px;
+}
+
+.screenshot {
+  width: 160px;
+  overflow: hidden;
+  object-fit: cover;
+  object-position: top;
+  clip-path: inset(0 0 25% 0); /* 上部4/5を表示 */
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent);
+  mask-image: linear-gradient(to bottom, black 10%, transparent);
+}
+
+.description-text {
+  flex: 1;
+}
+
+
+
+/* 箇条書き項目 */
+ul {
+  list-style-type: none;
+}
+
+/* アプリダウンロードボタン */
+#dl-buttons {
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+#dl-buttons img{
+  height: 60px;
+  margin: 10px 20px;
+}
+
+.image-link-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.disabled-link {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.5;
+}
+
+.overlay-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 5px;
+}
+
+
+input[type="text"], input[type="password"] {
+  width: 100%; /* 幅 */
+  font-size: 0.95em; /* フォントサイズ */
+  margin: 1em 0; /* 前後の余白 */
+  padding: 0.5em; /* テキスト周りの余白 */
+  border: solid 2px #e3e6ea; /* 線の色 */
+  border-radius: 4px; /* 角丸 */
+}
+/* フォーカス時のスタイル */
+input[type="text"]:focus, input[type="password"]:focus {
+  border-color: #529fff; /* 線の色 */
+  outline: 0;
+}
+
+
+
+
+
