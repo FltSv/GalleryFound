@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="GalleryFound.Views.CreatorListPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:GalleryFound.Views"
+    Title="CreatorListPage">
+
+    <ContentPage.BindingContext>
+        <views:CreatorListPageVm />
+    </ContentPage.BindingContext>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Label
+            Grid.Row="0"
+            FontAttributes="Bold"
+            FontSize="Title"
+            Text="作家" />
+
+        <Entry
+            Grid.Row="1"
+            Margin="0,10"
+            ClearButtonVisibility="WhileEditing"
+            Placeholder="検索"
+            Text="{Binding SearchText}" />
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <CollectionView
+                x:Name="creatorListCollectionView"
+                Grid.Column="0"
+                ItemsSource="{Binding CreatorList}"
+                SelectedItem="{Binding SelectedCreator}"
+                SelectionChangedCommand="{Binding OpenDetailCommand}"
+                SelectionMode="Single">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+
+                        <Label Margin="5" Text="{Binding Name}" />
+
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.EmptyView>
+                    <StackLayout>
+                        <Label
+                            Margin="10,25,10,10"
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            HorizontalTextAlignment="Center"
+                            Text="結果はありません。" />
+                        <Label
+                            FontSize="12"
+                            HorizontalTextAlignment="Center"
+                            Text="条件を変更して再度検索してください。" />
+                    </StackLayout>
+                </CollectionView.EmptyView>
+            </CollectionView>
+
+            <CollectionView
+                Grid.Column="1"
+                ItemsSource="{Binding InitialList}"
+                SelectedItem="{Binding SelectedInitial}"
+                SelectionChangedCommand="{Binding SelectInitialCommand}"
+                SelectionMode="Single">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+
+                        <Label
+                            Margin="10"
+                            HorizontalOptions="Center"
+                            Text="{Binding .}"
+                            VerticalOptions="Center" />
+
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="GalleryFound.Views.MapPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:GalleryFound.Views"
+    Title="MapPage"
+    x:DataType="views:MapPageVm">
+
+    <WebView Source="{Binding Source}" />
+    <!--<iframe
+        allowfullscreen=""
+        height="450"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10190.871666205303!2d139.76732883350954!3d35.67762486395047!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188bfbd89f700b%3A0x277c49ba34ed38!2z5p2x5Lqs6aeF!5e0!3m2!1sja!2sjp!4v1687995678179!5m2!1sja!2sjp"
+        style="border:0;"
+        width="600" />-->
+</ContentPage>

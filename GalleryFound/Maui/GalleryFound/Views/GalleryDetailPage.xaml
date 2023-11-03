@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="GalleryFound.Views.GalleryDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:GalleryFound.Views"
+    Title="GalleryDetailPage"
+    x:DataType="views:GalleryDetailPageVm">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="LinkLabelStyle" TargetType="{x:Type Label}">
+                <Setter Property="TextColor" Value="DeepSkyBlue" />
+                <Setter Property="TextDecorations" Value="Underline" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid Margin="50">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="3*" />
+        </Grid.RowDefinitions>
+
+        <Image
+            Grid.Row="0"
+            HorizontalOptions="Start"
+            Source="{Binding Product.Image}" />
+
+        <VerticalStackLayout
+            Grid.Row="1"
+            Margin="10"
+            Spacing="10">
+
+            <Label Text="" />
+            <Label Text="{Binding Product.DisplayDate}" />
+            <Label Style="{StaticResource LinkLabelStyle}" Text="{Binding Product.Gallery.Name}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenGalleryMapCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <Label Style="{StaticResource LinkLabelStyle}" Text="{Binding Product.Creator.Name}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenCreatorCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

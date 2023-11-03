@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="GalleryFound.Views.MagazineDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:GalleryFound.Views"
+    Title="MagazineDetailPage"
+    x:DataType="views:MagazineDetailPageVm">
+
+    <Grid Margin="50">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="3*" />
+        </Grid.RowDefinitions>
+
+        <Image
+            Grid.Row="0"
+            HorizontalOptions="Start"
+            Source="{Binding Magazine.Image}" />
+
+        <VerticalStackLayout
+            Grid.Row="1"
+            Margin="10"
+            Spacing="10">
+
+            <Label Text="" />
+            <Label Text="通販" />
+            <CollectionView ItemsLayout="VerticalList" ItemsSource="{Binding List}">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="views:ShopUriItem">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Image
+                                Grid.Column="0"
+                                Aspect="AspectFit"
+                                HeightRequest="20"
+                                Source="{Binding Icon}">
+                                <!--  HeightRequest="{Binding Source={x:Reference label}, Path=Height}"  -->
+                            </Image>
+                            <Label
+                                x:Name="label"
+                                Grid.Column="1"
+                                Margin="5,0"
+                                Text="{Binding DisplayUrl}"
+                                TextColor="DeepSkyBlue"
+                                TextDecorations="Underline">
+
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenPageCommand}" />
+                                </Label.GestureRecognizers>
+                            </Label>
+
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

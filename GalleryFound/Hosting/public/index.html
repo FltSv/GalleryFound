@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>Gallery Found</title>
+
+  <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+  <script defer="" src="/__/firebase/init.js?useEmulator=true"></script>
+    -->
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+
+  <link href="styles.css" rel="stylesheet" />
+  <script defer type="module" src="/bundle.js"></script>
+</head>
+
+<body>
+  <header>
+    <a href="/login" class="rounded-button">Creator Login</a>
+  </header>
+
+  <div id="contents">
+    <h1>Gallery Found</h1>
+    <p class="desc-message">こちらは説明文です。スタイルを適用してデザインを向上させます。<br>
+    改行された説明文です。ここで改行されて次の行に移ります。</p>
+    
+    <div class="app-description left-align">
+      <img src="img/app-screen-1.png" class="screenshot">
+      <div class="description-text">
+        <h2>機能1</h2>
+        <p>このスクリーンショットは機能1を示しています。<br>
+          ここに詳細な説明文を記述できます。</p>
+      </div>
+    </div>
+
+    <div class="app-description right-align">
+      <img src="img/app-screen-2.png" class="screenshot">
+      <div class="description-text">
+        <h2>機能1</h2>
+        <p>このスクリーンショットは機能1を示しています。<br>
+          ここに詳細な説明文を記述できます。</p>
+      </div>
+    </div>
+
+    <ul id="dl-buttons">
+      <li>
+        <div class="image-link-wrapper">
+          <a href='#' target="_blank" class="disabled-link"><img src='img/google-play-badge_JP.png'/></a>
+          <div class="overlay-text">準備中</div>
+        </div>
+      </li>
+      <li>
+        <div class="image-link-wrapper">
+          <a href='#' target="_blank" class="disabled-link"><img src='img/DownloadAppStore_JP.svg'/></a>
+          <div class="overlay-text">準備中</div>
+        </div>
+      </li>
+    </ul>
+    
+  </div>
+</body>
+
+</html>

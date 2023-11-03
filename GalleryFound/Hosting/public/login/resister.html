@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+
+  <title>Resister</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet"/>
+  <script src="https://kit.fontawesome.com/9dcbe6295e.js" crossorigin="anonymous"></script>
+
+  <link href="/styles.css" rel="stylesheet" />
+  <link href="styles.css" rel="stylesheet" />
+  <script defer type="module" src="/bundle.js"></script>
+</head>
+
+<body>
+  <div id="contents">
+    <h1><a href="/">Gallery Found</a></h1>
+    
+    <!-- アイコンフォントは https://fontawesome.com/search -->
+    <ul id="login-buttons">
+      <li>
+        <h2>Resister</h2>
+      </li>
+      <li>
+        <input type="text" id="input-id" placeholder="メールアドレス">
+      </li>
+      <li>
+        <input type="password" id="input-pwd" placeholder="パスワード">
+      </li>
+      <li>
+        <input type="password" id="input-pwd-confirm" placeholder="パスワード（確認）">
+      </li>
+      <li>
+        <div>
+          <input type="checkbox" id="input-pwd-visible" />
+          <label>パスワードを表示する</label>
+        </div>
+      </li>
+      <li><button type="button" id="resister-button" class="login-button login-mail">
+        <i class="fa-regular fa-envelope login-iconfont"></i>メールアドレスで新規登録</button>
+      </li>
+      <li>
+        <p id="login-error-msg" class="login-error"></p>
+      </li>
+
+      <!-- ソーシャルログイン -->
+      <li>
+        <p>or</p>
+      </li>
+      <li><a href="" class="login-button login-google">
+        <i class="fa-brands fa-google login-iconfont"></i>Googleで新規登録</a>
+      </li>
+    </ul>
+    
+  </div>
+</body>
+
+</html>
