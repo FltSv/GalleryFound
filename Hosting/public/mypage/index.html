@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet"/>
   <script src="https://kit.fontawesome.com/9dcbe6295e.js" crossorigin="anonymous"></script>
 
+  <link href="/public/styles.css" rel="stylesheet" />
   <link href="/styles.css" rel="stylesheet" />
   <link href="styles.css" rel="stylesheet" />
   <script defer type="module" src="/bundle.js"></script>
@@ -37,7 +38,14 @@
         <button>ファイルを選択する</button>
       </li>
       <li>
-        <p>展示登録</p>
+        <input
+          type="file"
+          id="profile_pic"
+          name="profile_pic"
+          accept=".jpg,.jpeg,.png"/>
+          
+
+        <p>作品登録</p>
         <table>
           <tr><th>画像</th><th>名前</th><th>場所</th><th>期間</th></tr>
           <tr><td>no image</td><td>なんとかかんとか</td><td>xx美術館</td><td>20xx年x月</td></tr>

@@ -16,6 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet"/>
   <script src="https://kit.fontawesome.com/9dcbe6295e.js" crossorigin="anonymous"></script>
 
+  <link href="/public/styles.css" rel="stylesheet" />
   <link href="/styles.css" rel="stylesheet" />
   <link href="styles.css" rel="stylesheet" />
   <script defer type="module" src="/bundle.js"></script>
@@ -31,28 +32,33 @@
         <h2>Log in</h2>
       </li>
       <li>
-        <input type="text" id="input-id" placeholder="メールアドレス">
+        <input type="text" 
+         id="input-id"
+         style="width: 180px; height: 30px;"
+         placeholder="メールアドレス">
+       
       </li>
       <li>
-        <input type="password" id="input-pwd" placeholder="パスワード">
+        <input type="password"
+                style="width: 150px; height: 30px;"
+         id="input-pwd" placeholder="パスワード">
       </li>
       <li>
+        
         <div>
           <input type="checkbox" id="input-pwd-visible" />
           <label>パスワードを表示する</label>
         </div>
       </li>
-      <li><button type="button" id="login-button" class="login-button login-mail">
-        <i class="fa-regular fa-envelope login-iconfont"></i>メールアドレスでログイン</button>
-      </li>
       <li>
         <p id="login-error-msg" class="login-error"></p>
       </li>
+      <li><button type="button" id="login-button" class="login-button login-mail">
+        <i class="fa-regular fa-envelope login-iconfont"></i>メールアドレスでログイン</button>
+      </li>
+      
 
       <!-- ソーシャルログイン -->
-      <li>
-        <p>or</p>
-      </li>
       <li><a href="" class="login-button login-google">
         <i class="fa-brands fa-google login-iconfont"></i>Googleでログイン</a>
       </li>
