@@ -1,12 +1,6 @@
 /*
  * ログイン画面のスタイルを記述
-
-
- 
-
-
-
-
+ */
  
 /* ログインボタン */
 #login-buttons {
@@ -52,7 +46,7 @@
 
 .login-iconfont {
   font-size: 1em;
-  margin: 0 0em 0 0;
+  margin: 0;
 }
 
 .login-mail {
