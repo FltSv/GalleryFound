@@ -1,13 +1,29 @@
 /*
  * ログイン画面のスタイルを記述
  */
-
+ 
 /* ログインボタン */
 #login-buttons {
   list-style-type: none;
   padding: 0;
   justify-content: center;
 }
+#input-id[type="text"],#input-pwd[type="password"]{
+  width: 180px;
+   height: 20px;
+  font-size: medium;
+  margin: 0.2em 0;
+  padding: 0.5em;
+  border: solid 2px #e3e3e6ea ;
+  border-radius: 10px;
+
+}
+/* フォーカス時のスタイル */
+#input-id[type="text"]:focus,#input-pwd[type="password"]:focus {
+  border-color: #9752ff; /* 線の色 */
+  outline: 0;
+}
+
 
 .login-button {
   width: 300px;
@@ -24,19 +40,20 @@
   vertical-align: middle;
   text-decoration: none;
   letter-spacing: 0.1em;
-  border-radius: 0.5rem;
+  border-radius: 10rem;
+  box-shadow:0 2px 10px 0 #787777 ;
 }
 
 .login-iconfont {
   font-size: 1em;
-  margin: 0 0.5em 0 0;
+  margin: 0;
 }
 
 .login-mail {
   color: #fff;
-  background-color: #eb6100;
+  background-color: #de8c51;
+  border: 1px solid #ccc
 }
-
 .login-google {
   color: #fff;
   background-color: #4285F4;
@@ -46,6 +63,7 @@
   color: #000;
   background-color: #fff;
   border: 1px solid black;
+  
 }
 
 /* ログイン時のエラー */
