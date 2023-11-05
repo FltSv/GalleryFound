@@ -73,3 +73,6 @@ node_modules/
 /app.js
 /package-lock.json
 /firebase-config.json
+
+# OS Auto Generate File
+*.DS_Store
