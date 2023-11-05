@@ -18,6 +18,7 @@ jobs:
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_GALLERY_FOUND }}'
+          entryPoint: ./Hosting
           expires: 30d
           channelId: alpha
           projectId: gallery-found
