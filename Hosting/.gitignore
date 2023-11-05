@@ -71,7 +71,6 @@ node_modules/
 # Webpack
 /public/bundle.js
 /app.js
-/package-lock.json
 /firebase-config.json
 
 # OS Auto Generate File
