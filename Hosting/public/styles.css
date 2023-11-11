@@ -16,7 +16,8 @@ header {
 
 /* 角丸ボタンのスタイル */
 .rounded-button {
-  padding: 10px 20px;
+  padding: 0.5em 1em;
+  margin: 0 0.2em;
   border: 1px solid black;
   border-radius: 25px;
   color: black;

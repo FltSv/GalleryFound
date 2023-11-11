@@ -39,7 +39,24 @@ onAuthStateChanged(auth, user => {
   } else {
     console.log('No User.')
   }
-});
 
-// ログアウト
-// firebase.auth().signOut();
+  // ログインボタン等の表示切り替え
+  const isLogin = user !== null
+
+  // ログイン中のみ表示
+  const logoutButton = document.getElementById('header-logout-button')
+  if (logoutButton) {
+    logoutButton.style.display = isLogin ? "block" : "none";
+  }
+
+  const mypageButton = document.getElementById('header-mypage-button')
+  if (mypageButton) {
+    mypageButton.style.display = isLogin ? "block" : "none";
+  }
+
+  // ログアウト中のみ表示
+  const loginButton = document.getElementById('header-login-button')
+  if (loginButton) {
+    loginButton.style.display = isLogin ? "none" : "block";
+  }
+});
