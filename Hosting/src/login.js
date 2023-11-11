@@ -1,6 +1,13 @@
 //@ts-check
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 
+// イベント
+document.addEventListener('DOMContentLoaded', event => {
+  // ログアウトボタン
+  document.getElementById('header-logout-button')?.addEventListener('click', signout);
+});
+
+
 // パスワードの表示非表示を切替
 export function changePwdVisible() {
   const setType = this.checked ? 'text' : 'password';
@@ -91,6 +98,12 @@ export async function signupMail() {
 
   console.log("新規登録でログインしたよ～");
   window.location.href = "/login/sendverify.html";
+}
+
+// ログアウト
+function signout() {
+  getAuth().signOut();
+  window.location.href = '/';
 }
 
 /**
