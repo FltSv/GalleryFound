@@ -8,20 +8,18 @@
   padding: 0;
   justify-content: center;
 }
-#input-id[type="text"],#input-pwd[type="password"],
-#input-pwd-confirm[type="password"]{
-  width: 180px;
+.input-form[type]{
+  width: 150px;
    height: 20px;
-  font-size: medium;
+  font-size: small;
   margin: 0.2em 0;
-  padding: 0.5em;
+  padding: 0.2em;
   border: solid 2px #e3e3e6ea ;
   border-radius: 10px;
 
 }
 /* フォーカス時のスタイル */
-#input-id[type="text"]:focus,#input-pwd[type="password"]:focus,
-#input-pwd-confirm[type="password"]:focus {
+.input-form[type]:focus {
   border-color: #a4cce7; /* 線の色 */
   outline: 0;
 }
@@ -29,7 +27,7 @@
 
 .login-button {
   width: 300px;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
   position: relative;
   display: inline-block;
