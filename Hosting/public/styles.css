@@ -56,6 +56,9 @@ p.desc-message {
   margin: 2em auto;        /* 中央寄せ */
 }
 
+.div-left-align {
+  margin-left: 0;
+}
 
 /* アプリ紹介 */
 .app-description {
