@@ -1,6 +1,7 @@
 //@ts-check
 import { doc, getDoc, setDoc } from "firebase/firestore"; 
 import { db, getUserId } from "./index";
+import * as htmlHelper from "./lib/htmlHelper";
 
 const creatorsPath = "creators";
 
@@ -56,23 +57,9 @@ async function loadMypage(userId) {
     console.log("データ:", data);
 
     // 既存情報の反映
-    setInputValue("creator-name", docSnap.get("name"));
+    htmlHelper.setInputValue("creator-name", docSnap.get("name"));
 
   }).catch(error => {
     console.error("エラー:", error);
   });
-}
-
-
-/**
- * HTMLInputElementへ値を設定
- * @param {string} elementId
- * @param {string} value
- */
-function setInputValue(elementId, value) {
-  const element = document.getElementById(elementId);
-  if (!(element instanceof HTMLInputElement)) {
-    return;
-  }
-  element.value = value;
 }

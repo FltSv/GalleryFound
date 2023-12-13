@@ -1,5 +1,6 @@
 //@ts-check
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import * as htmlHelper from "./lib/htmlHelper";
 
 // イベント
 document.addEventListener('DOMContentLoaded', event => {
@@ -17,8 +18,8 @@ export function changePwdVisible() {
 
 // ログイン
 export function loginMail() {
-  const id = getInputValue('input-id');
-  const pwd = getInputValue('input-pwd');
+  const id = htmlHelper.getInputValue('input-id');
+  const pwd = htmlHelper.getInputValue('input-pwd');
 
   if (!validationIdPwd(id, pwd, pwd)) {
     return;
@@ -40,9 +41,9 @@ export function loginMail() {
 
 // 新規登録
 export async function signupMail() {
-  const id = getInputValue('input-id');
-  const pwd = getInputValue('input-pwd');
-  const pwd2 = getInputValue('input-pwd-confirm');
+  const id = htmlHelper.getInputValue('input-id');
+  const pwd = htmlHelper.getInputValue('input-pwd');
+  const pwd2 = htmlHelper.getInputValue('input-pwd-confirm');
 
   if (!validationIdPwd(id, pwd, pwd2)) {
     return;
@@ -131,18 +132,6 @@ function transitionPage(link) {
 
   // 認証済みの場合、正常にページ移動を行う
   window.location.href = link;
-}
-
-/**
- * HTMLInputElementから値を取得
- * @param {string} elementId
- */
-function getInputValue(elementId) {
-  const element = document.getElementById(elementId);
-  if (!(element instanceof HTMLInputElement)) {
-    return "";
-  }
-  return element.value;
 }
 
 // 入力チェック
