@@ -7,10 +7,11 @@
  */
 export function getInputValue(elementId) {
   const element = document.getElementById(elementId);
-  if (!(element instanceof HTMLInputElement)) {
-    return "";
+  if (element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement) {
+    return element.value;
   }
-  return element.value;
+  return "";
 }
 
 /**
@@ -20,8 +21,10 @@ export function getInputValue(elementId) {
  */
 export function setInputValue(elementId, value) {
   const element = document.getElementById(elementId);
-  if (!(element instanceof HTMLInputElement)) {
-    return;
+  if (element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement) {
+    element.value = value;
+    return true;
   }
-  element.value = value;
+  return false;
 }

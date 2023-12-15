@@ -148,7 +148,17 @@ input[type="text"]:focus, input[type="password"]:focus {
   outline: 0;
 }
 
+/* バリデーション */
+input[type="text"]:invalid {
+  border: 2px solid red;
+  background-color: pink;
+}
 
+#errorMsg {
+  display: block;
+  color: red;
+  font-size: 12px;
+}
 
 
 
