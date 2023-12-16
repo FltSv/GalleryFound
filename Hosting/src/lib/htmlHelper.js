@@ -28,3 +28,16 @@ export function setInputValue(elementId, value) {
   }
   return false;
 }
+
+/**
+ * ファイル選択ボタンから選択されたファイルを取得
+ * @param {string} elementId
+ * @returns {FileList?}
+ */
+export function getInputFiles(elementId) {
+  const element = document.getElementById(elementId);
+  if (element instanceof HTMLInputElement) {
+    return element.files;
+  }
+  return null;
+}

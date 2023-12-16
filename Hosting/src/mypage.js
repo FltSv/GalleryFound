@@ -1,11 +1,16 @@
 //@ts-check
-import { doc, getDoc, setDoc } from "firebase/firestore"; 
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
+import imageCompression from "browser-image-compression";
+
 import { db, getUserId } from "./index";
 import * as htmlHelper from "./lib/htmlHelper";
 
 const creatorsPath = "creators";
 const creatorNameId = "creator-name";
 const presHistoryId = "presented-history";
+const presProductsId = "presented-products";
+const selectedImagesId = "selected-images";
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (!document.body.classList.contains('page-mypage')) {
@@ -30,6 +35,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   nameInput?.addEventListener("input", validateCheck);
   validate(nameInput);
 
+  // ファイル選択ボタン
+  const selectFileButton = document.getElementById(presProductsId);
+  selectFileButton?.addEventListener('change', showPreview);
+
   // 確定ボタン
   const button = document.getElementById('submit-button');
   button?.addEventListener('click', async () => {
@@ -43,6 +52,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    // 画像のアップロード
+    await uploadImages(htmlHelper.getInputFiles(presProductsId));
+
+    // DB更新
     await setDoc(doc(db, creatorsPath, userId), {
       name: name,
       presHistory: presentedHistory
@@ -117,3 +130,74 @@ const validate = (/** @type {HTMLElement?} */ input) => {
     errMsgSpan.textContent = isValid ? "" : input.validationMessage
   }
 };
+
+/**
+ * 選択した画像のプレビューを表示
+ */
+async function showPreview() {
+  const imagesContainer = document.getElementById(selectedImagesId);
+  if (!imagesContainer) {
+    return;
+  }
+
+  imagesContainer.innerHTML = ''; // 以前の画像をクリア
+
+  const files = htmlHelper.getInputFiles(presProductsId)
+  if (!files) {
+    return;
+  }
+
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) {
+      continue;
+    }
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      const src = e.target?.result?.toString();
+      if (!src) {
+        return;
+      }
+
+      const img = document.createElement('img');
+      img.src = src;
+      imagesContainer.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+/**
+ * Cloud Storageへの画像アップロードを行う
+ * @param {FileList?} files
+ */
+async function uploadImages(files) {
+  console.log("start uploadImages");
+  if (!files) {
+    console.log("not selected file");
+    return;
+  }
+
+  const options = {
+    maxSizeMB: 1,
+    fileType: "image/png"
+  };
+
+  try {
+    const storage = getStorage();
+    for (const file of files) {
+      const compressedFile = await imageCompression(file, options);
+      console.log("start upload:", file);
+
+      const userId = await getUserId();
+      const storageRef = ref(storage, `creators/${userId}/${crypto.randomUUID()}.png`);
+      await uploadBytes(storageRef, compressedFile).then(snapshot => {
+        console.log('Uploaded a file!', snapshot);
+      });
+    }
+  
+    console.log("Upload successful");
+  } catch (error) {
+    console.error(error);
+  }
+}

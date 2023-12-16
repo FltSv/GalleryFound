@@ -1,0 +1,10 @@
+#selected-images {
+    display: flex;
+    width: 500px;
+    overflow-x: auto;
+}
+
+#selected-images > img {
+    height: 200px;
+    margin: 10px;
+}
