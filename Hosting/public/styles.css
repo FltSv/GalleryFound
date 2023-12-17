@@ -144,25 +144,30 @@ input[type="text"]:focus, input[type="password"]:focus {
   border-color: #529fff; /* 線の色 */
   outline: 0;
 }
+
+/* 404ページ */
 @font-face {
   font-family: 'YojoFont';
-  src: url('/assets/yojo.ttf') format('truetype');
+  src: url('/assets/yojo.woff') format('woff');
 }
-.yojo-font {
-  font-family: 'YojoFont', sans-serif;
-  font-size: 60px;
-}
-
 @font-face {
   font-family: 'comesinhandyfont';
   src: url('/assets/comesinhandy.ttf') format('truetype');
 }
-.comesinhandy-font {
+
+h2.yojo-font {
+  font-family: 'YojoFont', sans-serif;
+  font-size: 60px;
+}
+
+h2.comesinhandy-font {
   font-family: 'comesinhandyfont', sans-serif;
   font-size: 45px;
   color: rgba(114, 114, 114, 0.47)
 }
-h2 {
+
+h2.yojo-font,
+h2.comesinhandy-font {
   margin: 0.3em 0;
   font-weight: bold;
 }
