@@ -1,6 +1,6 @@
 //@ts-check
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { getStorage, ref, uploadBytes, listAll, getBlob } from "firebase/storage";
 import imageCompression from "browser-image-compression";
 
 import { db, getUserId } from "./index";
@@ -11,6 +11,7 @@ const creatorNameId = "creator-name";
 const presHistoryId = "presented-history";
 const presProductsId = "presented-products";
 const selectedImagesId = "selected-images";
+const presProductListId = "presented-product-images";
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (!document.body.classList.contains('page-mypage')) {
@@ -73,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function loadMypage(userId) {
   // Firestoreからユーザーデータを取得
-  await getDoc(doc(db, creatorsPath, userId)).then(docSnap => {
+  await getDoc(doc(db, creatorsPath, userId)).then(async docSnap => {
     // 作家情報が存在しているか
     if (!docSnap.exists()) {
       // 存在しない場合、情報は空のままで登録を促す
@@ -89,6 +90,27 @@ async function loadMypage(userId) {
     htmlHelper.setInputValue(creatorNameId, docSnap.get("name"));
     htmlHelper.setInputValue(presHistoryId, docSnap.get("presHistory"));
 
+    // 発表作品のロード、表示
+    const listRef = ref(getStorage(), `creators/${userId}`);
+    try {
+      const presProductList = document.getElementById(presProductListId);
+      if (!presProductList) {
+        return;
+      }
+
+      const res = await listAll(listRef);
+      for (const itemRef of res.items) {
+        const blob = await getBlob(itemRef)
+        const url = URL.createObjectURL(blob);
+  
+        const img = document.createElement('img');
+        img.src = url;
+  
+        presProductList.appendChild(img);
+      }
+    } catch (error) {
+      console.error("Error listing files:", error);
+    }
   }).catch(error => {
     console.error("エラー:", error);
   });

@@ -1,10 +1,10 @@
-#selected-images {
+.presImages {
     display: flex;
     width: 500px;
     overflow-x: auto;
 }
 
-#selected-images > img {
-    height: 200px;
+.presImages > img {
+    height: 150px;
     margin: 10px;
 }
