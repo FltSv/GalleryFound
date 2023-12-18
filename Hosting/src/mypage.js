@@ -91,7 +91,7 @@ async function loadMypage(userId) {
     htmlHelper.setInputValue(presHistoryId, docSnap.get("presHistory"));
 
     // 発表作品のロード、表示
-    const listRef = ref(getStorage(), `creators/${userId}`);
+    const listRef = ref(getStorage(), getPresProductsPath(userId));
     try {
       const presProductList = document.getElementById(presProductListId);
       if (!presProductList) {
@@ -111,6 +111,10 @@ async function loadMypage(userId) {
     } catch (error) {
       console.error("Error listing files:", error);
     }
+
+    // 展示登録
+    //todo
+    
   }).catch(error => {
     console.error("エラー:", error);
   });
@@ -212,7 +216,7 @@ async function uploadImages(files) {
       console.log("start upload:", file);
 
       const userId = await getUserId();
-      const storageRef = ref(storage, `creators/${userId}/${crypto.randomUUID()}.png`);
+      const storageRef = ref(storage, `${getPresProductsPath(userId)}/${crypto.randomUUID()}.png`);
       await uploadBytes(storageRef, compressedFile).then(snapshot => {
         console.log('Uploaded a file!', snapshot);
       });
@@ -222,4 +226,8 @@ async function uploadImages(files) {
   } catch (error) {
     console.error(error);
   }
+}
+
+function getPresProductsPath(userId) {
+  return `creators/${userId}/presProducts`;
 }
