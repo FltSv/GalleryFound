@@ -26,6 +26,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // popupイベントハンドラの登録
+  const showPopupButton = document.getElementById("presented-resister-button");
+  showPopupButton?.addEventListener('click', () => changePopup(true));
+
+  const closePopupButton = document.getElementById("close-popup-button");
+  closePopupButton?.addEventListener('click', () => changePopup(false));
+
+
   // マイページ表示時にデータのロード
   await loadMypage(userId).catch(error => {
     console.error("loadMypage().catch:", error);
@@ -230,4 +238,15 @@ async function uploadImages(files) {
 
 function getPresProductsPath(userId) {
   return `creators/${userId}/presProducts`;
+}
+
+/**
+ * Jsからpopupの表示を切り替える
+ * @param {boolean} isVisible
+ */
+function changePopup(isVisible) {
+  const popupCheckbox = document.getElementById("popup");
+  if (popupCheckbox instanceof HTMLInputElement) {
+    popupCheckbox.checked = isVisible;
+  }
 }

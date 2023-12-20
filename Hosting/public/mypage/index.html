@@ -43,11 +43,30 @@
         <tr><th>画像</th><th>名前</th><th>場所</th><th>期間</th></tr>
         <tr><td>no image</td><td>なんとかかんとか</td><td>xx美術館</td><td>20xx年x月</td></tr>
       </table>
-
+      <button type="button" id="presented-resister-button">展示を登録する</button>
+      
       <p><br></p>
 
       <button type="button" id="submit-button" class="login-button login-mail">
-        <i class="fa-solid fa-check"></i> 確定</button>
+        <i class="fa-solid fa-check"></i> 確定
+      </button>
+
+
+      <!-- popup window -->
+      <input type="checkbox" id="popup">
+      <div class="popup-overlay">
+        <div class="popup-window">
+          <h2>カスタムポップアップ</h2>
+          <p class="popup-text">これはカスタムポップアップのサンプルです。</p>
+          <label class="popup-close" for="popup">
+            <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+              <line x1="0" y1="0" x2="18" y2="18" stroke="white" stroke-width="3"></line>
+              <line x1="0" y1="18" x2="18" y2="0" stroke="white" stroke-width="3"></line>
+            </svg>
+          </label>
+          <button id="close-popup-button">確定</button>
+        </div>
+      </div>
     </div>
   </div>
 </body>
