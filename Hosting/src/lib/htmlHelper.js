@@ -41,3 +41,51 @@ export function getInputFiles(elementId) {
   }
   return null;
 }
+
+/**
+ * 
+ * @param {string} elementId 
+ * @param {string} value 
+ * @returns {boolean}
+ */
+export function setInnerHTML(elementId, value) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.innerHTML = value;
+    return true;
+  }
+  return false;
+}
+/**
+ * ファイル選択ボタンから選択されたファイルの内容を取得
+ * @param {string} elementId 
+ * @returns {Promise<string[]?>}
+ */
+export async function getInputFileSrcs(elementId) {
+  const files = getInputFiles(elementId);
+  if (!files) {
+    return null;
+  }
+
+  /** type {string[]} */
+  const filePaths = [];
+  
+  const promises = Array.from(files).map(async file =>
+    await new Promise(resolve => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const src = reader.result?.toString();
+        if (src) {
+          filePaths.push(src);
+          resolve(0);
+        }
+      };
+
+      reader.readAsDataURL(file);
+    })
+  );
+
+  await Promise.all(promises);
+  return filePaths.length > 0 ? filePaths : null;
+}

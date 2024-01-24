@@ -13,18 +13,35 @@
 /* 展示一覧 */
 table {
     width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
 }
 td {
-    width: 1px;
+    width: 0;
     padding: 0.5em;
     white-space: nowrap;
 }
 
+/* 行ごとの背景色 */
+table tr:nth-child(odd) {
+    background-color: #ddd
+}
+table tr:nth-child(even) {
+    background-color: #eff
+}
+
+td.exhibit-image-col > img {
+    max-width: 150px;
+}
 td.exhibit-content-col {
     width: auto;
+    vertical-align: top;
 }
 td.exhibit-content-col p {
     margin: 0.2em;
+}
+td.exhibit-button-col {
+    vertical-align: top;
 }
 
 
@@ -77,4 +94,9 @@ div.flex-area {
 div.innerflex-half-area {
     width: 50%;
     padding: 10px;
+}
+
+#exhibit-img-preview {
+    width: 100%;
+    margin: 10px 0;
 }

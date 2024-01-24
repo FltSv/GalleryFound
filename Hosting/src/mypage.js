@@ -13,6 +13,23 @@ const presProductsId = "presented-products";
 const selectedImagesId = "selected-images";
 const presProductListId = "presented-product-images";
 
+const exhibitNameId = "exhibit-name";
+const exhibitLocId = "exhibit-location";
+const exhibitDateId = "exhibit-period";
+const exhibitImgId = "exhibit-img-fileinput";
+const exhibitImgPrevId = "exhibit-img-preview";
+const exhibitConfirmButtonId = "add-exhibit-row-button";
+const confirmTypeAttr = "confirm-type";
+const exhibitIdAttr = "exhibit-id";
+
+/**
+ * 展示登録の内部配列
+ * @type {Exhibit[]}
+ */
+const tmpExhibits = [];
+
+
+// イベントの登録
 document.addEventListener('DOMContentLoaded', async () => {
   if (!document.body.classList.contains('page-mypage')) {
     return;
@@ -27,11 +44,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // popupイベントハンドラの登録
-  const showPopupButton = document.getElementById("presented-resister-button");
-  showPopupButton?.addEventListener('click', () => changePopup(true));
+  document.getElementById("presented-resister-button")?.addEventListener('click', showAddExhibitPopup);
 
-  const closePopupButton = document.getElementById("close-popup-button");
-  closePopupButton?.addEventListener('click', () => changePopup(false));
+  document.querySelectorAll(".popup-close").forEach(element => {
+    element.addEventListener('click', closeExhibitPopup);
+  });
+
+  const exhibitImgInputId = 'exhibit-img-fileinput';
+  document.getElementById(exhibitImgInputId)?.addEventListener('change', async () => {
+    const files = await htmlHelper.getInputFileSrcs(exhibitImgInputId);
+
+    const exhibitPreviewImg = document.getElementById("exhibit-img-preview");
+    if (exhibitPreviewImg instanceof HTMLImageElement) {
+      exhibitPreviewImg.src = files ? files[0] : "";
+    }
+  });
+
+  const addExhibitRowButton = document.getElementById(exhibitConfirmButtonId);
+  addExhibitRowButton?.addEventListener('click', () => {
+    switch (addExhibitRowButton?.getAttribute(confirmTypeAttr)) {
+      case "add":
+        addExhibitRow();
+        return;
+
+      case "edit":
+        editExhibitRow(addExhibitRowButton?.getAttribute(exhibitIdAttr) ?? "");
+        return;
+
+      default: return;
+    }
+  });
 
 
   // マイページ表示時にデータのロード
@@ -67,7 +109,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // DB更新
     await setDoc(doc(db, creatorsPath, userId), {
       name: name,
-      presHistory: presentedHistory
+      presHistory: presentedHistory,
+      //exhibits: tmpExhibits
     });
 
     // 処理完了
@@ -122,6 +165,7 @@ async function loadMypage(userId) {
 
     // 展示登録
     //todo
+    viewExhibitsTable();
     
   }).catch(error => {
     console.error("エラー:", error);
@@ -249,4 +293,263 @@ function changePopup(isVisible) {
   if (popupCheckbox instanceof HTMLInputElement) {
     popupCheckbox.checked = isVisible;
   }
+}
+
+/**
+ * 展示登録の追加画面を開く
+ */
+function showAddExhibitPopup() {
+  htmlHelper.setInnerHTML('popup-title', '展示登録');
+  htmlHelper.setInnerHTML(exhibitConfirmButtonId, '<i class="fa-solid fa-add"></i> 追加')
+  document.getElementById(exhibitConfirmButtonId)?.setAttribute(confirmTypeAttr, "add");
+
+  changePopup(true);
+}
+
+/**
+ * 展示登録に編集画面を開く 
+ * @param {Exhibit} exhibit
+ */
+function showEditExhibitPopup(exhibit) {
+  htmlHelper.setInnerHTML('popup-title', '展示修正');
+  htmlHelper.setInnerHTML(exhibitConfirmButtonId, '<i class="fa-solid fa-check"></i> 変更'); //fixme
+  document.getElementById(exhibitConfirmButtonId)?.setAttribute(confirmTypeAttr, "edit");
+  document.getElementById(exhibitConfirmButtonId)?.setAttribute(exhibitIdAttr, exhibit.getId());
+
+  // exhibitクラスをpopupに適用
+  htmlHelper.setInputValue(exhibitNameId, exhibit.title);
+  htmlHelper.setInputValue(exhibitLocId, exhibit.location);
+  htmlHelper.setInputValue(exhibitDateId, exhibit.date);
+  document.getElementById(exhibitImgPrevId)?.setAttribute('src', exhibit.getImageSrc());
+
+  // popupを表示
+  changePopup(true);
+}
+
+/**
+ * 展示登録画面を閉じる
+ */
+function closeExhibitPopup() {
+  changePopup(false);
+
+  // popupの内容リセット
+  [exhibitNameId, exhibitLocId, exhibitDateId, exhibitImgId].map(x => {
+    htmlHelper.setInputValue(x, "");
+  });
+
+  // 画像のリセット
+  var imgElement = document.getElementById(exhibitImgPrevId);
+  imgElement?.setAttribute('src', '');
+}
+
+/**
+ * 展示登録popupの内容を確定、tmpExhibitsに追加する
+ */
+async function addExhibitRow() {
+  const exhibit = new Exhibit();
+  exhibit.title = htmlHelper.getInputValue(exhibitNameId);
+  exhibit.location = htmlHelper.getInputValue(exhibitLocId);
+  exhibit.date = htmlHelper.getInputValue(exhibitDateId);
+
+  const files = await htmlHelper.getInputFileSrcs(exhibitImgId);
+  exhibit.imageData = files ? files[0] : "";
+
+  // 値のチェック
+  if (!checkExhibit(exhibit)) {
+    return;
+  }
+  
+  tmpExhibits.push(exhibit);
+
+  // テーブル更新
+  viewExhibitsTable();
+  
+  // popupを閉じる
+  closeExhibitPopup();
+}
+
+/**
+ * 展示登録popupの内容を変更
+ * @param {string} exhibitId
+ */
+async function editExhibitRow(exhibitId) {
+  const exhibit = tmpExhibits.find(x => x.getId() === exhibitId);
+  if (!exhibit) {
+    return;
+  }
+
+  exhibit.title = htmlHelper.getInputValue(exhibitNameId);
+  exhibit.location = htmlHelper.getInputValue(exhibitLocId);
+  exhibit.date = htmlHelper.getInputValue(exhibitDateId);
+
+  const files = await htmlHelper.getInputFileSrcs(exhibitImgId);
+  if (files) {
+    exhibit.imageData = files[0];
+  }
+
+  // 値のチェック
+  if (!checkExhibit(exhibit)) {
+    return;
+  }
+
+  // テーブル更新
+  viewExhibitsTable();
+  
+  // popupを閉じる
+  closeExhibitPopup();
+}
+
+function checkExhibit(exhibit) {
+  const popupErrMsg = document.getElementById("popup-err-msg");
+  if (!popupErrMsg) {
+    return false;
+  }
+
+  if (!exhibit.checkValues()) {
+    //todo 各項目にエラーを出す
+    popupErrMsg.innerHTML = "未入力項目があります。";
+    return false;
+  }
+
+  popupErrMsg.innerHTML = "";
+  return true;
+}
+
+// 編集ボタンにイベントリスナーを追加
+// document.querySelectorAll('.exhibit-button-col .edit').forEach((button, i) => {
+  // button.addEventListener('click', () => {
+      // クリックされたボタンが属する行のデータを取得
+      // const exhibit = tmpExhibits[i];
+
+      // ポップアップウィンドウを更新
+      // htmlHelper.setInputValue('exhibit-name',exhibit.title);
+      // htmlHelper.setInputValue('exhibit-location',exhibit.location);
+      // htmlHelper.setInputValue('exhibit-period',exhibit.date);
+      // htmlHelper.setInputValue('exhibit-img-preview',exhibit.image);
+
+      // ポップアップウィンドウを表示
+      // changePopup(true);
+  // });
+// });
+
+/**
+ * HTMLテーブルを一時配列と同期させる
+ */
+function viewExhibitsTable() {
+  const table = document.getElementById("exhibits-table");
+  if (!(table instanceof HTMLTableElement)) {
+    return;
+  }
+
+  // テーブル初期化
+  table.innerHTML = '';
+
+  // 配列が0であれば、Emptyメッセージを示す
+  const emptyMsg = tmpExhibits.length === 0 ? '展示登録がありません' : '';
+  htmlHelper.setInnerHTML('exhibits-table-msg', emptyMsg);
+
+  // 配列の中身を表示
+  for (const exhibit of tmpExhibits) {
+    const tr = table.insertRow(-1);
+
+    // 画像セルを作成
+    const imgCell = tr.insertCell(0);
+    imgCell.className = 'exhibit-image-col';
+    const img = document.createElement('img');
+    img.src = exhibit.getImageSrc();
+    imgCell.appendChild(img);
+
+    // 内容セルを作成
+    const contentCell = tr.insertCell(1);
+    contentCell.className = 'exhibit-content-col';
+    contentCell.innerHTML = `<p>${exhibit.title}</p><p>${exhibit.location}</p><p>${exhibit.date}</p>`;
+
+    // ボタンセルを作成
+    const buttonCell = tr.insertCell(2);
+    buttonCell.className = 'exhibit-button-col';
+
+    const editButton = document.createElement('button');
+    editButton.textContent = '編集';
+    editButton.addEventListener('click', () => showEditExhibitPopup(exhibit));
+    buttonCell.appendChild(editButton);
+
+    buttonCell.appendChild(document.createElement('br'));
+    buttonCell.appendChild(document.createElement('br'));
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = '削除';
+    buttonCell.appendChild(deleteButton);
+  }
+}
+
+/**
+ * 展示
+ */
+class Exhibit {
+  #id = "";
+
+  /**
+   * 展示名
+   * @type {string}
+   */
+  title = "";
+
+  /**
+   * 展示場所
+   * @type {string}
+   */
+  location = "";
+
+  /**
+   * 展示期間
+   * @type {string}
+   */
+  date = "";
+
+  /**
+   * 展示イメージ
+   * @type {string}
+   */
+  imageData = "";
+
+  /**
+   * 展示イメージ
+   * @type {string}
+   */
+  imageUrl = "";
+
+  /**
+   * @param {string?} id 
+   */
+  constructor(id = null) {
+    this.#id = id ?? crypto.randomUUID();
+  }
+
+  getId() {
+    return this.#id;
+  }
+
+  getImageSrc() {
+    return this.imageUrl == "" ? this.imageData : this.imageUrl;
+  }
+
+  /**
+   * 値のチェックを行う
+   * @returns {boolean}
+   */
+  checkValues() {
+    if (this.title == "") {
+      return false;
+    }
+    if (this.location == "") {
+      return false;
+    }
+    if (this.date == "") {
+      return false;
+    }
+
+    return true;
+  }
+
+  // todo 日時の自然言語チェック
 }
