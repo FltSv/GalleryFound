@@ -1,6 +1,6 @@
 //@ts-check
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, listAll, getBlob } from "firebase/storage";
+import { getStorage, ref, uploadBytes, listAll, getBlob, getDownloadURL } from "firebase/storage";
 import imageCompression from "browser-image-compression";
 
 import { db, getUserId } from "./index";
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const userId = await getUserId();
- 
+
   // ログインしていない場合、ログインページに飛ばす
   if (!userId) {
     window.location.href = '/login';
@@ -92,31 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 確定ボタン
   const button = document.getElementById('submit-button');
-  button?.addEventListener('click', async () => {
-    // 入力値の取得
-    const name = htmlHelper.getInputValue(creatorNameId);
-    const presentedHistory = htmlHelper.getInputValue(presHistoryId);
-
-    // 入力チェック
-    if (!name) {
-      validate(nameInput);
-      return;
-    }
-
-    // 画像のアップロード
-    await uploadImages(htmlHelper.getInputFiles(presProductsId));
-
-    // DB更新
-    await setDoc(doc(db, creatorsPath, userId), {
-      name: name,
-      presHistory: presentedHistory,
-      //exhibits: tmpExhibits
-    });
-
-    // 処理完了
-    console.log("確定ボタン処理したよ");
-    window.location.href = '/mypage';
-  });
+  button?.addEventListener('click', async () => submitValue(userId));
 });
 
 /**
@@ -125,51 +101,97 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function loadMypage(userId) {
   // Firestoreからユーザーデータを取得
-  await getDoc(doc(db, creatorsPath, userId)).then(async docSnap => {
-    // 作家情報が存在しているか
-    if (!docSnap.exists()) {
-      // 存在しない場合、情報は空のままで登録を促す
-      console.log("情報ないよー");
+  const docSnap = await getDoc(doc(db, creatorsPath, userId));
+
+  // 作家情報が存在しているか
+  if (!docSnap.exists()) {
+    // 存在しない場合、情報は空のままで登録を促す
+    console.log("情報ないよー");
+    return;
+  }
+
+  // ドキュメントが存在する場合、詳細を取得
+  const data = docSnap.data();
+  console.log("データ:", data);
+
+  // 既存情報の反映
+  htmlHelper.setInputValue(creatorNameId, docSnap.get("name"));
+  htmlHelper.setInputValue(presHistoryId, docSnap.get("presHistory"));
+
+  // 発表作品のロード、表示
+  const listRef = ref(getStorage(), getPresProductsPath(userId));
+  try {
+    const presProductList = document.getElementById(presProductListId);
+    if (!presProductList) {
       return;
     }
 
-    // ドキュメントが存在する場合、詳細を取得
-    const data = docSnap.data();
-    console.log("データ:", data);
+    const res = await listAll(listRef);
+    for (const itemRef of res.items) {
+      const blob = await getBlob(itemRef)
+      const url = URL.createObjectURL(blob);
 
-    // 既存情報の反映
-    htmlHelper.setInputValue(creatorNameId, docSnap.get("name"));
-    htmlHelper.setInputValue(presHistoryId, docSnap.get("presHistory"));
+      const img = document.createElement('img');
+      img.src = url;
 
-    // 発表作品のロード、表示
-    const listRef = ref(getStorage(), getPresProductsPath(userId));
-    try {
-      const presProductList = document.getElementById(presProductListId);
-      if (!presProductList) {
-        return;
-      }
-
-      const res = await listAll(listRef);
-      for (const itemRef of res.items) {
-        const blob = await getBlob(itemRef)
-        const url = URL.createObjectURL(blob);
-  
-        const img = document.createElement('img');
-        img.src = url;
-  
-        presProductList.appendChild(img);
-      }
-    } catch (error) {
-      console.error("Error listing files:", error);
+      presProductList.appendChild(img);
     }
+  } catch (error) {
+    console.error("Error listing files:", error);
+  }
 
-    // 展示登録
-    //todo
-    viewExhibitsTable();
-    
-  }).catch(error => {
-    console.error("エラー:", error);
+  // 展示登録
+  const exhibits = docSnap.get("exhibits");
+  for (const exhibitDto of exhibits) {
+    const exhibit = new Exhibit(exhibitDto.id);
+    exhibit.title = exhibitDto.title;
+    exhibit.location = exhibitDto.location;
+    exhibit.date = exhibitDto.date;
+    exhibit.imageUrl = exhibitDto.image;
+
+    tmpExhibits.push(exhibit);
+  }
+
+  viewExhibitsTable();
+}
+
+/**
+ *  値の確定、DBへデータを送信する
+ * @param {string} userId 
+ */
+async function submitValue(userId) {
+  // 入力値の取得
+  const name = htmlHelper.getInputValue(creatorNameId);
+  const presentedHistory = htmlHelper.getInputValue(presHistoryId);
+
+  // 入力チェック
+  if (!name) {
+    validate(document.getElementById(creatorNameId));
+    return;
+  }
+
+  // 画像のアップロード
+  await uploadImages(htmlHelper.getInputFiles(presProductsId));
+  await uploadExhibitsImage();
+
+  // DB更新
+  await setDoc(doc(db, creatorsPath, userId), {
+    name: name,
+    presHistory: presentedHistory,
+    exhibits: tmpExhibits.map(x => ({
+      id: x.getId(),
+      title: x.title,
+      location: x.location,
+      date: x.date,
+      image: x.imageUrl
+    }))
   });
+
+  //todo 使用されていない画像の削除
+
+  // 処理完了
+  console.debug("確定ボタン処理");
+  window.location.href = '/mypage';
 }
 
 /**
@@ -188,7 +210,7 @@ function validateCheck(e) {
 const validate = (/** @type {HTMLElement?} */ input) => {
   if (!(input instanceof HTMLInputElement)) {
     return;
-  }    
+  }
 
   const isValid = input.value != "" // カスタムルール
   const invalidMsg = 'このフィールドを空にすることはできません。'
@@ -202,7 +224,7 @@ const validate = (/** @type {HTMLElement?} */ input) => {
   }
 
   button.disabled = !isValid;
-  
+
   const errMsgSpan = document.getElementById('errorMsg');
   if (errMsgSpan) {
     errMsgSpan.textContent = isValid ? "" : input.validationMessage
@@ -273,7 +295,7 @@ async function uploadImages(files) {
         console.log('Uploaded a file!', snapshot);
       });
     }
-  
+
     console.log("Upload successful");
   } catch (error) {
     console.error(error);
@@ -282,6 +304,40 @@ async function uploadImages(files) {
 
 function getPresProductsPath(userId) {
   return `creators/${userId}/presProducts`;
+}
+
+/**
+ * tmpExhibitsの画像をアップロード、URLを格納
+ */
+async function uploadExhibitsImage() {
+  const options = {
+    maxSizeMB: 1,
+    fileType: "image/png"
+  };
+
+  const promises = tmpExhibits.map(exhibit => new Promise(async resolve => {
+    // イメージの更新が無ければスキップ
+    if (!exhibit.imageData) {
+      resolve(0);
+      return;
+    }
+
+    const file = await imageCompression.getFilefromDataUrl(exhibit.imageData, exhibit.title)
+    const compressedFile = await imageCompression(file, options);
+    console.log("start upload:", file);
+
+    const storage = getStorage();
+    const userId = await getUserId();
+    const storageRef = ref(storage, `creators/${userId}/exhibits/${crypto.randomUUID()}.png`);
+    await uploadBytes(storageRef, compressedFile);
+
+    exhibit.imageData = "";
+    exhibit.imageUrl = await getDownloadURL(storageRef);
+
+    resolve(0);
+  }));
+
+  await Promise.all(promises);
 }
 
 /**
@@ -358,12 +414,12 @@ async function addExhibitRow() {
   if (!checkExhibit(exhibit)) {
     return;
   }
-  
+
   tmpExhibits.push(exhibit);
 
   // テーブル更新
   viewExhibitsTable();
-  
+
   // popupを閉じる
   closeExhibitPopup();
 }
@@ -394,7 +450,7 @@ async function editExhibitRow(exhibitId) {
 
   // テーブル更新
   viewExhibitsTable();
-  
+
   // popupを閉じる
   closeExhibitPopup();
 }
@@ -417,19 +473,19 @@ function checkExhibit(exhibit) {
 
 // 編集ボタンにイベントリスナーを追加
 // document.querySelectorAll('.exhibit-button-col .edit').forEach((button, i) => {
-  // button.addEventListener('click', () => {
-      // クリックされたボタンが属する行のデータを取得
-      // const exhibit = tmpExhibits[i];
+// button.addEventListener('click', () => {
+// クリックされたボタンが属する行のデータを取得
+// const exhibit = tmpExhibits[i];
 
-      // ポップアップウィンドウを更新
-      // htmlHelper.setInputValue('exhibit-name',exhibit.title);
-      // htmlHelper.setInputValue('exhibit-location',exhibit.location);
-      // htmlHelper.setInputValue('exhibit-period',exhibit.date);
-      // htmlHelper.setInputValue('exhibit-img-preview',exhibit.image);
+// ポップアップウィンドウを更新
+// htmlHelper.setInputValue('exhibit-name',exhibit.title);
+// htmlHelper.setInputValue('exhibit-location',exhibit.location);
+// htmlHelper.setInputValue('exhibit-period',exhibit.date);
+// htmlHelper.setInputValue('exhibit-img-preview',exhibit.image);
 
-      // ポップアップウィンドウを表示
-      // changePopup(true);
-  // });
+// ポップアップウィンドウを表示
+// changePopup(true);
+// });
 // });
 
 /**
@@ -478,6 +534,8 @@ function viewExhibitsTable() {
 
     const deleteButton = document.createElement('button');
     deleteButton.textContent = '削除';
+    //todo イベントハンドラ登録
+    deleteButton.style.display = "none";  // 実装後表示
     buttonCell.appendChild(deleteButton);
   }
 }
@@ -518,6 +576,7 @@ class Exhibit {
    */
   imageUrl = "";
 
+  //todo Dtoオブジェクトによる初期化のオーバーロード作成
   /**
    * @param {string?} id 
    */
@@ -530,7 +589,7 @@ class Exhibit {
   }
 
   getImageSrc() {
-    return this.imageUrl == "" ? this.imageData : this.imageUrl;
+    return this.imageData == "" ? this.imageUrl : this.imageData;
   }
 
   /**
