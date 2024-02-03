@@ -2,8 +2,10 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 import { changePwdVisible, loginMail, signupMail } from "./login";
+import "./mypage";
 
 // イベント
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -30,9 +32,18 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
+export { db };
 
+// ユーザー認証状態が確定するまでのプロミス
+let resolveUserAuthState;
+const userAuthStatePromise = new Promise(resolve => {
+  resolveUserAuthState = resolve;
+});
 // ログイン状態の更新で実行
 onAuthStateChanged(auth, user => {
+  resolveUserAuthState(user ? user.uid : null);
+
   if (user) {
     console.log('Logged in!');
     console.log('emailVerified: ' + user.emailVerified);
@@ -60,3 +71,6 @@ onAuthStateChanged(auth, user => {
     loginButton.style.display = isLogin ? "none" : "block";
   }
 });
+
+/** @returns {Promise<string>} */
+export const getUserId = () => userAuthStatePromise;

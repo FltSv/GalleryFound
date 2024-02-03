@@ -56,6 +56,9 @@ p.desc-message {
   margin: 2em auto;        /* 中央寄せ */
 }
 
+.div-left-align {
+  margin-left: 0;
+}
 
 /* アプリ紹介 */
 .app-description {
@@ -144,6 +147,19 @@ input[type="text"]:focus, input[type="password"]:focus {
   border-color: #529fff; /* 線の色 */
   outline: 0;
 }
+
+/* バリデーション */
+input[type="text"]:invalid {
+  border: 2px solid red;
+  background-color: pink;
+}
+
+#errorMsg {
+  display: block;
+  color: red;
+  font-size: 12px;
+}
+
 
 /* 404ページ */
 @font-face {

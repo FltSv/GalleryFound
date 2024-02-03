@@ -1,0 +1,102 @@
+.presImages {
+    display: flex;
+    width: 500px;
+    overflow-x: auto;
+}
+
+.presImages > img {
+    height: 150px;
+    margin: 10px;
+}
+
+
+/* 展示一覧 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+td {
+    width: 0;
+    padding: 0.5em;
+    white-space: nowrap;
+}
+
+/* 行ごとの背景色 */
+table tr:nth-child(odd) {
+    background-color: #ddd
+}
+table tr:nth-child(even) {
+    background-color: #eff
+}
+
+td.exhibit-image-col > img {
+    max-width: 150px;
+}
+td.exhibit-content-col {
+    width: auto;
+    vertical-align: top;
+}
+td.exhibit-content-col p {
+    margin: 0.2em;
+}
+td.exhibit-button-col {
+    vertical-align: top;
+}
+
+
+/* popup */
+#popup {
+    display: none;
+    /* label でコントロールするので input は非表示に */
+}
+
+.popup-overlay {
+    display: none;
+    /* input にチェックが入るまでは非表示に */
+}
+
+#popup:checked ~ .popup-overlay {
+  display: block;
+  z-index: 99999;
+  background-color: #00000070;
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  top: 0;
+  left: 0;
+}
+
+.popup-window {
+    width: 90vw;
+    max-width: 560px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.popup-close {
+    cursor: pointer;
+    position: absolute;
+    top: -26px;
+    right: 0;
+}
+
+/* popup内容 */
+div.flex-area {
+    display: flex;
+}
+
+div.innerflex-half-area {
+    width: 50%;
+    padding: 10px;
+}
+
+#exhibit-img-preview {
+    width: 100%;
+    margin: 10px 0;
+}
