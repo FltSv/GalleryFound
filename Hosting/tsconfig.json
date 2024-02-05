@@ -7,7 +7,14 @@
         "allowJs": true,    // Jsの共存を許可
         "moduleResolution": "node",
         "rootDir": "./src",
-        "outDir": "./dist"
+        "outDir": "./dist",
+
+        // React
+        "jsx": "react-jsx",
+        "lib": [
+            "ES2023",
+            "DOM"
+        ]
     },
     "include": [
         "./src/**/*"

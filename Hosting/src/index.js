@@ -1,4 +1,6 @@
 //@ts-check
+import { createRoot } from 'react-dom/client';
+
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -6,7 +8,13 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { changePwdVisible, loginMail, signupMail } from "./login";
 
 // イベント
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', () => {
+  const domNode = document.getElementById('logo');
+  if (domNode) {
+    const root = createRoot(domNode);
+    root.render(<Logo />);
+  }
+
   // パスワードの表示非表示
   document.getElementById('input-pwd-visible')?.addEventListener('change', changePwdVisible);
 
@@ -60,3 +68,7 @@ onAuthStateChanged(auth, user => {
     loginButton.style.display = isLogin ? "none" : "block";
   }
 });
+
+function Logo() {
+  return <h1>Gallery Found</h1>;
+}

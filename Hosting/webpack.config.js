@@ -1,10 +1,15 @@
-const path = require('path');
-
 module.exports = {
   mode: 'development',
   entry: './src/index.js',                  // 変換元のエントリーポイントファイルを指定します。
   module: {
     rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+        },
+      },
       {
         // 拡張子 .ts の場合
         test: /\.ts$/,
@@ -16,12 +21,13 @@ module.exports = {
   // import 文で .ts ファイルを解決する
   resolve: {
     extensions: [
-      '.ts', '.js',
+      '.ts', '.tsx', '.js', '.jsx'
     ],
   },
+  target: ["web", "es5"],
   output: {
-    path: path.resolve(__dirname, 'public'),  // 変換したファイルの出力先フォルダパスと、
-    filename: 'bundle.js'                   // 出力するファイル名を指定します。
+    path: `${__dirname}/public`,  // 変換したファイルの出力先フォルダパスと、
+    filename: 'bundle.js'         // 出力するファイル名を指定します。
   },
   devtool: 'eval-source-map',
 }
