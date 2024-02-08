@@ -1,5 +1,6 @@
 //@ts-check
 import { createRoot } from 'react-dom/client';
+import './index.tailwind.css';
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -70,5 +71,9 @@ onAuthStateChanged(auth, user => {
 });
 
 function Logo() {
-  return <h1>Gallery Found</h1>;
+  return (
+    <h1 className='text-7xl mb-4 no-underline font-dancing'>
+      <a href="/">Gallery Found</a>
+    </h1>
+  );
 }

@@ -5,7 +5,6 @@ module.exports = {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
         },
@@ -15,6 +14,21 @@ module.exports = {
         test: /\.ts$/,
         // TypeScript をコンパイルする
         use: 'ts-loader',
+      },
+      {
+        test: /\.css$/,
+        //use: ['style-loader', 'css-loader'],,
+        use: [
+          'style-loader',
+          { loader: 'css-loader', options: { importLoaders: 1 } },
+          { loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [ 'tailwindcss', 'autoprefixer' ],
+              },
+            },
+          },
+        ],
       },
     ],
   },
