@@ -1,5 +1,8 @@
 name: FormatLint
 on: pull_request
+defaults:
+  run:
+    working-directory: Hosting
 jobs:
   prettier:
     runs-on: ubuntu-latest
