@@ -1,12 +1,19 @@
 //@ts-check
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from 'firebase/auth';
+import * as htmlHelper from './lib/htmlHelper';
 
 // イベント
-document.addEventListener('DOMContentLoaded', event => {
+document.addEventListener('DOMContentLoaded', () => {
   // ログアウトボタン
-  document.getElementById('header-logout-button')?.addEventListener('click', signout);
+  document
+    .getElementById('header-logout-button')
+    ?.addEventListener('click', signout);
 });
-
 
 // パスワードの表示非表示を切替
 export function changePwdVisible() {
@@ -17,70 +24,72 @@ export function changePwdVisible() {
 
 // ログイン
 export function loginMail() {
-  const id = getInputValue('input-id');
-  const pwd = getInputValue('input-pwd');
+  const id = htmlHelper.getInputValue('input-id');
+  const pwd = htmlHelper.getInputValue('input-pwd');
 
   if (!validationIdPwd(id, pwd, pwd)) {
     return;
   }
 
   signInWithEmailAndPassword(getAuth(), id, pwd)
-  .then((userCredential) => {
-    // Signed in 
-    const user = userCredential.user;
+    .then(userCredential => {
+      // Signed in
+      const user = userCredential.user;
 
-    console.log("ログインしたよ～");
-    transitionPage("/mypage");
-  })
-  .catch((error) => {
-    showError(error);
-    return;
-  });
+      console.log(`ログインしたよ～: ${user}`);
+      transitionPage('/mypage');
+    })
+    .catch(error => {
+      showError(error);
+      return;
+    });
 }
 
 // 新規登録
 export async function signupMail() {
-  const id = getInputValue('input-id');
-  const pwd = getInputValue('input-pwd');
-  const pwd2 = getInputValue('input-pwd-confirm');
+  const id = htmlHelper.getInputValue('input-id');
+  const pwd = htmlHelper.getInputValue('input-pwd');
+  const pwd2 = htmlHelper.getInputValue('input-pwd-confirm');
 
   if (!validationIdPwd(id, pwd, pwd2)) {
     return;
   }
 
-  const auth = getAuth()
+  const auth = getAuth();
   await createUserWithEmailAndPassword(auth, id, pwd)
-  .then(userCredential => {
-    // Signed in 
-    const user = userCredential.user;
+    .then(userCredential => {
+      // Signed in
+      const user = userCredential.user;
 
-    console.log("createUser" + user);
-  })
-  .catch((error) => {
-    showError(error);
-    return;
-  });
+      console.log('createUser' + user);
+    })
+    .catch(error => {
+      showError(error);
+      return;
+    });
 
   // いったんメールアドレス・パスワードでログインし、未認証ならば確認メールを送信する
   //const currentUser = firebase.auth().currentUser;
   const currentUser = auth.currentUser;
   if (currentUser === null) {
-    console.log("currentUser is null");
+    console.log('currentUser is null');
     return;
   }
 
   if (currentUser.emailVerified) {
-    console.log("currentUser is Verified");
+    console.log('currentUser is Verified');
     return;
   }
 
-  await sendEmailVerification(currentUser).then(() => {
-    console.log("sendEmailVerification");
-  }).catch((error) => {
-    showError(error);
-    return;
-  });
-  
+  await sendEmailVerification(currentUser)
+    .then(() => {
+      console.log('sendEmailVerification');
+    })
+    .catch(error => {
+      showError(error);
+      return;
+    });
+
   // 上記における「url」欄のリンクをユーザーが踏むと期待される。
   // 踏んだ先のページに対するリクエストが投げられるので、
   // その先でリクエストのGETパラメーターのうち「oobCode」をキーとする値(文字列)を取得する。
@@ -91,13 +100,13 @@ export async function signupMail() {
     // メールアドレスの確認完了
   } catch (e) {
     // applyActionCodeのエラー
-    console.error(e)
+    console.error(e);
     showErrorMsg(e);
     return;
-  };
+  }
 
-  console.log("新規登録でログインしたよ～");
-  window.location.href = "/login/sendverify.html";
+  console.log('新規登録でログインしたよ～');
+  window.location.href = '/login/sendverify.html';
 }
 
 // ログアウト
@@ -112,20 +121,20 @@ function signout() {
  * @param {string} link
  */
 function transitionPage(link) {
-  const auth = getAuth()
+  const auth = getAuth();
   const currentUser = auth.currentUser;
 
   // ログイン状態でなければ、ログインページに移動
   if (currentUser === null) {
     window.location.href = '/login';
-    console.log("currentUser is null");
+    console.log('currentUser is null');
     return;
   }
 
   // 認証済みでなければ、確認を促すページに移動
   if (!currentUser.emailVerified) {
     window.location.href = '/login/noverified.html';
-    console.log("currentUser is not Verified");
+    console.log('currentUser is not Verified');
     return;
   }
 
@@ -133,32 +142,20 @@ function transitionPage(link) {
   window.location.href = link;
 }
 
-/**
- * HTMLInputElementから値を取得
- * @param {string} elementId
- */
-function getInputValue(elementId) {
-  const element = document.getElementById(elementId);
-  if (!(element instanceof HTMLInputElement)) {
-    return "";
-  }
-  return element.value;
-}
-
 // 入力チェック
 function validationIdPwd(id, pwd, pwd2) {
-  if (id === "") {
-    showErrorMsg("メールアドレスを入力してください。");
+  if (id === '') {
+    showErrorMsg('メールアドレスを入力してください。');
     return false;
   }
 
-  if (pwd === "") {
-    showErrorMsg("パスワードを入力してください。");
+  if (pwd === '') {
+    showErrorMsg('パスワードを入力してください。');
     return false;
   }
 
-  if (pwd !== pwd2 ) {
-    showErrorMsg("入力されたパスワードが異なります。");
+  if (pwd !== pwd2) {
+    showErrorMsg('入力されたパスワードが異なります。');
     return false;
   }
 
@@ -181,6 +178,6 @@ function showError(error) {
 function showErrorMsg(errorMsg) {
   const errorLabel = document.getElementById('login-error-msg');
   if (errorLabel) {
-    errorLabel.textContent = errorMsg
+    errorLabel.textContent = errorMsg;
   }
 }

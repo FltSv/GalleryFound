@@ -17,6 +17,7 @@
   "author": "suna",
   "license": "ISC",
   "dependencies": {
+    "browser-image-compression": "^2.0.2",
     "@types/react": "^18.2.52",
     "@types/react-dom": "^18.2.18",
     "firebase": "^10.4.0",
