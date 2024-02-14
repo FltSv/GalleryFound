@@ -1,3 +1,5 @@
 {
     "livePreview.serverRoot": "/Hosting/public",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
 }

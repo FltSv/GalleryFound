@@ -1,33 +1,45 @@
 //@ts-check
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { createRoot } from 'react-dom/client';
+import './index.tailwind.css';
 
-import { changePwdVisible, loginMail, signupMail } from "./login";
-import "./mypage";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from 'firebase/app';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+
+import { changePwdVisible, loginMail, signupMail } from './login';
+import './mypage';
 
 // イベント
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', () => {
+  const domNode = document.getElementById('logo');
+  if (domNode) {
+    const root = createRoot(domNode);
+    root.render(<Logo />);
+  }
+
   // パスワードの表示非表示
-  document.getElementById('input-pwd-visible')?.addEventListener('change', changePwdVisible);
+  document
+    .getElementById('input-pwd-visible')
+    ?.addEventListener('change', changePwdVisible);
 
   // ログインボタン
   document.getElementById('login-button')?.addEventListener('click', loginMail);
 
   // 登録ボタン
-  document.getElementById('resister-button')?.addEventListener('click', signupMail);
+  document
+    .getElementById('resister-button')
+    ?.addEventListener('click', signupMail);
 });
-    
 
 // Initialize Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDqf-8M_mqa1u3nF3eY3i0eEzhZi4Wow34",
-  authDomain: "gallery-found.firebaseapp.com",
-  projectId: "gallery-found",
-  storageBucket: "gallery-found.appspot.com",
-  messagingSenderId: "985501114281",
-  appId: "1:985501114281:web:0e6ad563fee57fb8826eb8"
+  apiKey: 'AIzaSyDqf-8M_mqa1u3nF3eY3i0eEzhZi4Wow34',
+  authDomain: 'gallery-found.firebaseapp.com',
+  projectId: 'gallery-found',
+  storageBucket: 'gallery-found.appspot.com',
+  messagingSenderId: '985501114281',
+  appId: '1:985501114281:web:0e6ad563fee57fb8826eb8',
 };
 
 const app = initializeApp(firebaseConfig);
@@ -48,29 +60,37 @@ onAuthStateChanged(auth, user => {
     console.log('Logged in!');
     console.log('emailVerified: ' + user.emailVerified);
   } else {
-    console.log('No User.')
+    console.log('No User.');
   }
 
   // ログインボタン等の表示切り替え
-  const isLogin = user !== null
+  const isLogin = user !== null;
 
   // ログイン中のみ表示
-  const logoutButton = document.getElementById('header-logout-button')
+  const logoutButton = document.getElementById('header-logout-button');
   if (logoutButton) {
-    logoutButton.style.display = isLogin ? "block" : "none";
+    logoutButton.style.display = isLogin ? 'block' : 'none';
   }
 
-  const mypageButton = document.getElementById('header-mypage-button')
+  const mypageButton = document.getElementById('header-mypage-button');
   if (mypageButton) {
-    mypageButton.style.display = isLogin ? "block" : "none";
+    mypageButton.style.display = isLogin ? 'block' : 'none';
   }
 
   // ログアウト中のみ表示
-  const loginButton = document.getElementById('header-login-button')
+  const loginButton = document.getElementById('header-login-button');
   if (loginButton) {
-    loginButton.style.display = isLogin ? "none" : "block";
+    loginButton.style.display = isLogin ? 'none' : 'block';
   }
 });
 
 /** @returns {Promise<string>} */
 export const getUserId = () => userAuthStatePromise;
+
+function Logo() {
+  return (
+    <h1 className="text-7xl mb-4 no-underline font-dancing">
+      <a href="/">Gallery Found</a>
+    </h1>
+  );
+}

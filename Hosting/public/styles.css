@@ -39,16 +39,6 @@ header {
   margin: 50px auto 16px;
 }
 
-/* Gallery Found */
-h1, h1 a {
-  text-align: center;
-  color: black;
-  font-size: 64px;
-  margin: 0 0 16px;
-  font-family: 'Dancing Script', cursive;
-  text-decoration: none;
-}
-
 p.desc-message {
   font-size: 1.2em;      /* フォントサイズを少し大きく */
   color: #666;           /* 色を薄めのグレーに */

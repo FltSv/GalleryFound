@@ -7,11 +7,13 @@
  */
 export function getInputValue(elementId) {
   const element = document.getElementById(elementId);
-  if (element instanceof HTMLInputElement ||
-    element instanceof HTMLTextAreaElement) {
+  if (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement
+  ) {
     return element.value;
   }
-  return "";
+  return '';
 }
 
 /**
@@ -21,8 +23,10 @@ export function getInputValue(elementId) {
  */
 export function setInputValue(elementId, value) {
   const element = document.getElementById(elementId);
-  if (element instanceof HTMLInputElement ||
-    element instanceof HTMLTextAreaElement) {
+  if (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement
+  ) {
     element.value = value;
     return true;
   }
@@ -43,9 +47,9 @@ export function getInputFiles(elementId) {
 }
 
 /**
- * 
- * @param {string} elementId 
- * @param {string} value 
+ *
+ * @param {string} elementId
+ * @param {string} value
  * @returns {boolean}
  */
 export function setInnerHTML(elementId, value) {
@@ -58,7 +62,7 @@ export function setInnerHTML(elementId, value) {
 }
 /**
  * ファイル選択ボタンから選択されたファイルの内容を取得
- * @param {string} elementId 
+ * @param {string} elementId
  * @returns {Promise<string[]?>}
  */
 export async function getInputFileSrcs(elementId) {
@@ -69,21 +73,22 @@ export async function getInputFileSrcs(elementId) {
 
   /** type {string[]} */
   const filePaths = [];
-  
-  const promises = Array.from(files).map(async file =>
-    await new Promise(resolve => {
-      const reader = new FileReader();
 
-      reader.onload = () => {
-        const src = reader.result?.toString();
-        if (src) {
-          filePaths.push(src);
-          resolve(0);
-        }
-      };
+  const promises = Array.from(files).map(
+    async file =>
+      await new Promise(resolve => {
+        const reader = new FileReader();
 
-      reader.readAsDataURL(file);
-    })
+        reader.onload = () => {
+          const src = reader.result?.toString();
+          if (src) {
+            filePaths.push(src);
+            resolve(0);
+          }
+        };
+
+        reader.readAsDataURL(file);
+      }),
   );
 
   await Promise.all(promises);
