@@ -72,3 +72,7 @@ node_modules/
 
 # OS Auto Generate File
 *.DS_Store
+
+# distImages
+/public/assets/images
+/public/favicon.ico

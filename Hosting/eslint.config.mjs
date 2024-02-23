@@ -14,7 +14,7 @@ export default [
     files: ['**/*.{js,jsx,ts,tsx}'],
   },
   {
-    ignores: ['eslint.config.js'],
+    ignores: ['*.config.js'],
   },
 
   // eslintの推奨ルールを使用
