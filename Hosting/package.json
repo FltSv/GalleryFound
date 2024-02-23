@@ -16,9 +16,9 @@
   "author": "suna",
   "license": "ISC",
   "dependencies": {
-    "browser-image-compression": "^2.0.2",
     "@types/react": "^18.2.52",
     "@types/react-dom": "^18.2.18",
+    "browser-image-compression": "^2.0.2",
     "firebase": "^10.4.0",
     "firebase-tools": "^13.2.1",
     "react": "^18.2.0",
@@ -38,6 +38,8 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "favicons": "^7.1.5",
+    "favicons-webpack-plugin": "^6.0.1",
     "globals": "^14.0.0",
     "husky": "^8.0.0",
     "lint-staged": "^15.2.2",
@@ -55,7 +57,7 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "prettier -w",
-      "eslint --fix"
+      "eslint --fix --max-warnings=0 --no-warn-ignored"
     ]
   }
 }
