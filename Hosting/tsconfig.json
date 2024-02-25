@@ -4,7 +4,6 @@
     "target": "ES5", // TSはECMAScript 5に変換
     "module": "ES2015", // TSのモジュールはES Modulesとして出力
     "strict": true, // 厳密モードとして設定
-    "allowJs": true, // Jsの共存を許可
     "moduleResolution": "node",
     "rootDir": "./src",
     "outDir": "./dist",
