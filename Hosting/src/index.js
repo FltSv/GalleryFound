@@ -10,6 +10,9 @@ import { getFirestore } from 'firebase/firestore';
 import { changePwdVisible, loginMail, signupMail } from './login';
 import './mypage';
 
+// components
+import Logo from './components/ui/Logo';
+
 // イベント
 document.addEventListener('DOMContentLoaded', () => {
   const domNode = document.getElementById('logo');
@@ -86,11 +89,3 @@ onAuthStateChanged(auth, user => {
 
 /** @returns {Promise<string>} */
 export const getUserId = () => userAuthStatePromise;
-
-function Logo() {
-  return (
-    <h1 className="text-7xl mb-4 no-underline font-dancing">
-      <a href="/">Gallery Found</a>
-    </h1>
-  );
-}
