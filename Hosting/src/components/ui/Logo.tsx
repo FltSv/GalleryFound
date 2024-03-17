@@ -1,4 +1,4 @@
-const Logos = () => {
+const Logo = () => {
   return (
     <h1 className="text-7xl mb-4 no-underline font-dancing">
       <a href="/">Gallery Found</a>
@@ -6,4 +6,4 @@ const Logos = () => {
   );
 };
 
-export default Logos;
+export default Logo;
