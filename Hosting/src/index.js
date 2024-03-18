@@ -12,9 +12,15 @@ import './mypage';
 
 // components
 import Logo from './components/ui/Logo';
+//import App from './App';
 
 // イベント
 document.addEventListener('DOMContentLoaded', () => {
+  // document.body.innerHTML = '<div id="app"></div>';
+  // var element = document.getElementById('app');
+  // createRoot(element).render(<App />);
+  // return;
+
   const domNode = document.getElementById('logo');
   if (domNode) {
     const root = createRoot(domNode);
