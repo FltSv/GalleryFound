@@ -12,6 +12,7 @@ import './mypage';
 
 // components
 import Logo from './components/ui/Logo';
+import Header from './components/ui/Header';
 //import App from './App';
 
 // イベント
@@ -25,6 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (domNode) {
     const root = createRoot(domNode);
     root.render(<Logo />);
+  }
+
+  const domNodeHeader = document.getElementById('header');
+  if (domNodeHeader) {
+    const root = createRoot(domNodeHeader);
+    root.render(<Header />);
   }
 
   // パスワードの表示非表示
