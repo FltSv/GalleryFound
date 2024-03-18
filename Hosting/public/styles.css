@@ -1,34 +1,10 @@
 body {
-  background: #ECEFF1;
+  background: #eceff1;
   color: rgba(0, 0, 0, 0.87);
   font-family: Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
 }
-
-/* ヘッダーのスタイル */
-header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 10px 20px;
-}
-
-/* 角丸ボタンのスタイル */
-.rounded-button {
-  padding: 0.5em 1em;
-  margin: 0 0.2em;
-  border: 1px solid black;
-  border-radius: 25px;
-  color: black;
-  text-decoration: none;
-  transition: background-color 0.3s;
-}
-
-.rounded-button:hover {
-  background-color: #bedff5;
-}
-
 
 /* ページ内メインコンテンツ */
 #contents {
@@ -40,10 +16,10 @@ header {
 }
 
 p.desc-message {
-  font-size: 1.2em;      /* フォントサイズを少し大きく */
-  color: #666;           /* 色を薄めのグレーに */
-  max-width: 600px;      /* 最大幅を制限 */
-  margin: 2em auto;        /* 中央寄せ */
+  font-size: 1.2em; /* フォントサイズを少し大きく */
+  color: #666; /* 色を薄めのグレーに */
+  max-width: 600px; /* 最大幅を制限 */
+  margin: 2em auto; /* 中央寄せ */
 }
 
 .div-left-align {
@@ -84,8 +60,6 @@ p.desc-message {
   flex: 1;
 }
 
-
-
 /* 箇条書き項目 */
 ul {
   list-style-type: none;
@@ -98,7 +72,7 @@ ul {
   justify-content: center;
 }
 
-#dl-buttons img{
+#dl-buttons img {
   height: 60px;
   margin: 10px 20px;
 }
@@ -123,8 +97,8 @@ ul {
   padding: 5px;
 }
 
-
-input[type="text"], input[type="password"] {
+input[type='text'],
+input[type='password'] {
   width: 100%; /* 幅 */
   font-size: 0.95em; /* フォントサイズ */
   margin: 1em 0; /* 前後の余白 */
@@ -133,13 +107,14 @@ input[type="text"], input[type="password"] {
   border-radius: 4px; /* 角丸 */
 }
 /* フォーカス時のスタイル */
-input[type="text"]:focus, input[type="password"]:focus {
+input[type='text']:focus,
+input[type='password']:focus {
   border-color: #529fff; /* 線の色 */
   outline: 0;
 }
 
 /* バリデーション */
-input[type="text"]:invalid {
+input[type='text']:invalid {
   border: 2px solid red;
   background-color: pink;
 }
@@ -149,7 +124,6 @@ input[type="text"]:invalid {
   color: red;
   font-size: 12px;
 }
-
 
 /* 404ページ */
 @font-face {
@@ -169,7 +143,7 @@ h2.yojo-font {
 h2.comesinhandy-font {
   font-family: 'comesinhandyfont', sans-serif;
   font-size: 45px;
-  color: rgba(114, 114, 114, 0.47)
+  color: rgba(114, 114, 114, 0.47);
 }
 
 h2.yojo-font,
