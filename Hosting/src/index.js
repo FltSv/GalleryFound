@@ -11,27 +11,14 @@ import { changePwdVisible, loginMail, signupMail } from './login';
 import './mypage';
 
 // components
-import Logo from './components/ui/Logo';
-import Header from './components/ui/Header';
-//import App from './App';
+import React from 'react';
+import App from './App';
 
 // イベント
 document.addEventListener('DOMContentLoaded', () => {
-  // document.body.innerHTML = '<div id="app"></div>';
-  // var element = document.getElementById('app');
-  // createRoot(element).render(<App />);
-  // return;
-
-  const domNode = document.getElementById('logo');
-  if (domNode) {
-    const root = createRoot(domNode);
-    root.render(<Logo />);
-  }
-
-  const domNodeHeader = document.getElementById('header');
-  if (domNodeHeader) {
-    const root = createRoot(domNodeHeader);
-    root.render(<Header />);
+  var element = document.getElementById('app');
+  if (element) {
+    createRoot(element).render(<App />);
   }
 
   // パスワードの表示非表示
