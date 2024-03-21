@@ -30,17 +30,6 @@ public static class Factories
     {
         // ストレージからAPI Keyの取得試行
         var storage = new RepoStorage();
-        string apiKey;
-
-        try
-        {
-            apiKey = storage.GetDataApiKey();
-        }
-        catch
-        {
-            string msg = "APIキーがストレージに見つかりませんでした。APIキーを入力してください。";
-            apiKey = await ShowPopup(msg);
-        }
 
         // データベースへの接続試行
         FirestoreDb firestore = null;
@@ -48,17 +37,14 @@ public static class Factories
         {
             try
             {
-                firestore = await AuthGcp.Auth_Anonymous(apiKey);
+                firestore = await AuthGcp.Auth_Anonymous();
             }
             catch
             {
-                string msg = "入力されたAPIキーで、データベースの接続ができませんでした。もう一度入力してください。";
-                apiKey = await ShowPopup(msg);
+                string msg = "failed Anonymous login.";
+                await ShowPopup(msg);
             }
         }
-
-        // データベースに接続を確認できてから、ストレージに登録
-        storage.SetDataApiKey(apiKey);
 
         return firestore;
 

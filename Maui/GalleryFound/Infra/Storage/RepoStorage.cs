@@ -32,7 +32,7 @@ public class RepoStorage
         Preferences.Set(_latestUpdate, date);
     }
 
-    public string GetDataApiKey()
+    private string GetDataApiKey() // 使用しなくなった
     {
         if (!Preferences.ContainsKey(_apiKey))
         {
@@ -42,7 +42,7 @@ public class RepoStorage
         return Preferences.Get(_apiKey, null);
     }
 
-    public void SetDataApiKey(string value)
+    private void SetDataApiKey(string value)
     {
         Preferences.Set(_apiKey, value);
     }

@@ -11,17 +11,17 @@ public static class AuthGcp
 {
     private const string _projectId = "gallery-found";
     private const string _authDomain = "gallery-found.firebaseapp.com";
+    private const string _apiKey = "AIzaSyDqf-8M_mqa1u3nF3eY3i0eEzhZi4Wow34";
 
     /// <summary>
     /// 匿名認証を行い、DBのインスタンスを取得
     /// </summary>
-    /// <param name="apiKey">Firebase WebアプリのAPIキー</param>
-    public static async Task<FirestoreDb> Auth_Anonymous(string apiKey)
+    public static async Task<FirestoreDb> Auth_Anonymous()
     {
         // Firebase認証クライアントを生成
         var firebaseClient = new FirebaseAuthClient(new FirebaseAuthConfig
         {
-            ApiKey = apiKey,
+            ApiKey = _apiKey,
             AuthDomain = _authDomain,
         });
 

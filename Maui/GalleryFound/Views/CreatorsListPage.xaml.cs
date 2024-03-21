@@ -44,7 +44,7 @@ public class CreatorListPageVm : VmBase
             OnPropertyChanged(nameof(InitialList));
         }
     }
-    private string _searchText;
+    private string _searchText = string.Empty;
 
     /// <summary>
     /// ìÒ‚Ì–¼‘OƒŠƒXƒg
