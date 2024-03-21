@@ -29,7 +29,33 @@ public class RepoGcp : IRepo
 
     public async Task<Creator[]> GetCreatorsAsync()
     {
-        throw new NotImplementedException();
+        var creatorRef = _firestore.Collection(_creatorsCollection);
+        var creatorSs = await creatorRef.GetSnapshotAsync();
+
+        var list = new List<Creator>();
+        foreach (var item in creatorSs.Documents)
+        {
+            var creator = new Creator
+            {
+                Name = item.GetValue<string>("name")
+            };
+
+            var exhibits = item.GetValue<List<Dictionary<string, string>>>("exhibits");
+            foreach (var exhibitItem in exhibits)
+            {
+                creator.Exhibits.Add(new Exhibit
+                {
+                    Title = exhibitItem["title"],
+                    Date = exhibitItem["date"],
+                    Image = new Uri(exhibitItem["image"]),
+                    Location = exhibitItem["location"]
+                });
+            }
+
+            list.Add(creator);
+        }
+
+        return [.. list];
     }
 
     public async Task<Gallery[]> GetGalleriesAsync()

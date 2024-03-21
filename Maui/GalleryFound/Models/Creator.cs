@@ -56,6 +56,11 @@ public record class Creator
     public List<Product> Products { get; } = new();
 
     /// <summary>
+    /// 展示一覧
+    /// </summary>
+    public List<Exhibit> Exhibits { get; } = new();
+
+    /// <summary>
     /// 展示歴を取得
     /// </summary>
     public void GetPresentedHistory()
