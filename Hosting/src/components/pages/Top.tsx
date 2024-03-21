@@ -1,4 +1,4 @@
-const Top = () => (
+export const Top = () => (
   <>
     <p className="desc-message">
       いつでもどこでも簡単にギャラリーを見つけられるアプリ。
@@ -58,5 +58,3 @@ const Top = () => (
     </ul>
   </>
 );
-
-export default Top;

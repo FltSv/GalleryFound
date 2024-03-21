@@ -1,29 +1,31 @@
+import { Link } from 'react-router-dom';
+
 const Header = () => {
   const styles =
     'px-4 py-2 mx-1 my-0 border border-solid border-neutral-950 rounded-3xl text-neutral-950 no-underline transition hover:bg-sky-200';
   return (
     <header className="flex justify-end items-center px-5 py-3">
-      <a
+      <Link
         id="header-login-button"
-        href="/login"
+        to="login"
         className={styles}
         style={{ display: 'none' }}>
         Creator Login
-      </a>
-      <a
+      </Link>
+      <Link
         id="header-mypage-button"
-        href="/mypage"
+        to="/mypage"
         className={styles}
         style={{ display: 'none' }}>
         MyPage
-      </a>
-      <a
+      </Link>
+      <Link
         id="header-logout-button"
-        href="/"
+        to="/"
         className={styles}
         style={{ display: 'none' }}>
         Logout
-      </a>
+      </Link>
     </header>
   );
 };
