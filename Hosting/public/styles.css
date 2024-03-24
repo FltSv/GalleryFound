@@ -97,34 +97,6 @@ ul {
   padding: 5px;
 }
 
-input[type='text'],
-input[type='password'] {
-  width: 100%; /* 幅 */
-  font-size: 0.95em; /* フォントサイズ */
-  margin: 1em 0; /* 前後の余白 */
-  padding: 0.5em; /* テキスト周りの余白 */
-  border: solid 2px #e3e6ea; /* 線の色 */
-  border-radius: 4px; /* 角丸 */
-}
-/* フォーカス時のスタイル */
-input[type='text']:focus,
-input[type='password']:focus {
-  border-color: #529fff; /* 線の色 */
-  outline: 0;
-}
-
-/* バリデーション */
-input[type='text']:invalid {
-  border: 2px solid red;
-  background-color: pink;
-}
-
-#errorMsg {
-  display: block;
-  color: red;
-  font-size: 12px;
-}
-
 /* 404ページ */
 @font-face {
   font-family: 'YojoFont';
