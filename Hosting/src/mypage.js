@@ -10,7 +10,7 @@ import {
 } from 'firebase/storage';
 import imageCompression from 'browser-image-compression';
 
-import { db, getUserId } from './index';
+import { db, getUserId } from './firebase';
 import * as htmlHelper from './lib/htmlHelper';
 
 const creatorsPath = 'creators';

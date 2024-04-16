@@ -1,49 +1,10 @@
 //@ts-check
 import {
   getAuth,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from 'firebase/auth';
 import * as htmlHelper from './lib/htmlHelper';
-
-// イベント
-document.addEventListener('DOMContentLoaded', () => {
-  // ログアウトボタン
-  document
-    .getElementById('header-logout-button')
-    ?.addEventListener('click', signout);
-});
-
-// パスワードの表示非表示を切替
-export function changePwdVisible() {
-  const setType = this.checked ? 'text' : 'password';
-  document.getElementById('input-pwd')?.setAttribute('type', setType);
-  document.getElementById('input-pwd-confirm')?.setAttribute('type', setType);
-}
-
-// ログイン
-export function loginMail() {
-  const id = htmlHelper.getInputValue('input-id');
-  const pwd = htmlHelper.getInputValue('input-pwd');
-
-  if (!validationIdPwd(id, pwd, pwd)) {
-    return;
-  }
-
-  signInWithEmailAndPassword(getAuth(), id, pwd)
-    .then(userCredential => {
-      // Signed in
-      const user = userCredential.user;
-
-      console.log(`ログインしたよ～: ${user}`);
-      transitionPage('/mypage');
-    })
-    .catch(error => {
-      showError(error);
-      return;
-    });
-}
 
 // 新規登録
 export async function signupMail() {
@@ -109,17 +70,12 @@ export async function signupMail() {
   window.location.href = '/login/sendverify.html';
 }
 
-// ログアウト
-function signout() {
-  getAuth().signOut();
-  window.location.href = '/';
-}
-
 /**
  * 認証状態により、ページ移動のハンドリングを行う
  * メールアドレス認証が行われていない場合、
  * @param {string} link
  */
+// eslint-disable-next-line no-unused-vars
 function transitionPage(link) {
   const auth = getAuth();
   const currentUser = auth.currentUser;
