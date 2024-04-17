@@ -5,10 +5,17 @@ import {
   ReactNode,
   useEffect,
 } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase';
+import { getAuth, User, onAuthStateChanged } from 'firebase/auth';
 
-const AuthContext = createContext<User | null>(null);
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+});
 
 export function useAuthContext() {
   return useContext(AuthContext);
@@ -16,15 +23,19 @@ export function useAuthContext() {
 
 export const AuthProvider = (props: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribed = onAuthStateChanged(auth, user => {
+    const unsubscribed = onAuthStateChanged(getAuth(), user => {
       setUser(user);
+      setLoading(false);
     });
     return unsubscribed;
   }, []);
 
   return (
-    <AuthContext.Provider value={user}>{props.children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, loading }}>
+      {props.children}
+    </AuthContext.Provider>
   );
 };

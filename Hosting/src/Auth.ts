@@ -1,8 +1,8 @@
 import {
+  createUserWithEmailAndPassword,
   getAuth,
+  sendEmailVerification,
   signInWithEmailAndPassword,
-  //   createUserWithEmailAndPassword,
-  //   sendEmailVerification,
 } from 'firebase/auth';
 
 /**
@@ -12,11 +12,24 @@ import {
  */
 export async function loginWithEmail(email: string, pass: string) {
   const auth = getAuth();
-  const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-  // Signed in
-  const user = userCredential.user;
+  return await signInWithEmailAndPassword(auth, email, pass);
+}
 
-  console.debug('ログインしたよ～: ', user);
+/**
+ * メール・パスワードによる新規登録
+ * @returns
+ */
+export async function signupWithEmail(email: string, pass: string) {
+  const auth = getAuth();
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    pass,
+  );
+
+  // メールアドレス確認メールを送信する
+  await sendEmailVerification(userCredential.user);
+  return userCredential;
 }
 
 /**

@@ -1,8 +1,6 @@
 //@ts-check
 import { createRoot } from 'react-dom/client';
 import './index.tailwind.css';
-
-import { signupMail } from './login';
 import './mypage';
 
 import { AuthProvider } from './components/AuthContext';
@@ -14,16 +12,13 @@ import App from './App';
 // イベント
 document.addEventListener('DOMContentLoaded', () => {
   var element = document.getElementById('app');
-  if (element) {
-    createRoot(element).render(
-      <AuthProvider>
-        <App />
-      </AuthProvider>,
-    );
+  if (!element) {
+    return;
   }
 
-  // 登録ボタン
-  document
-    .getElementById('resister-button')
-    ?.addEventListener('click', signupMail);
+  createRoot(element).render(
+    <AuthProvider>
+      <App />
+    </AuthProvider>,
+  );
 });

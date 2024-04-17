@@ -6,7 +6,12 @@ const Header = () => {
   const styles =
     'px-4 py-2 mx-1 my-0 border border-solid border-neutral-950 rounded-3xl text-neutral-950 no-underline transition hover:bg-sky-200';
 
-  const user = useAuthContext();
+  const { user, loading } = useAuthContext();
+
+  if (loading) {
+    return <></>;
+  }
+
   const isLogged = user !== null;
 
   const onSignOut = () => {
