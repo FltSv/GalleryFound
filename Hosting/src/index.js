@@ -1,7 +1,6 @@
 //@ts-check
 import { createRoot } from 'react-dom/client';
 import './index.tailwind.css';
-import './mypage';
 
 import { AuthProvider } from './components/AuthContext';
 

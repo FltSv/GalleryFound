@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { getFirestore, FirestoreDataConverter } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDqf-8M_mqa1u3nF3eY3i0eEzhZi4Wow34',
@@ -15,21 +15,33 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// ユーザー認証状態が確定するまでのプロミス
-let resolveUserAuthState: (arg: string | null) => void;
-const userAuthStatePromise = new Promise<string | null>(resolve => {
-  resolveUserAuthState = resolve;
-});
-// ログイン状態の更新で実行
-onAuthStateChanged(auth, user => {
-  resolveUserAuthState(user ? user.uid : null);
+export const fbCreatorConverter: FirestoreDataConverter<Creator> = {
+  toFirestore: modelObject => modelObject,
 
-  if (user) {
-    console.log(`Logged in! emailVerified: ${user.emailVerified}`);
-  } else {
-    console.log('No User.');
-  }
-});
+  fromFirestore: (snapshot, options?) => {
+    const data = snapshot.data(options);
+    return data as Creator;
+  },
+};
 
-/** @returns {Promise<string>} */
-export const getUserId = () => userAuthStatePromise;
+/** firestore Creator */
+export interface Creator {
+  name: string;
+  products: Product[];
+  exhibits: Exhibit[];
+}
+
+/** firestore Product */
+export interface Product {
+  id: string;
+  image: string;
+}
+
+/** firestore Exhibit */
+export interface Exhibit {
+  id: string;
+  title: string;
+  location: string;
+  date: string;
+  image: string;
+}

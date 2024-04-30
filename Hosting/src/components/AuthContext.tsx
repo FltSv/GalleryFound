@@ -5,7 +5,8 @@ import {
   ReactNode,
   useEffect,
 } from 'react';
-import { getAuth, User, onAuthStateChanged } from 'firebase/auth';
+import { User, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -26,9 +27,15 @@ export const AuthProvider = (props: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribed = onAuthStateChanged(getAuth(), user => {
+    const unsubscribed = onAuthStateChanged(auth, user => {
       setUser(user);
       setLoading(false);
+
+      if (user) {
+        console.debug(`Logged in! emailVerified: ${user.emailVerified}`);
+      } else {
+        console.debug('No User.');
+      }
     });
     return unsubscribed;
   }, []);
