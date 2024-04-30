@@ -39,7 +39,8 @@ export const Login = () => {
     return <Navigate replace to={'/mypage'} />;
   }
 
-  const isRegister = (location.state as LoginState).isRegister;
+  const loginState = location.state as LoginState;
+  const isRegister = loginState.isRegister || false;
   const actionText = isRegister ? '登録' : 'ログイン';
 
   const visiblePwd = watch('visiblePwd', false);
@@ -146,9 +147,9 @@ export const Login = () => {
           <Button
             type="button"
             addClass="text-black bg-white"
-            onClick={() =>
-              { navigate('/login', { state: { isRegister: true } as LoginState }); }
-            }>
+            onClick={() => {
+              navigate('/login', { state: { isRegister: true } as LoginState });
+            }}>
             新規登録
           </Button>
         </>
