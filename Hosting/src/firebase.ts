@@ -26,9 +26,9 @@ export const fbCreatorConverter: FirestoreDataConverter<Creator> = {
 
 /** firestore Creator */
 export interface Creator {
-  name: string;
-  products: Product[];
-  exhibits: Exhibit[];
+  name?: string;
+  products?: Product[];
+  exhibits?: Exhibit[];
 }
 
 /** firestore Product */

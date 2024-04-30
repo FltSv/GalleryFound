@@ -44,10 +44,10 @@ export async function getCreatorData(user: User) {
   const data = docSnap.data();
   console.debug('docSnap.data:', data);
 
-  creator.name = data.name;
+  creator.name = data.name ?? '';
 
   // 発表作品
-  const fbProducts = data.products;
+  const fbProducts = data.products ?? [];
   console.debug('products: ', fbProducts);
   if (fbProducts.length > 0) {
     creator.products = fbProducts.map(x => ({
@@ -73,7 +73,7 @@ export async function getCreatorData(user: User) {
   }
 
   // 展示登録
-  const fbExhibits = data.exhibits;
+  const fbExhibits = data.exhibits ?? [];
   creator.exhibits = fbExhibits.map(x => ({
     id: x.id,
     title: x.title,
