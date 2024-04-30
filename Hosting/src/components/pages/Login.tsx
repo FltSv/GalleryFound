@@ -17,6 +17,17 @@ interface LoginState {
   isRegister: boolean;
 }
 
+function isLoginState(value: unknown): value is LoginState {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const record = value as Record<keyof LoginState, unknown>;
+  const loginState: LoginState = {
+    isRegister: false,
+  };
+  return typeof record.isRegister === typeof loginState.isRegister;
+}
+
 export const Login = () => {
   const { user, loading } = useAuthContext();
   const [loginErrorMsg, setLoginErrorMsg] = useState<string>();
@@ -39,8 +50,7 @@ export const Login = () => {
     return <Navigate replace to={'/mypage'} />;
   }
 
-  const loginState = location.state as LoginState;
-  const isRegister = loginState.isRegister || false;
+  const isRegister = isLoginState(location.state) && location.state.isRegister;
   const actionText = isRegister ? '登録' : 'ログイン';
 
   const visiblePwd = watch('visiblePwd', false);
