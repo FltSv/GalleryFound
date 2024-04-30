@@ -29,7 +29,9 @@ export const Mypage = () => {
         setCreator(x);
         setLoading(false);
       })
-      .catch(x => { console.error('failed fetch data: ', x); });
+      .catch(x => {
+        console.error('failed fetch data: ', x);
+      });
   }, [user]);
 
   const {
@@ -215,10 +217,18 @@ const ExhibitRow = (props: ExhibitRowProps) => {
       </td>
       {/* ボタンセル */}
       <td className="align-top w-fit flex flex-col gap-2">
-        <button type="button" onClick={() => { onEdit(data); }}>
+        <button
+          type="button"
+          onClick={() => {
+            onEdit(data);
+          }}>
           編集
         </button>
-        <button type="button" onClick={() => { onDelete(data); }}>
+        <button
+          type="button"
+          onClick={() => {
+            onDelete(data);
+          }}>
           削除
         </button>
       </td>
@@ -232,7 +242,7 @@ interface ExhibitFormProps {
 }
 
 interface ExhibitWithFile extends Exhibit {
-  selectedFiles: FileList;
+  selectedFiles?: FileList;
 }
 
 const ExhibitForm = (props: ExhibitFormProps) => {
@@ -249,7 +259,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
   const selectedFiles = watch('selectedFiles');
   const tmpImage =
-    selectedFiles.length > 0
+    selectedFiles !== undefined && selectedFiles.length > 0
       ? URL.createObjectURL(selectedFiles[0])
       : exhibit?.tmpImageData ?? '';
 
@@ -271,8 +281,15 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             type="file"
             accept="image/*"
             {...register('selectedFiles', {
-              validate: value =>
-                !isAdd || value.length > 0 || 'ファイルを選択してください。',
+              validate: value => {
+                if (!isAdd) {
+                  return true;
+                }
+                if (value === undefined) {
+                  return false;
+                }
+                return value.length > 0 || 'ファイルを選択してください。';
+              },
             })}
           />
           <p className="text-red-600 text-xs">
