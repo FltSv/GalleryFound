@@ -5,6 +5,7 @@ import { Top } from './components/pages/Top';
 import { Login } from './components/pages/Login';
 import { Mypage } from './components/pages/Mypage';
 import { SendVerify, NoVerify } from './components/pages/Verify';
+import { NotFound } from './components/pages/NotFound';
 
 // ui
 import Header from './components/ui/Header';
@@ -43,7 +44,7 @@ const App = () => (
         <Route path="login" element={<Login />} />
         <Route path="sendverify" element={<SendVerify />} />
         <Route path="mypage" element={<AuthRouting page={<Mypage />} />} />
-        <Route path="*" element={<h1>Not Found Page</h1>} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   </BrowserRouter>
