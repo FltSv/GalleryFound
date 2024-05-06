@@ -1,4 +1,6 @@
 singleQuote: true
-quoteProps: "consistent"
+quoteProps: 'consistent'
 bracketSameLine: true
-arrowParens: "avoid"
+arrowParens: 'avoid'
+plugins:
+  - 'prettier-plugin-tailwindcss'
