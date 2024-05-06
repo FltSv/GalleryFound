@@ -1,5 +1,5 @@
 /* eslint react/display-name: 0 */
-import { FC, ReactNode, ComponentProps, forwardRef, ForwardedRef } from 'react';
+import { FC, ReactNode, ComponentProps, forwardRef } from 'react';
 
 interface TextboxProps extends ComponentProps<'input'> {
   type: 'text' | 'password';
@@ -26,7 +26,7 @@ export interface ButtonProps extends ComponentProps<'button'> {
 export const Button: FC<ButtonProps> = ({ addClass, iconClass, ...props }) => (
   <button
     {...props}
-    className={`w-fit select-none rounded-full px-4 py-2 shadow-[0_1px_3px_0_#898282] transition-all duration-300 ${addClass}`}>
+    className={`w-fit select-none rounded-full px-4 py-2 shadow-[0_1px_3px_0_#898282] transition-all duration-300 ${addClass ?? ''}`}>
     <i className={iconClass ? iconClass + ' m-0 mr-2' : ''}></i>
     {props.children}
   </button>
