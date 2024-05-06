@@ -5,6 +5,8 @@ module.exports = {
     extend: {
       fontFamily: {
         magneto: ['"magneto"', 'sans-serif'],
+        yojo: ['"YojoFont"', 'sans-serif'],
+        comesinhandy: ['"comesinhandyfont"', 'sans-serif'],
       },
     },
   },
