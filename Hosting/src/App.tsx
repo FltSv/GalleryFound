@@ -36,7 +36,7 @@ const AuthRouting = (props: { page: ReactNode }) => {
 const App = () => (
   <BrowserRouter>
     <Header />
-    <div id="contents">
+    <div className="flex flex-col items-center mx-auto pb-8 max-w-xl">
       <Logo />
       <Routes>
         <Route path="/" element={<Top />} />
