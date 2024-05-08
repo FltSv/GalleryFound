@@ -2,6 +2,8 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+@import 'assets/fonts/index.css';
+
 @layer base {
   h1 {
     @apply text-2xl font-bold;
@@ -15,6 +17,6 @@
 }
 
 body {
-  @apply text-slate-950 bg-slate-50;
+  @apply bg-slate-50 text-slate-950;
   font-family: Roboto, Helvetica, Arial, sans-serif;
 }
