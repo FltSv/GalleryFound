@@ -68,7 +68,6 @@ node_modules/
 # Webpack
 /public/bundle.js
 /app.js
-/firebase-config.json
 
 # OS Auto Generate File
 *.DS_Store
@@ -76,3 +75,7 @@ node_modules/
 # distImages
 /public/assets/images
 /public/favicon.ico
+
+# outputFonts
+/public/*.ttf
+/public/*.woff
