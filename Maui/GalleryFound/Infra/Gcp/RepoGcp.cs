@@ -37,17 +37,29 @@ public class RepoGcp : IRepo
         {
             var creator = new Creator
             {
+                Id = item.Id,
                 Name = item.GetValue<string>("name")
             };
+
+            var products = item.GetValue<List<Dictionary<string, string>>>("products");
+            foreach (var productItem in products)
+            {
+                creator.Products.Add(new Product
+                {
+                    Id = productItem["id"],
+                    Image = productItem["image"],
+                });
+            }
 
             var exhibits = item.GetValue<List<Dictionary<string, string>>>("exhibits");
             foreach (var exhibitItem in exhibits)
             {
                 creator.Exhibits.Add(new Exhibit
                 {
+                    Id = exhibitItem["id"],
                     Title = exhibitItem["title"],
                     Date = exhibitItem["date"],
-                    Image = new Uri(exhibitItem["image"]),
+                    Image = exhibitItem["image"],
                     Location = exhibitItem["location"]
                 });
             }

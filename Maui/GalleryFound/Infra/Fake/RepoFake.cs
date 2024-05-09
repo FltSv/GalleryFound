@@ -128,7 +128,7 @@ public class RepoFake : IRepo
 
             var product = new Product()
             {
-                Image = _imageUris[rnd.Next(_imageUris.Length)],
+                Image = _imageUris[rnd.Next(_imageUris.Length)].AbsolutePath,  // 動作未確認
                 Creator = _creators[rnd.Next(_creators.Length)],
                 Gallery = _galleries[rnd.Next(_galleries.Length)],
                 ReleaseDate = randomDate,

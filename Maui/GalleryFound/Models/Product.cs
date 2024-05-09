@@ -5,15 +5,17 @@
 /// </summary>
 public record class Product
 {
+    public string Id { get; init; }
+
     /// <summary>
     /// 作品名
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; init; }
 
     /// <summary>
     /// 作品のサムネイル画像
     /// </summary>
-    public Uri Image { get; set; }
+    public string Image { get; init; }
 
     /// <summary>
     /// 公開日時

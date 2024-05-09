@@ -6,6 +6,8 @@ public record class Creator
 {
     private static readonly char[] _spaceDelimiters = new[] { ' ', '　' };
 
+    public string Id { get; init; }
+
     /// <summary>
     /// 作家名
     /// </summary>
