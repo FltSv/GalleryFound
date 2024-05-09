@@ -22,6 +22,7 @@ const imageCompOptions: Options = {
 
 export async function getCreatorData(user: User) {
   const userId = user.uid;
+  const creatorUrl = `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${user.uid}%2F`;
   const creator: Creator = {
     name: '',
     products: [],
@@ -52,7 +53,8 @@ export async function getCreatorData(user: User) {
   if (fbProducts.length > 0) {
     creator.products = fbProducts.map(x => ({
       id: x.id,
-      imageUrl: x.image,
+      srcImage: x.image,
+      imageUrl: creatorUrl + x.image,
       tmpImageData: '',
     }));
   } else {
@@ -65,6 +67,7 @@ export async function getCreatorData(user: User) {
       const blob = await getBlob(itemRef);
       const product: Product = {
         id: crypto.randomUUID(),
+        srcImage: '',
         imageUrl: '',
         tmpImageData: URL.createObjectURL(blob),
       };
@@ -79,7 +82,8 @@ export async function getCreatorData(user: User) {
     title: x.title,
     location: x.location,
     date: x.date,
-    imageUrl: x.image,
+    srcImage: x.image,
+    imageUrl: creatorUrl + x.image,
     tmpImageData: '',
   }));
 
@@ -103,13 +107,13 @@ export async function setCreatorData(user: User, data: Creator) {
   );
   await setDoc(docRef, {
     name: data.name,
-    products: data.products.map(x => ({ id: x.id, image: x.imageUrl })),
+    products: data.products.map(x => ({ id: x.id, image: x.srcImage })),
     exhibits: data.exhibits.map(x => ({
       id: x.id,
       title: x.title,
       location: x.location,
       date: x.date,
-      image: x.imageUrl,
+      image: x.srcImage,
     })),
   });
 
@@ -143,8 +147,9 @@ async function uploadImageData(user: User, images: ImageStatus[]) {
     const storageRef = ref(storage, path);
     const result = await uploadBytes(storageRef, compressedFile);
 
-    image.tmpImageData = '';
-    image.imageUrl = await getDownloadURL(result.ref);
+    const url = await getDownloadURL(result.ref);
+    const name = result.metadata.name;
+    image.srcImage = url.match(`${name}.*`)?.[0] ?? '';
   };
 
   const tasks = images.map(exhibit => uploadImage(exhibit));
@@ -183,6 +188,9 @@ export interface Exhibit extends ImageStatus {
 }
 
 interface ImageStatus {
+  /* DBのファイル名＋トークン */
+  srcImage: string;
+
   /** イメージ(Upload前) */
   tmpImageData: string;
 

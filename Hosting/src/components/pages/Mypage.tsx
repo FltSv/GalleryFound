@@ -78,12 +78,12 @@ export const Mypage = () => {
             defaultValue={creator?.name}
             {...register('name', { required: '1文字以上の入力が必要です。' })}
           />
-          <p className="text-red-600 text-xs">{errors.name?.message}</p>
+          <p className="text-xs text-red-600">{errors.name?.message}</p>
         </div>
 
         <div>
           <p>発表作品</p>
-          <div className="flex w-[500px] overflow-x-auto [&>img]:h-40 [&>img]:m-2">
+          <div className="flex w-[500px] overflow-x-auto [&>img]:m-2 [&>img]:h-40">
             {creator?.products.map(product => (
               <img
                 key={product.id}
@@ -106,6 +106,7 @@ export const Mypage = () => {
                 const product: Product = {
                   id: crypto.randomUUID(),
                   tmpImageData: url,
+                  srcImage: '',
                   imageUrl: '',
                 };
                 tmpProducts.push(product);
@@ -113,7 +114,7 @@ export const Mypage = () => {
               setTmpProducts([...tmpProducts]);
             }}
           />
-          <div className="flex w-[500px] overflow-x-auto [&>img]:h-40 [&>img]:m-2">
+          <div className="flex w-[500px] overflow-x-auto [&>img]:m-2 [&>img]:h-40">
             {tmpProducts.map(product => (
               <img key={product.id} src={product.tmpImageData} />
             ))}
@@ -210,13 +211,13 @@ const ExhibitRow = (props: ExhibitRowProps) => {
         />
       </td>
       {/* 内容セル */}
-      <td className="align-top w-max [&>p]:m-1">
+      <td className="w-max align-top [&>p]:m-1">
         <p>{data.title}</p>
         <p>{data.location}</p>
         <p>{data.date}</p>
       </td>
       {/* ボタンセル */}
-      <td className="align-top w-fit flex flex-col gap-2">
+      <td className="flex w-fit flex-col gap-2 align-top">
         <button
           type="button"
           onClick={() => {
@@ -292,15 +293,15 @@ const ExhibitForm = (props: ExhibitFormProps) => {
               },
             })}
           />
-          <p className="text-red-600 text-xs">
+          <p className="text-xs text-red-600">
             {errors.selectedFiles?.message}
           </p>
           <img
-            className="w-full mx-0 my-2.5"
+            className="mx-0 my-2.5 w-full"
             src={tmpImage || exhibit?.imageUrl}
           />
         </div>
-        <div className="w-1/2 p-2.5 flex flex-col gap-2">
+        <div className="flex w-1/2 flex-col gap-2 p-2.5">
           <div>
             <p>展示名</p>
             <input
@@ -310,7 +311,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
                 required: reqMessage,
               })}
             />{' '}
-            <p className="text-red-600 text-xs">{errors.title?.message}</p>
+            <p className="text-xs text-red-600">{errors.title?.message}</p>
           </div>
           <div>
             <p>場所</p>
@@ -319,7 +320,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
               defaultValue={exhibit?.location}
               {...register('location', { required: reqMessage })}
             />
-            <p className="text-red-600 text-xs">{errors.location?.message}</p>
+            <p className="text-xs text-red-600">{errors.location?.message}</p>
           </div>
           <div>
             <p>日時</p>
@@ -328,7 +329,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
               defaultValue={exhibit?.date}
               {...register('date', { required: reqMessage })}
             />
-            <p className="text-red-600 text-xs">{errors.date?.message}</p>
+            <p className="text-xs text-red-600">{errors.date?.message}</p>
           </div>
         </div>
       </div>
