@@ -1,13 +1,6 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { User } from 'firebase/auth';
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  listAll,
-  getBlob,
-  getDownloadURL,
-} from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
 
 import { db, fbCreatorConverter } from './firebase';
@@ -49,31 +42,12 @@ export async function getCreatorData(user: User) {
 
   // 発表作品
   const fbProducts = data.products ?? [];
-  console.debug('products: ', fbProducts);
-  if (fbProducts.length > 0) {
-    creator.products = fbProducts.map(x => ({
-      id: x.id,
-      srcImage: x.image,
-      imageUrl: creatorUrl + x.image,
-      tmpImageData: '',
-    }));
-  } else {
-    // 旧仕様
-    console.debug('old format products');
-    const presProductsPath = `creators/${userId}/presProducts`;
-    const listRef = ref(getStorage(), presProductsPath);
-    const res = await listAll(listRef);
-    for (const itemRef of res.items) {
-      const blob = await getBlob(itemRef);
-      const product: Product = {
-        id: crypto.randomUUID(),
-        srcImage: '',
-        imageUrl: '',
-        tmpImageData: URL.createObjectURL(blob),
-      };
-      creator.products.push(product);
-    }
-  }
+  creator.products = fbProducts.map(x => ({
+    id: x.id,
+    srcImage: x.image,
+    imageUrl: creatorUrl + x.image,
+    tmpImageData: '',
+  }));
 
   // 展示登録
   const fbExhibits = data.exhibits ?? [];
