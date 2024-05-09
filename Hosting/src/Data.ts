@@ -1,13 +1,6 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { User } from 'firebase/auth';
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  listAll,
-  getBlob,
-  getDownloadURL,
-} from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
 
 import { db, fbCreatorConverter } from './firebase';
@@ -22,6 +15,7 @@ const imageCompOptions: Options = {
 
 export async function getCreatorData(user: User) {
   const userId = user.uid;
+  const creatorUrl = `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${user.uid}%2F`;
   const creator: Creator = {
     name: '',
     products: [],
@@ -48,29 +42,12 @@ export async function getCreatorData(user: User) {
 
   // 発表作品
   const fbProducts = data.products ?? [];
-  console.debug('products: ', fbProducts);
-  if (fbProducts.length > 0) {
-    creator.products = fbProducts.map(x => ({
-      id: x.id,
-      imageUrl: x.image,
-      tmpImageData: '',
-    }));
-  } else {
-    // 旧仕様
-    console.debug('old format products');
-    const presProductsPath = `creators/${userId}/presProducts`;
-    const listRef = ref(getStorage(), presProductsPath);
-    const res = await listAll(listRef);
-    for (const itemRef of res.items) {
-      const blob = await getBlob(itemRef);
-      const product: Product = {
-        id: crypto.randomUUID(),
-        imageUrl: '',
-        tmpImageData: URL.createObjectURL(blob),
-      };
-      creator.products.push(product);
-    }
-  }
+  creator.products = fbProducts.map(x => ({
+    id: x.id,
+    srcImage: x.image,
+    imageUrl: creatorUrl + x.image,
+    tmpImageData: '',
+  }));
 
   // 展示登録
   const fbExhibits = data.exhibits ?? [];
@@ -79,7 +56,8 @@ export async function getCreatorData(user: User) {
     title: x.title,
     location: x.location,
     date: x.date,
-    imageUrl: x.image,
+    srcImage: x.image,
+    imageUrl: creatorUrl + x.image,
     tmpImageData: '',
   }));
 
@@ -103,13 +81,13 @@ export async function setCreatorData(user: User, data: Creator) {
   );
   await setDoc(docRef, {
     name: data.name,
-    products: data.products.map(x => ({ id: x.id, image: x.imageUrl })),
+    products: data.products.map(x => ({ id: x.id, image: x.srcImage })),
     exhibits: data.exhibits.map(x => ({
       id: x.id,
       title: x.title,
       location: x.location,
       date: x.date,
-      image: x.imageUrl,
+      image: x.srcImage,
     })),
   });
 
@@ -143,8 +121,9 @@ async function uploadImageData(user: User, images: ImageStatus[]) {
     const storageRef = ref(storage, path);
     const result = await uploadBytes(storageRef, compressedFile);
 
-    image.tmpImageData = '';
-    image.imageUrl = await getDownloadURL(result.ref);
+    const url = await getDownloadURL(result.ref);
+    const name = result.metadata.name;
+    image.srcImage = url.match(`${name}.*`)?.[0] ?? '';
   };
 
   const tasks = images.map(exhibit => uploadImage(exhibit));
@@ -183,6 +162,9 @@ export interface Exhibit extends ImageStatus {
 }
 
 interface ImageStatus {
+  /* DBのファイル名＋トークン */
+  srcImage: string;
+
   /** イメージ(Upload前) */
   tmpImageData: string;
 
