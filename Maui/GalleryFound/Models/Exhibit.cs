@@ -5,24 +5,26 @@
     /// </summary>
     public class Exhibit
     {
+        public string Id { get; init; }
+
         /// <summary>
         /// 展示名
         /// </summary>
-        public string Title { get; set; }
+        public string Title { get; init; }
 
         /// <summary>
         /// 展示場所（ギャラリー）
         /// </summary>
-        public string Location { get; set; }
+        public string Location { get; init; }
 
         /// <summary>
-        /// イメージ画像URL
+        /// イメージ画像のファイル名＋トークン
         /// </summary>
-        public Uri Image { get; set; }
+        public string Image { get; init; }
 
         /// <summary>
         /// 展示日時
         /// </summary>
-        public string Date { get; set; }
+        public string Date { get; init; }
     }
 }

@@ -55,6 +55,7 @@
         <Button
             Grid.Row="1"
             Grid.Column="2"
+            IsEnabled="{Binding IsActive}"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.Account}"
             CommandParameter="{x:Type views:CreatorListPage}"
@@ -63,6 +64,7 @@
         <Button
             Grid.Row="2"
             Grid.Column="1"
+            IsEnabled="{Binding IsActive}"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.FountainPen}"
             CommandParameter="{x:Type views:GalleryListPage}"
@@ -70,6 +72,7 @@
         <Button
             Grid.Row="2"
             Grid.Column="3"
+            IsEnabled="{Binding IsActive}"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.BookOpenPageVariantOutline}"
             CommandParameter="{x:Type views:MagazineListPage}"
@@ -77,10 +80,14 @@
         <Button
             Grid.Row="3"
             Grid.Column="2"
+            IsEnabled="{Binding IsActive}"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.MapMarker}"
             CommandParameter="{x:Type views:MapPage}"
             BackgroundColor="Blue"/>
+        
+        <ActivityIndicator Color="Cyan" IsRunning="{Binding IsLoading}"
+                           Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" Grid.ColumnSpan="5"/>
     </Grid>
     
 </ContentPage>
