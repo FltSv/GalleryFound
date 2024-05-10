@@ -3,9 +3,11 @@
     x:Class="GalleryFound.Views.CreatorDetailPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:GalleryFound.Views.Converters"
     xmlns:models="clr-namespace:GalleryFound.Models"
     xmlns:views="clr-namespace:GalleryFound.Views"
     Title="CreatorDetailPage"
+    x:Name="page"
     x:DataType="views:CreatorDetailPageVm">
 
     <ContentPage.Resources>
@@ -17,6 +19,7 @@
                     Text="結果はありません。" />
             </StackLayout>
         </DataTemplate>
+        <converters:CreatorImageUrlConverter x:Key="toImageUrl" />
     </ContentPage.Resources>
 
     <ScrollView Orientation="Vertical">
@@ -51,7 +54,9 @@
                                     <ColumnDefinition Width="2*" />
                                 </Grid.ColumnDefinitions>
 
-                                <Image Grid.Column="0" Source="{Binding Image}" />
+                                <Image Grid.Column="0" Source="{Binding Image,
+                                    Converter={StaticResource toImageUrl},
+                                    ConverterParameter={x:Reference page}}" />
                                 <Grid Grid.Column="2">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*" />
@@ -59,7 +64,7 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    
+
                                     <Label Grid.Row="0" Text="{Binding Title}" />
                                     <Label Grid.Row="1" Text="{Binding Date}" />
                                     <Label Grid.Row="2" Text="{Binding Location}" />
@@ -91,7 +96,9 @@
                             <Image
                                 Aspect="AspectFill"
                                 HeightRequest="160"
-                                Source="{Binding Image}"
+                                Source="{Binding Image,
+                                Converter={StaticResource toImageUrl},
+                                ConverterParameter={x:Reference page}}"
                                 WidthRequest="120" />
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
