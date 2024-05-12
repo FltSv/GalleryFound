@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { CircularProgress } from '@mui/joy';
 import { useAuthContext } from '../AuthContext';
 import { Popup } from '../ui/Popup';
 import {
@@ -16,6 +17,7 @@ export const Mypage = () => {
   const [loading, setLoading] = useState(true);
   const [tmpProducts, setTmpProducts] = useState<Product[]>([]);
   const [visiblePopup, setVisiblePopup] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [editExhibit, setEditExhibit] = useState<Exhibit | undefined>();
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export const Mypage = () => {
         setCreator(x);
         setLoading(false);
       })
-      .catch(x => {
+      .catch((x: unknown) => {
         console.error('failed fetch data: ', x);
       });
   }, [user]);
@@ -54,7 +56,8 @@ export const Mypage = () => {
       return;
     }
 
-    // todo ローディングの表示
+    // ローディングの表示
+    setIsSubmitting(true);
 
     // 情報の送信
     console.debug('submit: ', data);
@@ -155,9 +158,20 @@ export const Mypage = () => {
         </div>
 
         <div>
-          <br />
-          <button type="submit" className="">
-            <i className="fa-solid fa-check"></i> 確定
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-fit rounded-md border px-4 py-2 
+              ${isSubmitting ? 'bg-zinc-300' : 'bg-white'}`}>
+            {isSubmitting ? (
+              <div className="flex justify-center gap-2">
+                <CircularProgress size="sm" /> Loading...
+              </div>
+            ) : (
+              <>
+                <i className="fa-solid fa-check"></i> 確定
+              </>
+            )}
           </button>
         </div>
       </form>

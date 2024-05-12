@@ -16,6 +16,9 @@
   "author": "suna",
   "license": "ISC",
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/joy": "^5.0.0-beta.36",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "browser-image-compression": "^2.0.2",
