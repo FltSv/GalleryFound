@@ -34,7 +34,6 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-      - run: npm ci
       - uses: technote-space/get-diff-action@v6 #差分を取得
         with:
           PATTERNS: "**/*.{ts,tsx,js,jsx}"
@@ -55,7 +54,6 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-      - run: npm ci
       - name: Run ESLint
         uses: reviewdog/action-eslint@v1
         with:
@@ -76,7 +74,6 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-      - run: npm ci
       - run: npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
