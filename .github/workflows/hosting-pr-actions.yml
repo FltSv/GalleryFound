@@ -23,7 +23,7 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
-      - run: npm ci
+      - run: npm ci && cd ..
 
   prettier:
     needs: setup
@@ -60,7 +60,7 @@ jobs:
         with:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review
-          workdir: ${{ github.workspace }}/Hosting
+          workdir: Hosting
           eslint_flags: "src/**/*.{js,jsx,ts,tsx}"
           fail_on_error: true # 指摘が発生したらjobを失敗扱いにする
 
