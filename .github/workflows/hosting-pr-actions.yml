@@ -60,6 +60,7 @@ jobs:
         with:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review
+          workdir: ../Hosting
           eslint_flags: "src/**/*.{js,jsx,ts,tsx}"
           fail_on_error: true # 指摘が発生したらjobを失敗扱いにする
 
