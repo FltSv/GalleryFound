@@ -1,0 +1,88 @@
+name: hosting-pr-actions
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+defaults:
+  run:
+    working-directory: Hosting
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/cache/restore@v4
+        id: cache-restore
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('Hosting/package-lock.json') }}
+      - if: steps.cache-restore.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Cache node_modules
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        id: cache
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('Hosting/package-lock.json') }}
+
+  prettier:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('Hosting/package-lock.json') }}
+      - uses: technote-space/get-diff-action@v6 #差分を取得
+        with:
+          PATTERNS: "**/*.{ts,tsx,js,jsx}"
+      - name: Run Prettier
+        run: npx prettier --write ${{ env.GIT_DIFF_FILTERED }} # 環境変数GIT_DIFF_FILTEREDに差分のあるファイルが列挙されている
+        if: env.GIT_DIFF
+      - uses: stefanzweifel/git-auto-commit-action@v4 # フォーマットしたファイルをコミット
+        with:
+          commit_message: Apply Prettier Change
+
+  eslint:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('Hosting/package-lock.json') }}
+      - name: Run ESLint
+        uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          workdir: Hosting
+          eslint_flags: "src/**/*.{js,jsx,ts,tsx}"
+          fail_on_error: true # 指摘が発生したらjobを失敗扱いにする
+
+  deploy:
+    if: "${{ github.event.pull_request.head.repo.full_name == github.repository }}"
+    needs: [setup, prettier, eslint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('Hosting/package-lock.json') }}
+      - run: npm ci && npm run build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_GALLERY_FOUND }}"
+          entryPoint: ./Hosting
+          projectId: gallery-found
