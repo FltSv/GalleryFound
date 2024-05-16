@@ -1,0 +1,84 @@
+name: hosting-pr-actions
+on: pull_request
+
+defaults:
+  run:
+    working-directory: Hosting
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      node_modules_cache: ${{ steps.cache.outputs.cache-hit }}
+    steps:
+      - uses: actions/checkout@v3 # コードをチェックアウト
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-node@v4 # Node.jsをセットアップ
+        with:
+          node-version: 20
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - run: npm ci
+
+  prettier:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore node_modules from cache
+        if: needs.setup.outputs.node_modules_cache == 'false'
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      - uses: technote-space/get-diff-action@v6 #差分を取得
+        with:
+          PATTERNS: "**/*.{ts,tsx,js,jsx}"
+      - name: Run Prettier
+        run: npx prettier --write ${{ env.GIT_DIFF_FILTERED }} # 環境変数GIT_DIFF_FILTEREDに差分のあるファイルが列挙されている
+        if: env.GIT_DIFF
+      - uses: stefanzweifel/git-auto-commit-action@v4 # フォーマットしたファイルをコミット
+        with:
+          commit_message: Apply Prettier Change
+
+  eslint:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore node_modules from cache
+        if: needs.setup.outputs.node_modules_cache == 'false'
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      - name: Run ESLint
+        uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          workdir: Hosting
+          eslint_flags: "src/**/*.{js,jsx,ts,tsx}"
+          fail_on_error: true # 指摘が発生したらjobを失敗扱いにする
+
+  deploy:
+    if: "${{ github.event.pull_request.head.repo.full_name == github.repository }}"
+    needs: [setup, prettier, eslint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore node_modules from cache
+        if: needs.setup.outputs.node_modules_cache == 'false'
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      - run: npm run build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_GALLERY_FOUND }}"
+          entryPoint: ./Hosting
+          projectId: gallery-found
