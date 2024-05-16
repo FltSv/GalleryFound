@@ -23,7 +23,7 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
-      - run: npm ci && cd ..
+      - run: npm ci
 
   prettier:
     needs: setup
@@ -55,6 +55,7 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      - uses: actions/checkout@v3
       - name: Run ESLint
         uses: reviewdog/action-eslint@v1
         with:
