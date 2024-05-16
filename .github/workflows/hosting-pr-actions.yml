@@ -8,15 +8,13 @@ defaults:
 jobs:
   setup:
     runs-on: ubuntu-latest
-    outputs:
-      node_modules_cache: ${{ steps.cache.outputs.cache-hit }}
     steps:
-      - uses: actions/checkout@v3 # コードをチェックアウト
-        with:
-          ref: ${{ github.head_ref }}
-      - uses: actions/setup-node@v4 # Node.jsをセットアップ
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: "npm"
+          cache-dependency-path: Hosting/package-lock.json
       - name: Cache node_modules
         uses: actions/cache@v4
         with:
@@ -29,8 +27,9 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
       - name: Restore node_modules from cache
-        if: needs.setup.outputs.node_modules_cache == 'false'
         uses: actions/cache@v4
         with:
           path: ~/.npm
@@ -49,13 +48,13 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
       - name: Restore node_modules from cache
-        if: needs.setup.outputs.node_modules_cache == 'false'
         uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-      - uses: actions/checkout@v3
       - name: Run ESLint
         uses: reviewdog/action-eslint@v1
         with:
@@ -70,8 +69,9 @@ jobs:
     needs: [setup, prettier, eslint]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
       - name: Restore node_modules from cache
-        if: needs.setup.outputs.node_modules_cache == 'false'
         uses: actions/cache@v4
         with:
           path: ~/.npm
