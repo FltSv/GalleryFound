@@ -1,21 +1,25 @@
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
+/** @type import('webpack').Configuration */
 module.exports = {
-  mode: 'development',
   entry: './src/index.js', // 変換元のエントリーポイントファイルを指定します。
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.jsx?$/,
         use: {
           loader: 'babel-loader',
         },
       },
       {
         // 拡張子 .ts の場合
-        test: /\.(ts|tsx)$/,
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
         // TypeScript をコンパイルする
-        use: 'ts-loader',
+        loader: 'ts-loader',
+        options: {
+          transpileOnly: true,
+        },
       },
       {
         test: /\.css$/,
@@ -43,7 +47,6 @@ module.exports = {
     path: `${__dirname}/public`, // 変換したファイルの出力先フォルダパスと、
     filename: 'bundle.js', // 出力するファイル名を指定します。
   },
-  devtool: 'eval-source-map',
   plugins: [
     new FaviconsWebpackPlugin({
       /**

@@ -1,4 +1,9 @@
 {
+  "emulators": {
+    "hosting": {
+      "port": 5000
+    }
+  },
   "hosting": {
     "site": "gallery-found",
     "public": "public",
