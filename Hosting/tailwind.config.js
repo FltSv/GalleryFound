@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        magneto: ['"magneto"', 'sans-serif'],
+        magneto: ['magneto'],
         yojo: ['yojo'],
         comesinhandy: ['comesinhandy'],
       },

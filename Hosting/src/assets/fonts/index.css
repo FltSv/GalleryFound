@@ -1,4 +1,9 @@
 @font-face {
+  font-family: magneto;
+  src: url('magnetob.ttf');
+}
+
+@font-face {
   font-family: yojo;
   src: url('yojo.woff');
 }
