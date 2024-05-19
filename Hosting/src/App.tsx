@@ -9,7 +9,6 @@ import { NotFound } from './components/pages/NotFound';
 
 // ui
 import Header from './components/ui/Header';
-import Logo from './components/ui/Logo';
 
 import { useAuthContext } from './components/AuthContext';
 import { ReactNode } from 'react';
@@ -37,8 +36,7 @@ const AuthRouting = (props: { page: ReactNode }) => {
 const App = () => (
   <BrowserRouter>
     <Header />
-    <div className="flex flex-col items-center mx-auto pb-8 max-w-xl">
-      <Logo />
+    <div className="mx-auto flex max-w-xl flex-col items-center pb-8">
       <Routes>
         <Route path="/" element={<Top />} />
         <Route path="login" element={<Login />} />

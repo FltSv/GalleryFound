@@ -1,33 +1,51 @@
 /* eslint react/display-name: 0 */
-import { FC, ReactNode, ComponentProps, forwardRef } from 'react';
+import { FC, forwardRef } from 'react';
+import { FieldError } from 'react-hook-form';
+import {
+  Button as MuiJoyButton,
+  ButtonProps,
+  Input,
+  InputProps,
+  FormControl,
+} from '@mui/joy';
 
-interface TextboxProps extends ComponentProps<'input'> {
+interface TextboxProps extends InputProps {
   type: 'text' | 'password';
+  label: string;
+  fieldError?: FieldError;
 }
 
 export const Textbox = forwardRef<HTMLInputElement, TextboxProps>(
-  (props, ref) => (
-    <input
+  (props, ref) => {
+    const { fieldError, ...others } = props;
+    const isError = props.fieldError !== undefined;
+
+    return (
+      <FormControl error={isError}>
+        <p className="font-ibmflex">{props.label}</p>
+        <Input
+          {...others}
+          ref={ref}
+          className="my-1 rounded-full border bg-transparent"
+          sx={{
+            borderColor: 'black', //isError ? 'red' : 'black',
+          }}
+        />
+        <p className="text-xs text-red-600">{fieldError?.message}</p>
+      </FormControl>
+    );
+  },
+);
+
+export const Button: FC<ButtonProps> = props => {
+  return (
+    <MuiJoyButton
       {...props}
-      ref={ref}
-      type={props.type}
-      className="w-full rounded border-2 border-blue-100 p-1 outline-none *:border-2 invalid:border-red-500
-      invalid:bg-red-100 invalid:text-red-500 focus:border-blue-500"
-    />
-  ),
-);
-
-export interface ButtonProps extends ComponentProps<'button'> {
-  iconClass?: string;
-  addClass?: string;
-  children: ReactNode;
-}
-
-export const Button: FC<ButtonProps> = ({ addClass, iconClass, ...props }) => (
-  <button
-    {...props}
-    className={`w-fit select-none rounded-full px-4 py-2 shadow-[0_1px_3px_0_#898282] transition-all duration-300 ${addClass ?? ''}`}>
-    <i className={iconClass ? iconClass + ' m-0 mr-2' : ''}></i>
-    {props.children}
-  </button>
-);
+      className={`rounded-full font-normal transition hover:opacity-80 ${props.className ?? ''}`}
+      sx={{
+        opacity: props.disabled ? 0.4 : 1,
+      }}>
+      {props.children}
+    </MuiJoyButton>
+  );
+};
