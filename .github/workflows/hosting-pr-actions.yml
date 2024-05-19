@@ -44,8 +44,11 @@ jobs:
       - uses: technote-space/get-diff-action@v6 #差分を取得
         with:
           PATTERNS: "**/*.{ts,tsx,js,jsx}"
+          RELATIVE: "Hosting"
       - name: Run Prettier
-        run: npx prettier --write ${{ env.GIT_DIFF_FILTERED }} # 環境変数GIT_DIFF_FILTEREDに差分のあるファイルが列挙されている
+        run: |
+          npm ci
+          npx prettier --write ${{ env.GIT_DIFF_FILTERED }} # 環境変数GIT_DIFF_FILTEREDに差分のあるファイルが列挙されている
         if: env.GIT_DIFF
       - uses: stefanzweifel/git-auto-commit-action@v4 # フォーマットしたファイルをコミット
         with:
