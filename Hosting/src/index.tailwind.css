@@ -20,3 +20,10 @@ body {
   @apply bg-gradient-to-b from-purple-300 to-blue-200 bg-fixed text-slate-950;
   font-family: Roboto, Helvetica, Arial, sans-serif;
 }
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+}
