@@ -7,8 +7,11 @@ module.exports = {
         magneto: ['magneto'],
         yojo: ['yojo'],
         comesinhandy: ['comesinhandy'],
+        ibmflex: ['IBM Plex Sans'],
+        redhatdisp: ['Red Hat Display'],
       },
     },
   },
   plugins: [],
+  important: true,
 };

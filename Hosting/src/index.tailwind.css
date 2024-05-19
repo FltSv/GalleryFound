@@ -6,7 +6,7 @@
 
 @layer base {
   h1 {
-    @apply text-2xl font-bold;
+    @apply text-2xl font-bold text-purple-900;
   }
   h2 {
     @apply text-xl font-bold;
@@ -17,6 +17,6 @@
 }
 
 body {
-  @apply bg-slate-50 text-slate-950;
+  @apply bg-gradient-to-b from-purple-300 to-blue-200 bg-fixed text-slate-950;
   font-family: Roboto, Helvetica, Arial, sans-serif;
 }

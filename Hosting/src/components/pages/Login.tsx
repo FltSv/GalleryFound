@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate, Link } from 'react-router-dom';
+import { Divider, Checkbox } from '@mui/joy';
+import { FcGoogle } from 'react-icons/fc';
+import { FaFacebook } from 'react-icons/fa';
 import { FirebaseError } from 'firebase/app';
 import { Button, Textbox } from '../ui/Input';
 import { loginWithEmail, signupWithEmail } from '../../Auth';
@@ -51,7 +54,7 @@ export const Login = () => {
   }
 
   const isRegister = isLoginState(location.state) && location.state.isRegister;
-  const actionText = isRegister ? '登録' : 'ログイン';
+  const actionText = isRegister ? 'sign up' : 'rogin';
 
   const visiblePwd = watch('visiblePwd', false);
 
@@ -78,15 +81,14 @@ export const Login = () => {
 
   return (
     <form
-      className="flex flex-col justify-center gap-2 p-0 w-fit"
+      className="flex flex-col items-center gap-8"
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onSubmit={handleSubmit(onValid)}>
-      <h2>{isRegister ? 'Register' : 'Log in'}</h2>
-      <div>
+      <div className="flex flex-col gap-4">
         <Textbox
           type="text"
           autoComplete="username"
-          placeholder="メールアドレス"
+          label="メールアドレス"
           {...register('mail', {
             required: reqMessage,
             pattern: {
@@ -94,75 +96,80 @@ export const Login = () => {
               message: '正しいメールアドレスを入力してください。',
             },
           })}
+          fieldError={errors.mail}
         />
-        <p className="text-red-600 text-xs">{errors.mail?.message}</p>
-      </div>
-      <div>
         <Textbox
           type={visiblePwd ? 'text' : 'password'}
           autoComplete="current-password"
-          placeholder="パスワード"
+          label="パスワード"
           {...register('password', {
             required: reqMessage,
+            minLength: { value: 6, message: '6文字以上で入力してください。' },
           })}
+          fieldError={errors.password}
         />
-        <p className="text-red-600 text-xs">{errors.password?.message}</p>
-      </div>
-      {isRegister && (
-        <div>
+        {isRegister && (
           <Textbox
             type={visiblePwd ? 'text' : 'password'}
             autoComplete="new-password"
-            placeholder="パスワード（確認）"
+            label="パスワード（確認）"
             {...register('passCheck', {
               required: reqMessage,
               validate: value =>
                 value === watch('password') || 'パスワードが一致しません',
             })}
+            fieldError={errors.passCheck}
           />
-          <p className="text-red-600 text-xs">{errors.passCheck?.message}</p>
-        </div>
-      )}
-      <div>
-        <input type="checkbox" {...register('visiblePwd')} />
-        <label>パスワードを表示する</label>
+        )}
+        <Checkbox
+          label="パスワードを表示する"
+          variant="outlined"
+          color="neutral"
+          {...register('visiblePwd')}
+          sx={{
+            '& span, span:hover': {
+              backgroundColor: 'transparent',
+              borderColor: 'black',
+            },
+          }}
+        />
+        <Button
+          type="submit"
+          className="font-redhatdisp w-full bg-gradient-to-r from-fuchsia-400 to-indigo-500 text-white">
+          {actionText}
+        </Button>
+        {loginErrorMsg && <p className="text-red-600">{loginErrorMsg}</p>}
       </div>
-      <Button
-        type="submit"
-        iconClass="fa-regular fa-envelope"
-        addClass="text-white bg-orange-500">
-        メールアドレスで{actionText}
-      </Button>
-      <p className="text-red-600">{loginErrorMsg}</p>
+
       {/* ソーシャルログイン */}
-      {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        false && (
-          <>
-            {/* 実装まで非表示 */}
-            <h2 className="mt-8">--- 外部アカウントで{actionText} ---</h2>
-            <Button
-              type="button"
-              iconClass="fa-brands fa-google"
-              addClass="text-white bg-blue-500">
-              Googleで{actionText}
-            </Button>
-          </>
-        )
-      }
+      <Divider className="text-base">or</Divider>
+      {/* 実装まで無効化 */}
+      <div className="flex gap-4">
+        <Button
+          disabled
+          startDecorator={<FcGoogle />}
+          className="w-fit bg-white text-black">
+          Continue with Google
+        </Button>
+        <Button
+          disabled
+          startDecorator={<FaFacebook color="#1877F2" />}
+          className="w-fit bg-white text-black">
+          Continue with Facebook
+        </Button>
+      </div>
+
       {/* 新規登録 */}
       {!isRegister && (
-        <>
-          <h2 className="mt-8">--- アカウントをお持ちでない方はこちら ---</h2>
-          <Button
-            type="button"
-            addClass="text-black bg-white"
-            onClick={() => {
-              navigate('/login', { state: { isRegister: true } as LoginState });
-            }}>
-            新規登録
-          </Button>
-        </>
+        <p>
+          新規登録は
+          <Link
+            to="/login"
+            className="text-blue-800 underline"
+            state={{ isRegister: true } as LoginState}>
+            こちら
+          </Link>
+        </p>
       )}
     </form>
   );
