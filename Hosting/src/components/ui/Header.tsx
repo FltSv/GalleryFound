@@ -6,16 +6,18 @@ import { useAuthContext } from '../AuthContext';
 
 const Header = () => {
   const styles =
-    'px-4 py-2 border border-solid border-current rounded-3xl no-underline transition hover:bg-sky-200 hover:bg-opacity-60';
+    'px-4 py-2 text-nowrap border border-solid border-current rounded-3xl no-underline transition hover:bg-sky-200 hover:bg-opacity-60';
 
   const { user, loading } = useAuthContext();
   const location = useLocation();
 
   const isLogged = user !== null;
 
-  const visibleLoginButton = !isLogged && location.pathname !== '/login';
+  const visibleLogin = !isLogged && location.pathname !== '/login';
   const visibleMypage = isLogged && location.pathname !== '/mypage';
   const visibleLogout = isLogged;
+
+  const visibleMenu = visibleLogin || visibleMypage || visibleLogout;
 
   const onSignOut = () => {
     void signOut();
@@ -35,13 +37,15 @@ const Header = () => {
           {/* アイコンメニュー */}
           <div className="md:hidden">
             <Dropdown>
-              <MenuButton
-                slots={{ root: IconButton }}
-                slotProps={{
-                  root: { variant: 'outlined', color: 'transparent' },
-                }}>
-                <FaBars />
-              </MenuButton>
+              {visibleMenu && (
+                <MenuButton
+                  slots={{ root: IconButton }}
+                  slotProps={{
+                    root: { variant: 'outlined', color: 'transparent' },
+                  }}>
+                  <FaBars />
+                </MenuButton>
+              )}
               <Menu
                 placement="bottom-end"
                 sx={{
@@ -49,7 +53,7 @@ const Header = () => {
                   backgroundColor: '#FFF4',
                   backdropFilter: 'blur(8px)',
                 }}>
-                {visibleLoginButton && (
+                {visibleLogin && (
                   <MenuItem>
                     <Link to="login">Creator Login</Link>
                   </MenuItem>
@@ -72,7 +76,7 @@ const Header = () => {
 
           {/* ボタンメニュー */}
           <div className="hidden gap-4 md:flex">
-            {visibleLoginButton && (
+            {visibleLogin && (
               <Link to="login" className={styles}>
                 Creator Login
               </Link>
