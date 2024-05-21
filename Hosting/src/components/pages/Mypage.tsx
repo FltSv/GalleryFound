@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { CircularProgress } from '@mui/joy';
+import { Button, CircularProgress } from '@mui/joy';
+import { FaPen, FaTrashAlt } from 'react-icons/fa';
 import { useAuthContext } from '../AuthContext';
 import { Popup } from '../ui/Popup';
 import {
@@ -70,7 +71,7 @@ export const Mypage = () => {
   return (
     <>
       <form
-        className="flex flex-col gap-4"
+        className="mx-auto flex w-full max-w-xl flex-col gap-4"
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={handleSubmit(onValid)}>
         <h2>My Page</h2>
@@ -86,9 +87,10 @@ export const Mypage = () => {
 
         <div>
           <p>発表作品</p>
-          <div className="flex w-[500px] overflow-x-auto [&>img]:m-2 [&>img]:h-40">
+          <div className="flex overflow-x-auto">
             {creator?.products.map(product => (
               <img
+                className="m-2 h-24 md:h-40"
                 key={product.id}
                 src={product.tmpImageData || product.imageUrl}
               />
@@ -117,9 +119,13 @@ export const Mypage = () => {
               setTmpProducts([...tmpProducts]);
             }}
           />
-          <div className="flex w-[500px] overflow-x-auto [&>img]:m-2 [&>img]:h-40">
+          <div className="flex overflow-x-auto">
             {tmpProducts.map(product => (
-              <img key={product.id} src={product.tmpImageData} />
+              <img
+                className="m-2 h-24 md:h-40"
+                key={product.id}
+                src={product.tmpImageData}
+              />
             ))}
           </div>
         </div>
@@ -215,37 +221,43 @@ const ExhibitRow = (props: ExhibitRowProps) => {
   const { data, onEdit, onDelete } = props;
 
   return (
-    <tr className="odd:bg-neutral-200 even:bg-neutral-50 [&>td]:p-2">
-      {/* 画像セル */}
-      <td className="max-w-40">
+    <tr className="odd:bg-neutral-200 even:bg-neutral-50">
+      <td className="flex gap-4 p-2">
+        {/* 画像 */}
         <img
-          className=""
+          className="max-w-32 md:max-w-40"
           src={data.tmpImageData || data.imageUrl}
           alt={data.title}
         />
-      </td>
-      {/* 内容セル */}
-      <td className="w-max align-top [&>p]:m-1">
-        <p>{data.title}</p>
-        <p>{data.location}</p>
-        <p>{data.date}</p>
-      </td>
-      {/* ボタンセル */}
-      <td className="flex w-fit flex-col gap-2 align-top">
-        <button
-          type="button"
-          onClick={() => {
-            onEdit(data);
-          }}>
-          編集
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            onDelete(data);
-          }}>
-          削除
-        </button>
+        {/* 内容 */}
+        <div className="flex w-full flex-col gap-1 align-top">
+          <p>{data.title}</p>
+          <p>{data.location}</p>
+          <p>{data.date}</p>
+        </div>
+        {/* 編集/削除ボタン */}
+        <div className="flex min-w-max flex-col gap-1 align-top">
+          <Button
+            size="sm"
+            variant="plain"
+            color="neutral"
+            onClick={() => {
+              onEdit(data);
+            }}>
+            <FaPen />
+            <label className="hidden md:inline md:pl-2">編集</label>
+          </Button>
+          <Button
+            size="sm"
+            variant="plain"
+            color="neutral"
+            onClick={() => {
+              onDelete(data);
+            }}>
+            <FaTrashAlt />
+            <label className="hidden md:inline md:pl-2">削除</label>
+          </Button>
+        </div>
       </td>
     </tr>
   );
@@ -290,8 +302,8 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     <form onSubmit={handleSubmit(onValid)}>
       <h2>{isAdd ? '展示登録' : '展示修正'}</h2>
 
-      <div className="flex">
-        <div className="w-1/2 p-2.5">
+      <div className="my-2 flex max-w-xl flex-col md:flex-row">
+        <div className="flex basis-1/2 flex-col gap-2 p-2">
           <input
             type="file"
             accept="image/*"
@@ -311,11 +323,11 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             {errors.selectedFiles?.message}
           </p>
           <img
-            className="mx-0 my-2.5 w-full"
+            className="w-full max-w-xs"
             src={tmpImage || exhibit?.imageUrl}
           />
         </div>
-        <div className="flex w-1/2 flex-col gap-2 p-2.5">
+        <div className="flex basis-1/2 flex-col gap-2 p-2">
           <div>
             <p>展示名</p>
             <input

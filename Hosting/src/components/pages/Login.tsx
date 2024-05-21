@@ -81,10 +81,10 @@ export const Login = () => {
 
   return (
     <form
-      className="flex flex-col items-center gap-8"
+      className="mx-auto flex flex-col items-center gap-8"
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onSubmit={handleSubmit(onValid)}>
-      <div className="flex flex-col gap-4">
+      <div className="flex w-full max-w-xs flex-col gap-4">
         <Textbox
           type="text"
           autoComplete="username"
@@ -135,7 +135,7 @@ export const Login = () => {
         />
         <Button
           type="submit"
-          className="w-full bg-gradient-to-r from-fuchsia-400 to-indigo-500 font-redhatdisp text-white">
+          className="font-redhatdisp w-full bg-gradient-to-r from-fuchsia-400 to-indigo-500 text-white">
           {actionText}
         </Button>
         {loginErrorMsg && <p className="text-red-600">{loginErrorMsg}</p>}

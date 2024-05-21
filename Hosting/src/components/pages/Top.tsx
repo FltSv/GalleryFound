@@ -1,29 +1,35 @@
 import { CSSProperties } from 'react';
 
 const screenshot: CSSProperties = {
-  //@apply mx-4 w-40,
   margin: '0 1rem',
-  width: '10rem',
   clipPath: 'inset(0 0 25% 0)' /* 上部4/5を表示 */,
   maskImage: 'linear-gradient(to bottom, black 10%, transparent)',
 };
 
 export const Top = () => (
-  <>
-    <p className="text-xl my-8">
+  <div className="mx-auto flex w-full max-w-xl flex-col">
+    <p className="mb-8 text-xl">
       いつでもどこでも簡単にギャラリーを見つけられるアプリ。
     </p>
 
     <div className="flex items-center">
-      <img src="img/app-screen-1.png" style={screenshot} />
+      <img
+        src="img/app-screen-1.png"
+        style={screenshot}
+        className="w-24 md:w-40"
+      />
       <div>
         <h2>ギャラリーリスト</h2>
         <p>手軽なリストで情報整理。一目で分かりやすく。</p>
       </div>
     </div>
 
-    <div className="flex items-center flex-row-reverse">
-      <img src="img/app-screen-2.png" style={screenshot} />
+    <div className="flex flex-row-reverse items-center">
+      <img
+        src="img/app-screen-2.png"
+        style={screenshot}
+        className="w-24 md:w-40"
+      />
       <div>
         <h2>地図機能</h2>
         <p>
@@ -34,29 +40,40 @@ export const Top = () => (
     </div>
 
     <div className="flex items-center">
-      <img src="img/Screenshot_20231215-150650.png" style={screenshot} />
+      <img
+        src="img/Screenshot_20231215-150650.png"
+        style={screenshot}
+        className="w-24 md:w-40"
+      />
       <div>
         <h2>雑誌リスト</h2>
         <p>美術雑誌も一目で分かりやすく。</p>
       </div>
     </div>
 
-    <div className="flex items-center flex-row-reverse">
-      <img src="img/Screenshot_20231215-150642.png" style={screenshot} />
+    <div className="flex flex-row-reverse items-center">
+      <img
+        src="img/Screenshot_20231215-150642.png"
+        style={screenshot}
+        className="w-24 md:w-40"
+      />
       <div>
         <h2>作家リスト</h2>
         <p>気になってるあの作家を一覧で見れる！</p>
       </div>
     </div>
-    <div className="flex gap-4">
+    <div className="mx-auto flex gap-1 md:gap-4">
       <div className="relative">
         <a
           href="#"
           target="_blank"
           className="pointer-events-none cursor-default opacity-50">
-          <img src="img/google-play-badge_JP.png" className="h-16 m-2" />
+          <img
+            src="img/google-play-badge_JP.png"
+            className="m-2 h-12 object-contain md:h-16"
+          />
         </a>
-        <div className="absolute bg-black bg-opacity-50 text-white p-1 bottom-0">
+        <div className="absolute bottom-0 bg-black bg-opacity-50 p-1 text-white">
           準備中
         </div>
       </div>
@@ -65,12 +82,15 @@ export const Top = () => (
           href="#"
           target="_blank"
           className="pointer-events-none cursor-default opacity-50">
-          <img src="img/DownloadAppStore_JP.svg" className="h-16 m-2" />
+          <img
+            src="img/DownloadAppStore_JP.svg"
+            className="m-2 h-12 object-contain md:h-16"
+          />
         </a>
-        <div className="absolute bg-black bg-opacity-50 text-white p-1 bottom-0">
+        <div className="absolute bottom-0 bg-black bg-opacity-50 p-1 text-white">
           準備中
         </div>
       </div>
     </div>
-  </>
+  </div>
 );
