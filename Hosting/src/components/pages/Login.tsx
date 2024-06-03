@@ -5,7 +5,7 @@ import { Divider, Checkbox } from '@mui/joy';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
 import { FirebaseError } from 'firebase/app';
-import { Button, Textbox } from '../ui/Input';
+import { Button, SubmitButton, Textbox } from '../ui/Input';
 import { loginWithEmail, signupWithEmail } from '../../Auth';
 import { useAuthContext } from '../AuthContext';
 
@@ -34,6 +34,7 @@ function isLoginState(value: unknown): value is LoginState {
 export const Login = () => {
   const { user, loading } = useAuthContext();
   const [loginErrorMsg, setLoginErrorMsg] = useState<string>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -59,6 +60,7 @@ export const Login = () => {
   const visiblePwd = watch('visiblePwd', false);
 
   const onValid: SubmitHandler<Inputs> = async data => {
+    setIsSubmitting(true);
     try {
       if (isRegister) {
         // 新規登録
@@ -74,6 +76,7 @@ export const Login = () => {
       if (error instanceof FirebaseError) {
         setLoginErrorMsg(error.message);
       }
+      setIsSubmitting(false);
     }
   };
 
@@ -133,11 +136,11 @@ export const Login = () => {
             },
           }}
         />
-        <Button
-          type="submit"
-          className="w-full bg-gradient-to-r from-fuchsia-400 to-indigo-500 font-redhatdisp text-white">
+        <SubmitButton
+          className="font-redhatdisp w-full bg-gradient-to-r from-fuchsia-400 to-indigo-500 text-white"
+          isSubmitted={isSubmitting}>
           {actionText}
-        </Button>
+        </SubmitButton>
         {loginErrorMsg && <p className="text-red-600">{loginErrorMsg}</p>}
       </div>
 
