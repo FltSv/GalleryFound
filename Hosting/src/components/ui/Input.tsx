@@ -66,7 +66,9 @@ export const SubmitButton: FC<SubmitButtonProps> = props => {
       className={`rounded-full font-normal transition
         ${disabled ? '' : 'hover:opacity-80'} ${props.className ?? ''}`}
       sx={{ opacity: disabled ? 0.4 : 1 }}
-      startDecorator={isSubmitted ? <CircularProgress size="sm" /> : undefined}
+      startDecorator={
+        isSubmitted ? <CircularProgress size="sm" /> : props.startDecorator
+      }
       disabled={disabled}>
       {isSubmitted ? 'Loading...' : props.children}
     </MuiJoyButton>

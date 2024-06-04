@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { Button, CircularProgress } from '@mui/joy';
-import { FaPen, FaTrashAlt } from 'react-icons/fa';
+import { Button as MuiJoyButton } from '@mui/joy';
+import { FaCheck, FaPen, FaPlus, FaTrashAlt } from 'react-icons/fa';
 import { useAuthContext } from '../AuthContext';
+import { Button, SubmitButton } from '../ui/Input';
 import { Popup } from '../ui/Popup';
 import {
   getCreatorData,
@@ -131,15 +132,18 @@ export const Mypage = () => {
         </div>
 
         <div>
-          <p>展示登録</p>
-          <button
-            type="button"
-            onClick={() => {
-              setEditExhibit(undefined);
-              setVisiblePopup(true);
-            }}>
-            展示を登録する
-          </button>
+          <div className="mb-2 flex gap-2">
+            <p className="mt-auto w-full">展示登録</p>
+            <Button
+              className="min-w-fit rounded-md bg-white text-black"
+              startDecorator={<FaPlus />}
+              onClick={() => {
+                setEditExhibit(undefined);
+                setVisiblePopup(true);
+              }}>
+              展示追加
+            </Button>
+          </div>
           <table className="w-full">
             <tbody>
               {creator?.exhibits.map(exhibit => (
@@ -163,23 +167,12 @@ export const Mypage = () => {
           </table>
         </div>
 
-        <div>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`w-fit rounded-md border px-4 py-2 
-              ${isSubmitting ? 'bg-zinc-300' : 'bg-white'}`}>
-            {isSubmitting ? (
-              <div className="flex justify-center gap-2">
-                <CircularProgress size="sm" /> Loading...
-              </div>
-            ) : (
-              <>
-                <i className="fa-solid fa-check"></i> 確定
-              </>
-            )}
-          </button>
-        </div>
+        <SubmitButton
+          className="w-fit rounded-md border bg-white text-black"
+          startDecorator={<FaCheck />}
+          isSubmitted={isSubmitting}>
+          確定
+        </SubmitButton>
       </form>
 
       {/* <!-- popup window --> */}
@@ -237,7 +230,7 @@ const ExhibitRow = (props: ExhibitRowProps) => {
         </div>
         {/* 編集/削除ボタン */}
         <div className="flex min-w-max flex-col gap-1 align-top">
-          <Button
+          <MuiJoyButton
             size="sm"
             variant="plain"
             color="neutral"
@@ -246,8 +239,8 @@ const ExhibitRow = (props: ExhibitRowProps) => {
             }}>
             <FaPen />
             <label className="hidden md:inline md:pl-2">編集</label>
-          </Button>
-          <Button
+          </MuiJoyButton>
+          <MuiJoyButton
             size="sm"
             variant="plain"
             color="neutral"
@@ -256,7 +249,7 @@ const ExhibitRow = (props: ExhibitRowProps) => {
             }}>
             <FaTrashAlt />
             <label className="hidden md:inline md:pl-2">削除</label>
-          </Button>
+          </MuiJoyButton>
         </div>
       </td>
     </tr>
