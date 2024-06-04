@@ -137,7 +137,7 @@ export const Login = () => {
           }}
         />
         <SubmitButton
-          className="font-redhatdisp w-full bg-gradient-to-r from-fuchsia-400 to-indigo-500 text-white"
+          className="w-full bg-gradient-to-r from-fuchsia-400 to-indigo-500 font-redhatdisp text-white"
           isSubmitted={isSubmitting}>
           {actionText}
         </SubmitButton>
