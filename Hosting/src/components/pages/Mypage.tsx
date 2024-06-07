@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { Button as MuiJoyButton } from '@mui/joy';
-import { FaCheck, FaPen, FaPlus, FaTrashAlt } from 'react-icons/fa';
+import { Button as MuiJoyButton, IconButton } from '@mui/joy';
+import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { useAuthContext } from '../AuthContext';
 import { Button, SubmitButton } from '../ui/Input';
 import { Popup } from '../ui/Popup';
@@ -17,7 +17,6 @@ export const Mypage = () => {
   const { user } = useAuthContext();
   const [creator, setCreator] = useState<Creator>();
   const [loading, setLoading] = useState(true);
-  const [tmpProducts, setTmpProducts] = useState<Product[]>([]);
   const [visiblePopup, setVisiblePopup] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editExhibit, setEditExhibit] = useState<Exhibit | undefined>();
@@ -51,7 +50,7 @@ export const Mypage = () => {
 
   const onValid: SubmitHandler<Creator> = async data => {
     // 一時データの結合
-    data.products = [...(creator?.products ?? []), ...tmpProducts];
+    data.products = creator?.products ?? [];
     data.exhibits = creator?.exhibits ?? [];
 
     if (user === null) {
@@ -87,45 +86,48 @@ export const Mypage = () => {
         </div>
 
         <div>
-          <p>発表作品</p>
+          <div className="mb-2 flex gap-2">
+            <p className="mt-auto w-full">発表作品</p>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              className="min-w-fit"
+              onChange={e => {
+                if (creator === undefined) return;
+
+                const files = e.currentTarget.files;
+                if (files === null) return;
+                if (files.length === 0) return;
+
+                for (const file of Array.from(files)) {
+                  const url = URL.createObjectURL(file);
+                  const product: Product = {
+                    id: crypto.randomUUID(),
+                    tmpImageData: url,
+                    srcImage: '',
+                    imageUrl: '',
+                  };
+                  creator.products.push(product);
+                }
+
+                setCreator({ ...creator, products: creator.products });
+              }}
+            />
+          </div>
+
           <div className="flex overflow-x-auto">
             {creator?.products.map(product => (
-              <img
-                className="m-2 h-24 md:h-40"
+              <ProductCell
                 key={product.id}
-                src={product.tmpImageData || product.imageUrl}
-              />
-            ))}
-          </div>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={e => {
-              const files = e.currentTarget.files;
-              if (files === null || files.length === 0) {
-                return;
-              }
+                data={product}
+                onDelete={() => {
+                  const newProducts = creator.products.filter(
+                    x => x.id !== product.id,
+                  );
 
-              for (const file of Array.from(files)) {
-                const url = URL.createObjectURL(file);
-                const product: Product = {
-                  id: crypto.randomUUID(),
-                  tmpImageData: url,
-                  srcImage: '',
-                  imageUrl: '',
-                };
-                tmpProducts.push(product);
-              }
-              setTmpProducts([...tmpProducts]);
-            }}
-          />
-          <div className="flex overflow-x-auto">
-            {tmpProducts.map(product => (
-              <img
-                className="m-2 h-24 md:h-40"
-                key={product.id}
-                src={product.tmpImageData}
+                  setCreator({ ...creator, products: newProducts });
+                }}
               />
             ))}
           </div>
@@ -204,6 +206,36 @@ export const Mypage = () => {
   );
 };
 
+interface ProductCellProps {
+  data: Product;
+  onDelete: (product: Product) => void;
+}
+
+const ProductCell = (props: ProductCellProps) => {
+  const { data, onDelete } = props;
+
+  return (
+    <div className="relative min-w-fit">
+      <img
+        className="h-28 p-2 md:h-40"
+        key={data.id}
+        src={data.tmpImageData || data.imageUrl}
+      />
+      <IconButton
+        size="sm"
+        variant="soft"
+        color="neutral"
+        sx={{ borderRadius: 9999 }}
+        className="absolute right-0 top-0"
+        onClick={() => {
+          onDelete(data);
+        }}>
+        <FaTimes />
+      </IconButton>
+    </div>
+  );
+};
+
 interface ExhibitRowProps {
   data: Exhibit;
   onEdit: (exhibit: Exhibit) => void;
@@ -247,7 +279,7 @@ const ExhibitRow = (props: ExhibitRowProps) => {
             onClick={() => {
               onDelete(data);
             }}>
-            <FaTrashAlt />
+            <FaTimes />
             <label className="hidden md:inline md:pl-2">削除</label>
           </MuiJoyButton>
         </div>
