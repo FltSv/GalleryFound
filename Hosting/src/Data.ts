@@ -1,6 +1,13 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { User } from 'firebase/auth';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  listAll,
+  deleteObject,
+} from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
 
 import { db, fbCreatorConverter } from './firebase';
@@ -91,7 +98,31 @@ export async function setCreatorData(user: User, data: Creator) {
     })),
   });
 
-  //todo 使用されていない画像の削除
+  // 使用されていない画像の削除
+  // 使用中の画像
+  const usingImages = [...data.products, ...data.exhibits].map(
+    (x: ImageStatus) => x.srcImage.split('?')[0],
+  );
+
+  // Storage内の画像
+  const allImagesRef = ref(getStorage(), `creators/${userId}`);
+  const allImages = await listAll(allImagesRef).then(res =>
+    res.items.map(item => item.name),
+  );
+
+  // 未使用画像の抽出、削除
+  const unusedImages = allImages.filter(image => !usingImages.includes(image));
+  const deleteTasks = unusedImages.map(async unusedImage => {
+    const unusedRef = ref(getStorage(), `creators/${userId}/${unusedImage}`);
+    await deleteObject(unusedRef)
+      .then(() => {
+        console.log(`successful delete: ${unusedImage}`);
+      })
+      .catch(() => {
+        console.log(`failed delete: ${unusedImage}`);
+      });
+  });
+  await Promise.all(deleteTasks);
 
   // 処理完了
   console.debug('complete setCreatorData');
