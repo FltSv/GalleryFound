@@ -45,3 +45,9 @@ export interface Exhibit {
   date: string;
   image: string;
 }
+
+export interface Gallery {
+  id: string;
+  name: string;
+  location: string;
+}

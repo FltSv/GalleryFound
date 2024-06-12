@@ -10,7 +10,7 @@ import {
 } from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
 
-import { db, fbCreatorConverter } from './firebase';
+import { db, fbCreatorConverter, Gallery } from './firebase';
 
 const creatorsPath = 'creators';
 
@@ -159,6 +159,28 @@ async function uploadImageData(user: User, images: ImageStatus[]) {
 
   const tasks = images.map(exhibit => uploadImage(exhibit));
   await Promise.all(tasks);
+}
+
+export async function getGalleries() {
+  const galleries: Gallery[] = [
+    {
+      id: 'a',
+      name: '新宿眼科画廊',
+      location: '〒160-0022 東京都新宿区新宿５丁目１８−１１',
+    },
+    {
+      id: 'b',
+      name: 'スペースくらげ',
+      location: '〒252-0312 神奈川県相模原市南区相南１丁目１２−１１ 1F',
+    },
+    {
+      id: 'c',
+      name: '皇居',
+      location: '〒100-8111 東京都千代田区千代田１−１',
+    },
+    { id: 'd', name: 'aaa', location: 'tokyo' },
+  ];
+  return Promise.resolve(() => galleries);
 }
 
 /** 作家 */

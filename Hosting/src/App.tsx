@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Top } from './components/pages/Top';
 import { Login } from './components/pages/Login';
 import { Mypage } from './components/pages/Mypage';
+import { Galleries } from './components/pages/Galleries';
 import { SendVerify, NoVerify } from './components/pages/Verify';
 import { NotFound } from './components/pages/NotFound';
 
@@ -42,6 +43,10 @@ const App = () => (
         <Route path="login" element={<Login />} />
         <Route path="sendverify" element={<SendVerify />} />
         <Route path="mypage" element={<AuthRouting page={<Mypage />} />} />
+        <Route
+          path="galleries"
+          element={<AuthRouting page={<Galleries />} />}
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

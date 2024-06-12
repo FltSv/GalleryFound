@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { Button as MuiJoyButton, IconButton } from '@mui/joy';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Button as MuiJoyButton,
+  IconButton,
+  Card,
+} from '@mui/joy';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { useAuthContext } from '../AuthContext';
 import { Button, SubmitButton } from '../ui/Input';
@@ -11,7 +18,9 @@ import {
   Creator,
   Product,
   Exhibit,
+  getGalleries,
 } from '../../Data';
+import { Gallery } from '../../firebase';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -299,12 +308,23 @@ interface ExhibitWithFile extends Exhibit {
 
 const ExhibitForm = (props: ExhibitFormProps) => {
   const { exhibit, onSubmit } = props;
+  const [galleries, setGalleries] = useState<Gallery[] | undefined>(undefined);
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<ExhibitWithFile>();
+  } = useForm<ExhibitWithFile>({ defaultValues: exhibit });
+
+  useEffect(() => {
+    getGalleries()
+      .then(x => {
+        setGalleries(x);
+      })
+      .catch((x: unknown) => {
+        console.error(x);
+      });
+  }, []);
 
   const reqMessage = '1文字以上の入力が必要です。';
   const isAdd = exhibit === undefined;
@@ -314,6 +334,10 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     selectedFiles !== undefined && selectedFiles.length > 0
       ? URL.createObjectURL(selectedFiles[0])
       : exhibit?.tmpImageData ?? '';
+
+  const location = watch('location', exhibit?.location);
+  const matchGallery = galleries?.find(x => x.name === location);
+  const isMatchGallery = matchGallery !== undefined;
 
   const onValid: SubmitHandler<Exhibit> = data => {
     data.id = exhibit?.id ?? crypto.randomUUID();
@@ -327,7 +351,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     <form onSubmit={handleSubmit(onValid)}>
       <h2>{isAdd ? '展示登録' : '展示修正'}</h2>
 
-      <div className="my-2 flex max-w-xl flex-col md:flex-row">
+      <div className="my-2 flex min-w-max flex-col md:flex-row">
         <div className="flex basis-1/2 flex-col gap-2 p-2">
           <input
             type="file"
@@ -357,7 +381,6 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             <p>展示名</p>
             <input
               type="text"
-              defaultValue={exhibit?.title}
               {...register('title', {
                 required: reqMessage,
               })}
@@ -368,16 +391,24 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             <p>場所</p>
             <input
               type="text"
-              defaultValue={exhibit?.location}
               {...register('location', { required: reqMessage })}
             />
             <p className="text-xs text-red-600">{errors.location?.message}</p>
+            {location !== '' && isMatchGallery ? (
+              <Card>
+                <div>
+                  <p className="text-lg font-bold">{matchGallery.name}</p>
+                  <p>{matchGallery.location}</p>
+                </div>
+              </Card>
+            ) : (
+              <NoGalleryInfo />
+            )}
           </div>
           <div>
             <p>日時</p>
             <input
               type="text"
-              defaultValue={exhibit?.date}
               {...register('date', { required: reqMessage })}
             />
             <p className="text-xs text-red-600">{errors.date?.message}</p>
@@ -390,5 +421,46 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         {isAdd ? '追加' : '変更'}
       </button>
     </form>
+  );
+};
+
+const NoGalleryInfo = () => {
+  return (
+    <Card size="sm">
+      <div>
+        <p>情報がありません。</p>
+        <Accordion>
+          <AccordionSummary>
+            <p>ギャラリー情報の新規追加</p>
+          </AccordionSummary>
+          <AccordionDetails>
+            <div className="flex flex-col gap-2">
+              <p>
+                ギャラリー名称 <br />
+                <input
+                  type="text"
+                  className="rounded-md border border-neutral-800"
+                />
+              </p>
+              <p>
+                所在地 <br />
+                <input
+                  type="text"
+                  className="rounded-md border border-neutral-800"
+                />
+              </p>
+              <MuiJoyButton
+                size="sm"
+                variant="soft"
+                color="neutral"
+                startDecorator={<FaPlus />}
+                className="w-fit">
+                追加
+              </MuiJoyButton>
+            </div>
+          </AccordionDetails>
+        </Accordion>
+      </div>
+    </Card>
   );
 };
