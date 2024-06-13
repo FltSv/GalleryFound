@@ -1,4 +1,11 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+} from 'firebase/firestore';
 import { User } from 'firebase/auth';
 import {
   getStorage,
@@ -10,7 +17,7 @@ import {
 } from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
 
-import { db, fbCreatorConverter, Gallery } from './firebase';
+import { db, fbCreatorConverter } from './firebase';
 
 const creatorsPath = 'creators';
 
@@ -161,26 +168,23 @@ async function uploadImageData(user: User, images: ImageStatus[]) {
   await Promise.all(tasks);
 }
 
+const galleriesCollectionName = 'galleries';
+
+/** ギャラリー情報の一覧を取得 */
 export async function getGalleries() {
-  const galleries: Gallery[] = [
-    {
-      id: 'a',
-      name: '新宿眼科画廊',
-      location: '〒160-0022 東京都新宿区新宿５丁目１８−１１',
-    },
-    {
-      id: 'b',
-      name: 'スペースくらげ',
-      location: '〒252-0312 神奈川県相模原市南区相南１丁目１２−１１ 1F',
-    },
-    {
-      id: 'c',
-      name: '皇居',
-      location: '〒100-8111 東京都千代田区千代田１−１',
-    },
-    { id: 'd', name: 'aaa', location: 'tokyo' },
-  ];
-  return Promise.resolve(() => galleries);
+  const querySnap = await getDocs(collection(db, galleriesCollectionName));
+  return querySnap.docs.map(doc => {
+    const data = doc.data();
+    return { ...data, id: doc.id } as Gallery;
+  });
+}
+
+/** ギャラリー情報を追加 */
+export async function addGallery(data: Gallery) {
+  const { id, ...firebaseData } = data;
+  void id;
+
+  await addDoc(collection(db, galleriesCollectionName), firebaseData);
 }
 
 /** 作家 */
@@ -223,4 +227,11 @@ interface ImageStatus {
 
   /** イメージ(Upload後) */
   imageUrl: string;
+}
+
+/** ギャラリー情報 */
+export interface Gallery {
+  id: string;
+  name: string;
+  location: string;
 }

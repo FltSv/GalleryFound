@@ -19,6 +19,7 @@ import {
   Product,
   Exhibit,
   getGalleries,
+  addGallery,
 } from '../../Data';
 import { Gallery } from '../../firebase';
 
@@ -316,7 +317,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     formState: { errors },
   } = useForm<ExhibitWithFile>({ defaultValues: exhibit });
 
-  useEffect(() => {
+  const fetchGalleries = () => {
     getGalleries()
       .then(x => {
         setGalleries(x);
@@ -324,7 +325,9 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       .catch((x: unknown) => {
         console.error(x);
       });
-  }, []);
+  };
+
+  useEffect(fetchGalleries, []);
 
   const reqMessage = '1文字以上の入力が必要です。';
   const isAdd = exhibit === undefined;
@@ -347,8 +350,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   };
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    <form onSubmit={handleSubmit(onValid)}>
+    <form onSubmit={void handleSubmit(onValid)}>
       <h2>{isAdd ? '展示登録' : '展示修正'}</h2>
 
       <div className="my-2 flex min-w-max flex-col md:flex-row">
@@ -402,7 +404,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
                 </div>
               </Card>
             ) : (
-              <NoGalleryInfo />
+              <NoGalleryInfo newName={location} onChange={fetchGalleries} />
             )}
           </div>
           <div>
@@ -424,43 +426,68 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   );
 };
 
-const NoGalleryInfo = () => {
+interface NoGalleryProps {
+  newName: string;
+  onChange: () => void;
+}
+
+const NoGalleryInfo = (props: NoGalleryProps) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<Gallery>({ defaultValues: { name: props.newName } as Gallery });
+
+  const onValid: SubmitHandler<Gallery> = async data => {
+    await addGallery({ ...data, id: '' });
+    props.onChange();
+  };
+
   return (
     <Card size="sm">
-      <div>
-        <p>情報がありません。</p>
-        <Accordion>
-          <AccordionSummary>
-            <p>ギャラリー情報の新規追加</p>
-          </AccordionSummary>
-          <AccordionDetails>
-            <div className="flex flex-col gap-2">
-              <p>
-                ギャラリー名称 <br />
-                <input
-                  type="text"
-                  className="rounded-md border border-neutral-800"
-                />
-              </p>
-              <p>
-                所在地 <br />
-                <input
-                  type="text"
-                  className="rounded-md border border-neutral-800"
-                />
-              </p>
-              <MuiJoyButton
-                size="sm"
-                variant="soft"
-                color="neutral"
-                startDecorator={<FaPlus />}
-                className="w-fit">
-                追加
-              </MuiJoyButton>
+      <p>情報がありません。</p>
+      <Accordion>
+        <AccordionSummary>
+          <p>ギャラリー情報の新規追加</p>
+        </AccordionSummary>
+        <AccordionDetails>
+          <div className="flex flex-col gap-2">
+            <div>
+              <p>ギャラリー名称</p>
+              <input
+                type="text"
+                className="rounded-md border border-neutral-800 p-1"
+                {...register('name', {
+                  required: '名称を入力してください。',
+                })}
+              />
+              <br />
+              <p className="text-xs text-red-600">{errors.name?.message}</p>
             </div>
-          </AccordionDetails>
-        </Accordion>
-      </div>
+            <div>
+              <p>所在地</p>
+              <input
+                type="text"
+                className="rounded-md border border-neutral-800 p-1"
+                {...register('location', {
+                  required: 'ギャラリーの所在地を入力してください。',
+                })}
+              />
+              <p className="text-xs text-red-600">{errors.location?.message}</p>
+            </div>
+            <MuiJoyButton
+              size="sm"
+              variant="soft"
+              color="neutral"
+              startDecorator={<FaPlus />}
+              className="w-fit"
+              loading={isSubmitting}
+              onClick={() => void handleSubmit(onValid)()}>
+              追加
+            </MuiJoyButton>
+          </div>
+        </AccordionDetails>
+      </Accordion>
     </Card>
   );
 };

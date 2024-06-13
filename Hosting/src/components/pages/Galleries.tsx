@@ -1,17 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from '@mui/joy';
-import { Gallery } from '../../firebase';
+import { Gallery } from '../../Data';
 import { getGalleries } from '../../Data';
 
 export const Galleries = () => {
   const [galleries, setGalleries] = useState<Gallery[] | undefined>(undefined);
-  getGalleries()
-    .then(x => {
-      setGalleries(x);
-    })
-    .catch((x: unknown) => {
-      console.error(x);
-    });
+
+  useEffect(() => {
+    getGalleries()
+      .then(x => {
+        setGalleries(x);
+      })
+      .catch((x: unknown) => {
+        console.error(x);
+      });
+  }, []);
 
   return (
     <>
