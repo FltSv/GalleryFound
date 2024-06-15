@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import {
   Accordion,
   AccordionDetails,
@@ -8,6 +8,7 @@ import {
   IconButton,
   Card,
 } from '@mui/joy';
+import { Autocomplete, TextField } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { useAuthContext } from '../AuthContext';
 import { Button, SubmitButton } from '../ui/Input';
@@ -20,8 +21,8 @@ import {
   Exhibit,
   getGalleries,
   addGallery,
+  Gallery,
 } from '../../Data';
-import { Gallery } from '../../firebase';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -311,6 +312,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const { exhibit, onSubmit } = props;
   const [galleries, setGalleries] = useState<Gallery[] | undefined>(undefined);
   const {
+    control,
     register,
     handleSubmit,
     watch,
@@ -338,7 +340,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       ? URL.createObjectURL(selectedFiles[0])
       : exhibit?.tmpImageData ?? '';
 
-  const location = watch('location', exhibit?.location);
+  const location = watch('location');
   const matchGallery = galleries?.find(x => x.name === location);
   const isMatchGallery = matchGallery !== undefined;
 
@@ -350,11 +352,15 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   };
 
   return (
-    <form onSubmit={void handleSubmit(onValid)}>
-      <h2>{isAdd ? '展示登録' : '展示修正'}</h2>
+    <form
+      onSubmit={e => {
+        e.preventDefault();
+        void handleSubmit(onValid)(e);
+      }}>
+      <h2 className="w-fit">{isAdd ? '展示登録' : '展示修正'}</h2>
 
-      <div className="my-2 flex min-w-max flex-col md:flex-row">
-        <div className="flex basis-1/2 flex-col gap-2 p-2">
+      <div className="my-2 flex max-w-2xl flex-col md:flex-row">
+        <div className="flex max-w-max basis-1/2 flex-col gap-2 p-2">
           <input
             type="file"
             accept="image/*"
@@ -378,7 +384,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             src={tmpImage || exhibit?.imageUrl}
           />
         </div>
-        <div className="flex basis-1/2 flex-col gap-2 p-2">
+        <div className="flex basis-1/2 flex-col gap-2 p-2 md:w-max">
           <div>
             <p>展示名</p>
             <input
@@ -391,9 +397,23 @@ const ExhibitForm = (props: ExhibitFormProps) => {
           </div>
           <div>
             <p>場所</p>
-            <input
-              type="text"
-              {...register('location', { required: reqMessage })}
+            <Controller
+              control={control}
+              name="location"
+              rules={{ required: reqMessage }}
+              render={({ field: { onChange, value } }) => (
+                <Autocomplete
+                  freeSolo
+                  options={galleries?.map(x => x.name) ?? []}
+                  onChange={(e, value) => {
+                    onChange(value);
+                  }}
+                  value={value}
+                  renderInput={params => (
+                    <TextField {...params} size="small" onChange={onChange} />
+                  )}
+                />
+              )}
             />
             <p className="text-xs text-red-600">{errors.location?.message}</p>
             {location !== '' && isMatchGallery ? (
@@ -435,11 +455,17 @@ const NoGalleryInfo = (props: NoGalleryProps) => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<Gallery>({ defaultValues: { name: props.newName } as Gallery });
 
   const onValid: SubmitHandler<Gallery> = async data => {
-    await addGallery({ ...data, id: '' });
+    if (props.newName === '') {
+      setError('name', { message: '場所（ギャラリー名称）が未入力です。' });
+      return;
+    }
+
+    await addGallery({ ...data, name: props.newName });
     props.onChange();
   };
 
@@ -453,26 +479,16 @@ const NoGalleryInfo = (props: NoGalleryProps) => {
         <AccordionDetails>
           <div className="flex flex-col gap-2">
             <div>
-              <p>ギャラリー名称</p>
-              <input
-                type="text"
-                className="rounded-md border border-neutral-800 p-1"
-                {...register('name', {
-                  required: '名称を入力してください。',
-                })}
-              />
-              <br />
-              <p className="text-xs text-red-600">{errors.name?.message}</p>
-            </div>
-            <div>
               <p>所在地</p>
               <input
                 type="text"
+                autoComplete="off"
                 className="rounded-md border border-neutral-800 p-1"
                 {...register('location', {
                   required: 'ギャラリーの所在地を入力してください。',
                 })}
               />
+              <p className="text-xs text-red-600">{errors.name?.message}</p>
               <p className="text-xs text-red-600">{errors.location?.message}</p>
             </div>
             <MuiJoyButton

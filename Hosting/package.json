@@ -17,6 +17,7 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/joy": "^5.0.0-dev.240424162023-9968b4889d",
+    "@mui/material": "^5.15.20",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
     "browser-image-compression": "^2.0.2",
