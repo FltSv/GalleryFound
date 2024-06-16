@@ -10,9 +10,9 @@ import {
 } from '@mui/joy';
 import { Autocomplete, TextField } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
-import { useAuthContext } from '../AuthContext';
-import { Button, SubmitButton } from '../ui/Input';
-import { Popup } from '../ui/Popup';
+import { useAuthContext } from 'components/AuthContext';
+import { Button, SubmitButton } from 'components/ui/Input';
+import { Popup } from 'components/ui/Popup';
 import {
   getCreatorData,
   setCreatorData,
@@ -22,7 +22,7 @@ import {
   getGalleries,
   addGallery,
   Gallery,
-} from '../../Data';
+} from 'src/Data';
 
 export const Mypage = () => {
   const { user } = useAuthContext();

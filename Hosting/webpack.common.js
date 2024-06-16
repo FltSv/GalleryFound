@@ -41,6 +41,10 @@ module.exports = {
   // import 文で .ts ファイルを解決する
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    alias: {
+      src: `${__dirname}/src`,
+      components: `${__dirname}/src/components`,
+    },
   },
   target: ['web', 'es5'],
   output: {
