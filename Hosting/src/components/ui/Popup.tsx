@@ -14,11 +14,13 @@ export const Popup = (props: PopupProps) => {
   }
 
   return (
-    <div className="block z-50 bg-neutral-500/50 fixed w-full h-screen left-0 top-0">
-      <div className="fixed -translate-x-1/2 -translate-y-1/2 bg-neutral-50 shadow-[0_0_10px_rgba(0,0,0,0.2)] p-5 rounded-md w-[90vw] max-w-xl left-1/2 top-1/2">
+    <div className="fixed left-0 top-0 z-50 block h-screen w-full bg-neutral-500/50">
+      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-neutral-50 p-5 shadow-lg shadow-neutral-800">
         <label
-          className="cursor-pointer absolute -top-6 right-0 text-white"
-          onClick={() => { setVisible(false); }}>
+          className="absolute -top-6 right-0 cursor-pointer text-white"
+          onClick={() => {
+            setVisible(false);
+          }}>
           <i className="fa-solid fa-xmark" />
         </label>
         {children}

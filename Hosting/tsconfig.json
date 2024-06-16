@@ -11,7 +11,12 @@
 
     // React
     "jsx": "react-jsx",
-    "lib": ["ES2023", "DOM"]
+    "lib": ["ES2023", "DOM"],
+
+    "paths": {
+      "src/*": ["./src/*"],
+      "components/*": ["./src/components/*"]
+    }
   },
   "include": ["./src/**/*"]
 }

@@ -1,17 +1,28 @@
 import { useEffect, useState } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { Button as MuiJoyButton, IconButton } from '@mui/joy';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Button as MuiJoyButton,
+  IconButton,
+  Card,
+} from '@mui/joy';
+import { Autocomplete, TextField } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
-import { useAuthContext } from '../AuthContext';
-import { Button, SubmitButton } from '../ui/Input';
-import { Popup } from '../ui/Popup';
+import { useAuthContext } from 'components/AuthContext';
+import { Button, SubmitButton } from 'components/ui/Input';
+import { Popup } from 'components/ui/Popup';
 import {
   getCreatorData,
   setCreatorData,
   Creator,
   Product,
   Exhibit,
-} from '../../Data';
+  getGalleries,
+  addGallery,
+  Gallery,
+} from 'src/Data';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -299,12 +310,26 @@ interface ExhibitWithFile extends Exhibit {
 
 const ExhibitForm = (props: ExhibitFormProps) => {
   const { exhibit, onSubmit } = props;
+  const [galleries, setGalleries] = useState<Gallery[] | undefined>(undefined);
   const {
+    control,
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<ExhibitWithFile>();
+  } = useForm<ExhibitWithFile>({ defaultValues: exhibit });
+
+  const fetchGalleries = () => {
+    getGalleries()
+      .then(x => {
+        setGalleries(x);
+      })
+      .catch((x: unknown) => {
+        console.error(x);
+      });
+  };
+
+  useEffect(fetchGalleries, []);
 
   const reqMessage = '1文字以上の入力が必要です。';
   const isAdd = exhibit === undefined;
@@ -315,6 +340,10 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       ? URL.createObjectURL(selectedFiles[0])
       : exhibit?.tmpImageData ?? '';
 
+  const location = watch('location');
+  const matchGallery = galleries?.find(x => x.name === location);
+  const isMatchGallery = matchGallery !== undefined;
+
   const onValid: SubmitHandler<Exhibit> = data => {
     data.id = exhibit?.id ?? crypto.randomUUID();
     data.tmpImageData = tmpImage;
@@ -323,12 +352,15 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   };
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    <form onSubmit={handleSubmit(onValid)}>
-      <h2>{isAdd ? '展示登録' : '展示修正'}</h2>
+    <form
+      onSubmit={e => {
+        e.preventDefault();
+        void handleSubmit(onValid)(e);
+      }}>
+      <h2 className="w-fit">{isAdd ? '展示登録' : '展示修正'}</h2>
 
-      <div className="my-2 flex max-w-xl flex-col md:flex-row">
-        <div className="flex basis-1/2 flex-col gap-2 p-2">
+      <div className="my-2 flex max-w-2xl flex-col md:flex-row">
+        <div className="flex max-w-max basis-1/2 flex-col gap-2 p-2">
           <input
             type="file"
             accept="image/*"
@@ -352,12 +384,11 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             src={tmpImage || exhibit?.imageUrl}
           />
         </div>
-        <div className="flex basis-1/2 flex-col gap-2 p-2">
+        <div className="flex basis-1/2 flex-col gap-2 p-2 md:w-max">
           <div>
             <p>展示名</p>
             <input
               type="text"
-              defaultValue={exhibit?.title}
               {...register('title', {
                 required: reqMessage,
               })}
@@ -366,18 +397,40 @@ const ExhibitForm = (props: ExhibitFormProps) => {
           </div>
           <div>
             <p>場所</p>
-            <input
-              type="text"
-              defaultValue={exhibit?.location}
-              {...register('location', { required: reqMessage })}
+            <Controller
+              control={control}
+              name="location"
+              rules={{ required: reqMessage }}
+              render={({ field: { onChange, value } }) => (
+                <Autocomplete
+                  freeSolo
+                  options={galleries?.map(x => x.name) ?? []}
+                  onChange={(e, value) => {
+                    onChange(value);
+                  }}
+                  value={value}
+                  renderInput={params => (
+                    <TextField {...params} size="small" onChange={onChange} />
+                  )}
+                />
+              )}
             />
             <p className="text-xs text-red-600">{errors.location?.message}</p>
+            {location !== '' && isMatchGallery ? (
+              <Card>
+                <div>
+                  <p className="text-lg font-bold">{matchGallery.name}</p>
+                  <p>{matchGallery.location}</p>
+                </div>
+              </Card>
+            ) : (
+              <NoGalleryInfo newName={location} onChange={fetchGalleries} />
+            )}
           </div>
           <div>
             <p>日時</p>
             <input
               type="text"
-              defaultValue={exhibit?.date}
               {...register('date', { required: reqMessage })}
             />
             <p className="text-xs text-red-600">{errors.date?.message}</p>
@@ -390,5 +443,67 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         {isAdd ? '追加' : '変更'}
       </button>
     </form>
+  );
+};
+
+interface NoGalleryProps {
+  newName: string;
+  onChange: () => void;
+}
+
+const NoGalleryInfo = (props: NoGalleryProps) => {
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<Gallery>({ defaultValues: { name: props.newName } as Gallery });
+
+  const onValid: SubmitHandler<Gallery> = async data => {
+    if (props.newName === '') {
+      setError('name', { message: '場所（ギャラリー名称）が未入力です。' });
+      return;
+    }
+
+    await addGallery({ ...data, name: props.newName });
+    props.onChange();
+  };
+
+  return (
+    <Card size="sm">
+      <p>情報がありません。</p>
+      <Accordion>
+        <AccordionSummary>
+          <p>ギャラリー情報の新規追加</p>
+        </AccordionSummary>
+        <AccordionDetails>
+          <div className="flex flex-col gap-2">
+            <div>
+              <p>所在地</p>
+              <input
+                type="text"
+                autoComplete="off"
+                className="rounded-md border border-neutral-800 p-1"
+                {...register('location', {
+                  required: 'ギャラリーの所在地を入力してください。',
+                })}
+              />
+              <p className="text-xs text-red-600">{errors.name?.message}</p>
+              <p className="text-xs text-red-600">{errors.location?.message}</p>
+            </div>
+            <MuiJoyButton
+              size="sm"
+              variant="soft"
+              color="neutral"
+              startDecorator={<FaPlus />}
+              className="w-fit"
+              loading={isSubmitting}
+              onClick={() => void handleSubmit(onValid)()}>
+              追加
+            </MuiJoyButton>
+          </div>
+        </AccordionDetails>
+      </Accordion>
+    </Card>
   );
 };

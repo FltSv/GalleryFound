@@ -1,4 +1,11 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+} from 'firebase/firestore';
 import { User } from 'firebase/auth';
 import {
   getStorage,
@@ -12,7 +19,10 @@ import imageCompression, { Options } from 'browser-image-compression';
 
 import { db, fbCreatorConverter } from './firebase';
 
-const creatorsPath = 'creators';
+const collectionNames = {
+  creators: 'creators',
+  galleries: 'galleries',
+} as const;
 
 const imageCompOptions: Options = {
   fileType: 'image/png',
@@ -30,7 +40,7 @@ export async function getCreatorData(user: User) {
   };
 
   // Firestoreからユーザーデータを取得
-  const docRef = doc(db, creatorsPath, userId).withConverter(
+  const docRef = doc(db, collectionNames.creators, userId).withConverter(
     fbCreatorConverter,
   );
   const docSnap = await getDoc(docRef);
@@ -83,7 +93,7 @@ export async function setCreatorData(user: User, data: Creator) {
   await uploadImageData(user, data.exhibits);
 
   // DB更新
-  const docRef = doc(db, creatorsPath, userId).withConverter(
+  const docRef = doc(db, collectionNames.creators, userId).withConverter(
     fbCreatorConverter,
   );
   await setDoc(docRef, {
@@ -105,7 +115,10 @@ export async function setCreatorData(user: User, data: Creator) {
   );
 
   // Storage内の画像
-  const allImagesRef = ref(getStorage(), `creators/${userId}`);
+  const allImagesRef = ref(
+    getStorage(),
+    `${collectionNames.creators}/${userId}`,
+  );
   const allImages = await listAll(allImagesRef).then(res =>
     res.items.map(item => item.name),
   );
@@ -113,14 +126,11 @@ export async function setCreatorData(user: User, data: Creator) {
   // 未使用画像の抽出、削除
   const unusedImages = allImages.filter(image => !usingImages.includes(image));
   const deleteTasks = unusedImages.map(async unusedImage => {
-    const unusedRef = ref(getStorage(), `creators/${userId}/${unusedImage}`);
-    await deleteObject(unusedRef)
-      .then(() => {
-        console.log(`successful delete: ${unusedImage}`);
-      })
-      .catch(() => {
-        console.log(`failed delete: ${unusedImage}`);
-      });
+    const unusedRef = ref(
+      getStorage(),
+      `${collectionNames.creators}/${userId}/${unusedImage}`,
+    );
+    await deleteObject(unusedRef);
   });
   await Promise.all(deleteTasks);
 
@@ -148,7 +158,7 @@ async function uploadImageData(user: User, images: ImageStatus[]) {
 
     // Storageへアップロード
     const storage = getStorage();
-    const path = `creators/${user.uid}/${crypto.randomUUID()}.png`;
+    const path = `${collectionNames.creators}/${user.uid}/${crypto.randomUUID()}.png`;
     const storageRef = ref(storage, path);
     const result = await uploadBytes(storageRef, compressedFile);
 
@@ -159,6 +169,23 @@ async function uploadImageData(user: User, images: ImageStatus[]) {
 
   const tasks = images.map(exhibit => uploadImage(exhibit));
   await Promise.all(tasks);
+}
+
+/** ギャラリー情報の一覧を取得 */
+export async function getGalleries() {
+  const querySnap = await getDocs(collection(db, collectionNames.galleries));
+  return querySnap.docs.map(doc => {
+    const data = doc.data();
+    return { ...data, id: doc.id } as Gallery;
+  });
+}
+
+/** ギャラリー情報を追加 */
+export async function addGallery(data: Gallery) {
+  const { id, ...firebaseData } = data;
+  void id;
+
+  await addDoc(collection(db, collectionNames.galleries), firebaseData);
 }
 
 /** 作家 */
@@ -201,4 +228,11 @@ interface ImageStatus {
 
   /** イメージ(Upload後) */
   imageUrl: string;
+}
+
+/** ギャラリー情報 */
+export interface Gallery {
+  id: string;
+  name: string;
+  location: string;
 }

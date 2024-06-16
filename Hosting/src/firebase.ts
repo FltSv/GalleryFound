@@ -45,3 +45,9 @@ export interface Exhibit {
   date: string;
   image: string;
 }
+
+/** firestore Gallery */
+export interface Gallery {
+  name: string;
+  location: string;
+}
