@@ -29,7 +29,7 @@
                     <Image
                         Aspect="AspectFill"
                         HeightRequest="80"
-                        Source="{Binding Image}"
+                        Source="{Binding ImageUrl}"
                         WidthRequest="60" />
 
                     <VerticalStackLayout
@@ -37,8 +37,8 @@
                         Padding="10,0"
                         Spacing="5">
 
-                        <Label Text="{Binding DisplayDate}" />
-                        <Label Text="{Binding Gallery.Name}" />
+                        <Label Text="{Binding Exhibit.Date}" />
+                        <Label Text="{Binding Exhibit.Title}" />
                         <Label Text="{Binding Creator.Name}" />
 
                     </VerticalStackLayout>

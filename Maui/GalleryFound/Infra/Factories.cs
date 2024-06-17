@@ -96,4 +96,12 @@ public static class Factories
             return true;
         }
     }
+
+    /// <summary>
+    /// 画像URLを取得する
+    /// </summary>
+    /// <param name="userId">クリエイターのユーザーID</param>
+    /// <param name="image">DBのファイル名＋トークン</param>
+    public static string getImageUrl(string userId, string image) =>
+        $"https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F{userId}%2F{image}";
 }
