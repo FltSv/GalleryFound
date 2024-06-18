@@ -10,7 +10,7 @@
     x:DataType="views:CreatorDetailPageVm">
 
     <ScrollView Orientation="Vertical">
-        <Grid Margin="30">
+        <Grid Margin="20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
@@ -35,10 +35,10 @@
                     <BindableLayout.EmptyView>
                         <StackLayout>
                             <Label
-                                   FontFamily="MaterialDesignIcons"
+                                FontFamily="MaterialDesignIcons"
                                 FontSize="Large"
                                 HorizontalOptions="Center"
-                                   Text="{x:Static md:MaterialDesignIconFonts.CommentQuestion}" />
+                                Text="{x:Static md:MaterialDesignIconFonts.CommentQuestion}" />
                             <Label
                                 Margin="0,20"
                                 HorizontalOptions="Center"
@@ -48,7 +48,7 @@
 
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="views:ExhibitItem">
-                            <Grid>
+                            <Grid Margin="0,5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="10" />

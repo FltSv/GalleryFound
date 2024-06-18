@@ -10,42 +10,68 @@
         <views:GalleryListPageVm />
     </ContentPage.BindingContext>
 
-    <CollectionView
-        ItemsLayout="VerticalList"
-        ItemsSource="{Binding ViewList}"
-        SelectedItem="{Binding SelectedItem}"
-        SelectionChangedCommand="{Binding OpenDetailCommand}"
-        SelectionMode="Single">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <CollectionView.ItemTemplate>
-            <DataTemplate>
+        <Label
+            Grid.Row="0"
+            FontAttributes="Bold"
+            FontSize="Title"
+            Text="展示一覧" />
 
-                <Grid Padding="10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+        <CollectionView
+            Grid.Row="1"
+            Margin="0,10"
+            ItemsLayout="VerticalList"
+            ItemsSource="{Binding ViewList}"
+            SelectedItem="{Binding SelectedItem}"
+            SelectionChangedCommand="{Binding OpenDetailCommand}"
+            SelectionMode="Single">
 
-                    <Image
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+
+                    <Grid Padding="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup Name="CommonStates">
+                                <VisualState Name="Normal" />
+                                <VisualState Name="Selected">
+                                    <VisualState.Setters>
+                                        <Setter Property="BackgroundColor" Value="Gray" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <Image
                         Aspect="AspectFill"
                         HeightRequest="80"
                         Source="{Binding ImageUrl}"
                         WidthRequest="60" />
 
-                    <VerticalStackLayout
+                        <VerticalStackLayout
                         Grid.Column="1"
                         Padding="10,0"
                         Spacing="5">
 
-                        <Label Text="{Binding Exhibit.Date}" />
-                        <Label Text="{Binding Exhibit.Title}" />
-                        <Label Text="{Binding Creator.Name}" />
+                            <Label Text="{Binding Exhibit.Date}" />
+                            <Label Text="{Binding Exhibit.Title}" />
+                            <Label Text="{Binding Creator.Name}" />
 
-                    </VerticalStackLayout>
-                </Grid>
+                        </VerticalStackLayout>
+                    </Grid>
 
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
 
-    </CollectionView>
+        </CollectionView>
+    </Grid>
 </ContentPage>

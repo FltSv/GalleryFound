@@ -10,7 +10,7 @@
         <views:CreatorListPageVm />
     </ContentPage.BindingContext>
 
-    <Grid Margin="10">
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
@@ -21,7 +21,7 @@
             Grid.Row="0"
             FontAttributes="Bold"
             FontSize="Title"
-            Text="作家" />
+            Text="作家一覧" />
 
         <Entry
             Grid.Row="1"
@@ -47,7 +47,20 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
 
-                        <Label Margin="5" Text="{Binding Name}" />
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup Name="CommonStates">
+                                    <VisualState Name="Normal" />
+                                    <VisualState Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="Gray" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+
+                            <Label Margin="5" Text="{Binding Name}" />
+                        </Grid>
 
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
