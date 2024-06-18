@@ -1,5 +1,5 @@
-﻿using GalleryFound.Infra;
-using GalleryFound.Models;
+﻿using GalleryFound.Models;
+using GalleryFound.Models.Services;
 using GalleryFound.Models.StaticValues;
 using System.Windows.Input;
 
@@ -53,5 +53,5 @@ public class GalleryListItem(Exhibit exhibit, Creator creator)
 
     public Creator Creator { get; } = creator;
 
-    public string ImageUrl => Factories.getImageUrl(Creator.Id, Exhibit.Image);
+    public string ImageUrl => ResourceService.GetImageUrl(Creator.Id, Exhibit.Image);
 }

@@ -26,6 +26,18 @@ public static class Factories
         return new RepoGcp(firestore);
     }
 
+    public static IResourceProvider GetResourceProvider()
+    {
+#if DEBUG
+        if (IsFake)
+        {
+            return new ResourceProviderFake();
+        }
+#endif
+
+        return new ResourceProviderGcp();
+    }
+
     public static async Task<FirestoreDb> AuthDb()
     {
         // ストレージからAPI Keyの取得試行
@@ -96,12 +108,4 @@ public static class Factories
             return true;
         }
     }
-
-    /// <summary>
-    /// 画像URLを取得する
-    /// </summary>
-    /// <param name="userId">クリエイターのユーザーID</param>
-    /// <param name="image">DBのファイル名＋トークン</param>
-    public static string getImageUrl(string userId, string image) =>
-        $"https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F{userId}%2F{image}";
 }

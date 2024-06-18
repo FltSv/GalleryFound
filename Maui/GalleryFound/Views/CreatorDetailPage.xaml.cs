@@ -1,5 +1,5 @@
-using GalleryFound.Infra;
 using GalleryFound.Models;
+using GalleryFound.Models.Services;
 
 namespace GalleryFound.Views;
 
@@ -37,7 +37,7 @@ public record class ProductItem : Product
 
     public string CreatorId { get; }
 
-    public string ImageUrl => Factories.getImageUrl(CreatorId, Image);
+    public string ImageUrl => ResourceService.GetImageUrl(CreatorId, Image);
 }
 
 public record class ExhibitItem : Exhibit
@@ -49,5 +49,5 @@ public record class ExhibitItem : Exhibit
 
     public string CreatorId { get; }
 
-    public string ImageUrl => Factories.getImageUrl(CreatorId, Image);
+    public string ImageUrl => ResourceService.GetImageUrl(CreatorId, Image);
 }

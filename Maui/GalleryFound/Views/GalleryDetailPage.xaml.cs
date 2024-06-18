@@ -1,5 +1,5 @@
-using GalleryFound.Infra;
 using GalleryFound.Models;
+using GalleryFound.Models.Services;
 using System.Windows.Input;
 
 namespace GalleryFound.Views;
@@ -19,7 +19,7 @@ public class GalleryDetailPageVm
 
     public Creator Creator { get; }
 
-    public string ImageUrl => Factories.getImageUrl(Creator.Id, Exhibit.Image);
+    public string ImageUrl => ResourceService.GetImageUrl(Creator.Id, Exhibit.Image);
 
     public ICommand OpenGalleryMapCommand { get; }
 
