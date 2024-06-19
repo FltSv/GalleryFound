@@ -11,7 +11,7 @@ public static class Factories
     /// <summary>
     /// 模擬データ参照フラグ
     /// </summary>
-    public static bool IsFake { get; } = true;
+    public static bool IsFake { get; } = false;
 
     public static async Task<IRepo> GetRepo()
     {

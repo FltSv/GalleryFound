@@ -77,7 +77,8 @@
             Text="{x:Static md:MaterialDesignIconFonts.BookOpenPageVariantOutline}"
             CommandParameter="{x:Type views:MagazineListPage}"/>
             <!--BackgroundColor="Green"-->
-        <Label Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" Text="準備中..." Margin="10,0" />
+        <Label Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" Margin="10,0"
+               Text="準備中..." TextColor="Gray" />
         <Button
             Grid.Row="3"
             Grid.Column="2"
