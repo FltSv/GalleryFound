@@ -182,10 +182,33 @@ export async function getGalleries() {
 
 /** ギャラリー情報を追加 */
 export async function addGallery(data: Gallery) {
-  const { id, ...firebaseData } = data;
+  const latLng = await getLatLngFromAddress(data.location);
+  const { id, ...firebaseData } = { ...data, latLng: latLng };
   void id;
 
   await addDoc(collection(db, collectionNames.galleries), firebaseData);
+}
+
+/** 住所から緯度経度を取得する */
+async function getLatLngFromAddress(address: string) {
+  const geocoder = new google.maps.Geocoder();
+  const response = await geocoder.geocode(
+    { address: address },
+    (results, status) => {
+      if (status !== google.maps.GeocoderStatus.OK) {
+        console.error('Geocoding API returned status:', status);
+        throw new Error(status);
+      }
+
+      if (results === null) {
+        throw new Error('result is null');
+      }
+
+      return;
+    },
+  );
+
+  return response.results[0].geometry.location.toJSON();
 }
 
 /** 作家 */
@@ -235,4 +258,5 @@ export interface Gallery {
   id: string;
   name: string;
   location: string;
+  latLng: google.maps.LatLngLiteral;
 }

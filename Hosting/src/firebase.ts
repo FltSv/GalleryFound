@@ -50,4 +50,5 @@ export interface Exhibit {
 export interface Gallery {
   name: string;
   location: string;
+  latLng: google.maps.LatLngLiteral;
 }

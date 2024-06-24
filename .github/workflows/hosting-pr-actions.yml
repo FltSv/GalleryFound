@@ -83,6 +83,8 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('Hosting/package-lock.json') }}
       - run: npm ci && npm run build
+        env:
+          MAPS_JS_API: ${{ secrets.MAPS_JS_API }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
