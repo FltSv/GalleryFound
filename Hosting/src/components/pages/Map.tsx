@@ -8,7 +8,7 @@ import {
   InfoWindow,
   useAdvancedMarkerRef,
 } from '@vis.gl/react-google-maps';
-import { Gallery, getGalleries } from 'src/Data';
+import { GalleryExhibits, getGalleryExhibits } from 'src/Data';
 
 // 東京駅
 const TOKYO_POS = {
@@ -32,12 +32,11 @@ interface MapViewProps {
 }
 
 const MapView = ({ coords, error }: MapViewProps) => {
-  const [galleries, setGalleries] = useState<Gallery[]>([]);
+  const [galleries, setGalleries] = useState<GalleryExhibits[]>([]);
 
   useEffect(() => {
     void (async () => {
-      const galleries = await getGalleries();
-      setGalleries(galleries);
+      setGalleries(await getGalleryExhibits());
     })();
   }, []);
 
@@ -67,16 +66,18 @@ const MapView = ({ coords, error }: MapViewProps) => {
           </AdvancedMarker>
         )}
         {galleries.map(x => (
-          <GalleryMarker key={x.id} gallery={x} />
+          <GalleryMarker key={x.gallery.id} item={x} />
         ))}
       </GoogleMap>
     </APIProvider>
   );
 };
 
-const GalleryMarker = ({ gallery }: { gallery: Gallery }) => {
+const GalleryMarker = (props: { item: GalleryExhibits }) => {
   const [showInfo, setShowInfo] = useState(false);
   const [markerRef, marker] = useAdvancedMarkerRef();
+
+  const { gallery, exhibits } = props.item;
 
   const onMarkerClick = useCallback(() => {
     setShowInfo(isShown => !isShown);
@@ -98,9 +99,24 @@ const GalleryMarker = ({ gallery }: { gallery: Gallery }) => {
         borderColor={'#7f1d1d'}
       />
       {showInfo && (
-        <InfoWindow anchor={marker} onClose={onClose}>
-          <h2>{gallery.name}</h2>
-          <p>{gallery.location}</p>
+        <InfoWindow
+          headerContent={
+            <div>
+              <p className="text-base">{gallery.name}</p>
+              <p className="max-w-60">{gallery.location}</p>
+            </div>
+          }
+          anchor={marker}
+          onClose={onClose}>
+          {exhibits.map(x => (
+            <div key={x.id} className="flex gap-2 py-1">
+              <img className="inline w-16" src={x.imageUrl} />
+              <div>
+                <p className="text-base font-bold">{x.title}</p>
+                <p>{x.date}</p>
+              </div>
+            </div>
+          ))}
         </InfoWindow>
       )}
     </AdvancedMarker>
