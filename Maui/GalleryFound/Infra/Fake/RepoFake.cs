@@ -168,6 +168,7 @@ public class RepoFake : IRepo
 
     public async Task<DbInfo> GetDbInfoAsync() => await Task.Run(() => new DbInfo
     {
-        LatestUpdate = DateTime.MinValue
+        LatestUpdate = DateTime.MinValue,
+        MapUrl = "https://goo.gl/maps/eMgnsvkndthT3Be26"  // 東京駅
     });
 }

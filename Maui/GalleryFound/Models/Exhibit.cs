@@ -3,7 +3,7 @@
     /// <summary>
     /// 展示
     /// </summary>
-    public class Exhibit
+    public record class Exhibit
     {
         public string Id { get; init; }
 

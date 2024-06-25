@@ -72,11 +72,13 @@
         <Button
             Grid.Row="2"
             Grid.Column="3"
-            IsEnabled="{Binding IsActive}"
+            IsEnabled="False"
             Style="{StaticResource IconButton}"
             Text="{x:Static md:MaterialDesignIconFonts.BookOpenPageVariantOutline}"
-            CommandParameter="{x:Type views:MagazineListPage}"
-            BackgroundColor="Green"/>
+            CommandParameter="{x:Type views:MagazineListPage}"/>
+            <!--BackgroundColor="Green"-->
+        <Label Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" Margin="10,0"
+               Text="準備中..." TextColor="Gray" />
         <Button
             Grid.Row="3"
             Grid.Column="2"
@@ -87,7 +89,8 @@
             BackgroundColor="Blue"/>
         
         <ActivityIndicator Color="Cyan" IsRunning="{Binding IsLoading}"
-                           Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" Grid.ColumnSpan="5"/>
+                           Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" Grid.ColumnSpan="5"
+                           HeightRequest="100" WidthRequest="100"/>
     </Grid>
     
 </ContentPage>

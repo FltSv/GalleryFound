@@ -1,3 +1,6 @@
+using GalleryFound.Models;
+using GalleryFound.Models.StaticValues;
+
 namespace GalleryFound.Views;
 
 public partial class MapPage : ContentPage
@@ -8,27 +11,25 @@ public partial class MapPage : ContentPage
         BindingContext = new MapPageVm();
 	}
 
-    public MapPage(string query = null)
+    public MapPage(Gallery item = null)
 	{
         InitializeComponent();
-        BindingContext = new MapPageVm(query);
+        BindingContext = new MapPageVm(item);
 	}
 }
 
 public class MapPageVm
 {
-	private const string _searchUrl = "https://www.google.com/maps/search/";
-	private const string _defaultUrl = "https://goo.gl/maps/eMgnsvkndthT3Be26";
+	private const string _searchUrl = "https://www.google.com/maps?q=";
 
-	public string Source { get; } = _defaultUrl;
+    public string Source { get; }
 
-    public MapPageVm(string query = null)
+    public MapPageVm(Gallery item = null)
     {
-		if (query is null)
-		{
-			return;
-		}
+        Source = DbInfoValues.Instance.MapUrl;
 
-		Source = _searchUrl + query;
+        if (string.IsNullOrEmpty(item?.Name)) return;
+
+        Source = _searchUrl + Uri.EscapeDataString(item.Name);
     }
 }

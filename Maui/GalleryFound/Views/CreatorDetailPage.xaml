@@ -3,27 +3,14 @@
     x:Class="GalleryFound.Views.CreatorDetailPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:converters="clr-namespace:GalleryFound.Views.Converters"
+    xmlns:md="clr-namespace:GalleryFound.Helpers"
     xmlns:models="clr-namespace:GalleryFound.Models"
     xmlns:views="clr-namespace:GalleryFound.Views"
     Title="CreatorDetailPage"
-    x:Name="page"
     x:DataType="views:CreatorDetailPageVm">
 
-    <ContentPage.Resources>
-        <DataTemplate x:Key="EmptyViewTemplate">
-            <StackLayout>
-                <Label
-                    Margin="10,25,10,10"
-                    HorizontalTextAlignment="Center"
-                    Text="結果はありません。" />
-            </StackLayout>
-        </DataTemplate>
-        <converters:CreatorImageUrlConverter x:Key="toImageUrl" />
-    </ContentPage.Resources>
-
     <ScrollView Orientation="Vertical">
-        <Grid Margin="30">
+        <Grid Margin="20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
@@ -43,20 +30,32 @@
                     Margin="0,10"
                     FontSize="18"
                     Text="展示歴" />
-                <CollectionView EmptyView="{StaticResource EmptyViewTemplate}" ItemsSource="{Binding Creator.Exhibits}">
+                <StackLayout BindableLayout.ItemsSource="{Binding ExhibitItems}">
 
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="models:Exhibit">
-                            <Grid>
+                    <BindableLayout.EmptyView>
+                        <StackLayout>
+                            <Label
+                                FontFamily="MaterialDesignIcons"
+                                FontSize="Large"
+                                HorizontalOptions="Center"
+                                Text="{x:Static md:MaterialDesignIconFonts.CommentQuestion}" />
+                            <Label
+                                Margin="0,20"
+                                HorizontalOptions="Center"
+                                Text=" 結果はありません。" />
+                        </StackLayout>
+                    </BindableLayout.EmptyView>
+
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="views:ExhibitItem">
+                            <Grid Margin="0,5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="10" />
                                     <ColumnDefinition Width="2*" />
                                 </Grid.ColumnDefinitions>
 
-                                <Image Grid.Column="0" Source="{Binding Image,
-                                    Converter={StaticResource toImageUrl},
-                                    ConverterParameter={x:Reference page}}" />
+                                <Image Grid.Column="0" Source="{Binding ImageUrl}" />
                                 <Grid Grid.Column="2">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*" />
@@ -71,9 +70,9 @@
                                 </Grid>
                             </Grid>
                         </DataTemplate>
-                    </CollectionView.ItemTemplate>
+                    </BindableLayout.ItemTemplate>
 
-                </CollectionView>
+                </StackLayout>
             </VerticalStackLayout>
 
             <!--  発表作品  -->
@@ -82,7 +81,20 @@
                     Margin="0,10"
                     FontSize="18"
                     Text="発表作品" />
-                <CollectionView EmptyView="{StaticResource EmptyViewTemplate}" ItemsSource="{Binding Creator.Products}">
+                <CollectionView ItemsSource="{Binding ProductItems}">
+
+                    <CollectionView.EmptyView>
+                        <StackLayout>
+                            <Label FontSize="Large"
+                                   HorizontalOptions="Center"
+                                   FontFamily="MaterialDesignIcons"
+                                   Text="{x:Static md:MaterialDesignIconFonts.CommentQuestion}" />
+                            <Label
+                                Margin="0,20"
+                                HorizontalOptions="Center"
+                                Text=" 結果はありません。" />
+                        </StackLayout>
+                    </CollectionView.EmptyView>
 
                     <CollectionView.ItemsLayout>
                         <GridItemsLayout
@@ -92,13 +104,11 @@
                     </CollectionView.ItemsLayout>
 
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="models:Product">
+                        <DataTemplate x:DataType="views:ProductItem">
                             <Image
                                 Aspect="AspectFill"
                                 HeightRequest="160"
-                                Source="{Binding Image,
-                                Converter={StaticResource toImageUrl},
-                                ConverterParameter={x:Reference page}}"
+                                Source="{Binding ImageUrl}"
                                 WidthRequest="120" />
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

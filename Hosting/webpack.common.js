@@ -1,4 +1,5 @@
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 /** @type import('webpack').Configuration */
 module.exports = {
@@ -105,5 +106,6 @@ module.exports = {
         },
       },
     }),
+    new Dotenv({ systemvars: true }),
   ],
 };

@@ -11,7 +11,7 @@ public static class Factories
     /// <summary>
     /// 模擬データ参照フラグ
     /// </summary>
-    public static bool IsFake { get; } = true;
+    public static bool IsFake { get; } = false;
 
     public static async Task<IRepo> GetRepo()
     {
@@ -24,6 +24,18 @@ public static class Factories
 
         var firestore = await AuthDb();
         return new RepoGcp(firestore);
+    }
+
+    public static IResourceProvider GetResourceProvider()
+    {
+#if DEBUG
+        if (IsFake)
+        {
+            return new ResourceProviderFake();
+        }
+#endif
+
+        return new ResourceProviderGcp();
     }
 
     public static async Task<FirestoreDb> AuthDb()

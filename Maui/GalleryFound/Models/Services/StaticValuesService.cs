@@ -15,6 +15,7 @@ public static class StaticValuesService
     {
         var repo = await Factories.GetRepo();
 
+        await DbInfoValues.Instance.LoadValueAsync(repo);
         await Creators.Instance.LoadValuesAsync(repo);
         await Galleries.Instance.LoadValuesAsync(repo);
         await Magazines.Instance.LoadValuesAsync(repo);

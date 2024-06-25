@@ -28,6 +28,8 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.es2021,
+        ...globals.node,
+        google: 'readonly',
       },
       parser: typeScriptEsLintParser,
       parserOptions: {

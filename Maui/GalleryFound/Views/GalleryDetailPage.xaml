@@ -16,31 +16,38 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid Margin="50">
+    <Grid Margin="30">
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="3*" />
         </Grid.RowDefinitions>
 
-        <Image
+        <Label
             Grid.Row="0"
+            FontAttributes="Bold"
+            FontSize="24"
+            Text="{Binding Exhibit.Title}" />
+
+        <Image
+            Grid.Row="1"
+            Margin="0,20"
             HorizontalOptions="Start"
-            Source="{Binding Product.Image}" />
+            Source="{Binding ImageUrl}" />
 
         <VerticalStackLayout
-            Grid.Row="1"
+            Grid.Row="2"
             Margin="10"
             Spacing="10">
 
-            <Label Text="" />
-            <Label Text="{Binding Product.DisplayDate}" />
-            <Label Style="{StaticResource LinkLabelStyle}" Text="{Binding Product.Gallery.Name}">
+            <Label Text="{Binding Exhibit.Date}" />
+            <Label Style="{StaticResource LinkLabelStyle}" Text="{Binding Exhibit.Location}">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding OpenGalleryMapCommand}" />
                 </Label.GestureRecognizers>
             </Label>
 
-            <Label Style="{StaticResource LinkLabelStyle}" Text="{Binding Product.Creator.Name}">
+            <Label Style="{StaticResource LinkLabelStyle}" Text="{Binding Creator.Name}">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding OpenCreatorCommand}" />
                 </Label.GestureRecognizers>

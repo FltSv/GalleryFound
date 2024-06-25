@@ -2,6 +2,8 @@
 
 public record class Gallery
 {
+    public string Id { get; init; }
+
     /// <summary>
     /// ギャラリー名
     /// </summary>
@@ -10,5 +12,5 @@ public record class Gallery
     /// <summary>
     /// ギャラリーの場所
     /// </summary>
-    public Uri Location { get; init; }
+    public string Location { get; init; }
 }

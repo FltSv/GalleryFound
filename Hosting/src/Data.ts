@@ -30,9 +30,13 @@ const imageCompOptions: Options = {
   maxWidthOrHeight: 1000,
 };
 
+function getCreatorStorageUrl(userId: string) {
+  return `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${userId}%2F`;
+}
+
 export async function getCreatorData(user: User) {
   const userId = user.uid;
-  const creatorUrl = `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${user.uid}%2F`;
+  const creatorUrl = getCreatorStorageUrl(userId);
   const creator: Creator = {
     name: '',
     products: [],
@@ -171,6 +175,53 @@ async function uploadImageData(user: User, images: ImageStatus[]) {
   await Promise.all(tasks);
 }
 
+/** すべての展示情報の取得 */
+export async function getAllExhibits() {
+  const creatorsSnap = await getDocs(
+    collection(db, collectionNames.creators).withConverter(fbCreatorConverter),
+  );
+  const exhibitsPromises = creatorsSnap.docs.map(creatorDocSnap => {
+    const data = creatorDocSnap.data();
+    const exhibits: Exhibit[] =
+      data.exhibits?.map(x => ({
+        ...x,
+        srcImage: x.image,
+        imageUrl: getCreatorStorageUrl(creatorDocSnap.id) + x.image,
+        tmpImageData: '',
+      })) ?? [];
+
+    return exhibits;
+  });
+
+  const resolvedExhibits = await Promise.all(exhibitsPromises);
+  return resolvedExhibits.flat();
+}
+
+export interface GalleryExhibits {
+  gallery: Gallery;
+  exhibits: Exhibit[];
+}
+
+/** ギャラリー情報と関連する展示の配列を取得 */
+export async function getGalleryExhibits() {
+  const galleries = await getGalleries();
+  const exhibits = await getAllExhibits();
+
+  const array: GalleryExhibits[] = [];
+
+  Map.groupBy(exhibits, x => x.location).forEach((value, key) => {
+    const gallery = galleries.find(x => x.name === key);
+    if (gallery === undefined) return;
+
+    array.push({
+      gallery: gallery,
+      exhibits: value,
+    });
+  });
+
+  return array;
+}
+
 /** ギャラリー情報の一覧を取得 */
 export async function getGalleries() {
   const querySnap = await getDocs(collection(db, collectionNames.galleries));
@@ -182,10 +233,38 @@ export async function getGalleries() {
 
 /** ギャラリー情報を追加 */
 export async function addGallery(data: Gallery) {
-  const { id, ...firebaseData } = data;
+  const latLng = await getLatLngFromAddress(data.location);
+  const { id, ...firebaseData } = { ...data, latLng: latLng };
   void id;
 
   await addDoc(collection(db, collectionNames.galleries), firebaseData);
+}
+
+/** 住所から緯度経度を取得する */
+async function getLatLngFromAddress(address: string) {
+  const geocoder = new google.maps.Geocoder();
+  const response = await geocoder.geocode(
+    { address: address },
+    (results, status) => {
+      if (status !== google.maps.GeocoderStatus.OK) {
+        console.error('Geocoding API returned status:', status);
+        throw new Error(status);
+      }
+
+      if (results === null) {
+        throw new Error('result is null');
+      }
+
+      return;
+    },
+  );
+
+  console.debug(
+    `get geocode: "${address}": `,
+    response.results[0].geometry.location.toJSON(),
+  );
+
+  return response.results[0].geometry.location.toJSON();
 }
 
 /** 作家 */
@@ -235,4 +314,5 @@ export interface Gallery {
   id: string;
   name: string;
   location: string;
+  latLng: google.maps.LatLngLiteral;
 }

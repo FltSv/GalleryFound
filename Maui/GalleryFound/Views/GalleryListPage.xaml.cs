@@ -1,4 +1,5 @@
 ﻿using GalleryFound.Models;
+using GalleryFound.Models.Services;
 using GalleryFound.Models.StaticValues;
 using System.Windows.Input;
 
@@ -14,10 +15,10 @@ public partial class GalleryListPage : ContentPage
 
 public class GalleryListPageVm : VmBase
 {
-    public List<Product> ViewList { get; } = new();
+    public List<GalleryListItem> ViewList { get; } = new();
 
-    private Product _selectedItem;
-    public Product SelectedItem
+    private GalleryListItem _selectedItem;
+    public GalleryListItem SelectedItem
     {
         get => _selectedItem;
         set => SetProperty(ref _selectedItem, value);
@@ -27,7 +28,10 @@ public class GalleryListPageVm : VmBase
 
     public GalleryListPageVm()
     {
-        ViewList.AddRange(Creators.GetAllCreatorsProducts());
+        var items = Creators.Instance
+            .SelectMany(creator => creator.Exhibits
+                .Select(exhibit => new GalleryListItem(exhibit, creator)));
+        ViewList.AddRange(items);
 
         OpenDetailCommand = new Command(async () =>
         {
@@ -41,4 +45,13 @@ public class GalleryListPageVm : VmBase
             SelectedItem = null;
         });
     }
+}
+
+public class GalleryListItem(Exhibit exhibit, Creator creator)
+{
+    public Exhibit Exhibit { get; } = exhibit;
+
+    public Creator Creator { get; } = creator;
+
+    public string ImageUrl => ResourceService.GetImageUrl(Creator.Id, Exhibit.Image);
 }

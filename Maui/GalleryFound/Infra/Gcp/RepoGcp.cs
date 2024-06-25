@@ -12,14 +12,12 @@ namespace GalleryFound.Infra.Gcp;
 
 public class RepoGcp : IRepo
 {
-    private const string _creatorsCollection = "creators";
-    private const string _dataCollection = "data";
-
     private readonly FirestoreDb _firestore;
 
     private static readonly Dictionary<string, string> _keyDict = new()
     {
         { nameof(DbInfo.LatestUpdate), "latestUpdate" },
+        { nameof(DbInfo.MapUrl), "mapUrl" },
     };
 
     public RepoGcp(FirestoreDb firestore)
@@ -29,7 +27,7 @@ public class RepoGcp : IRepo
 
     public async Task<Creator[]> GetCreatorsAsync()
     {
-        var creatorRef = _firestore.Collection(_creatorsCollection);
+        var creatorRef = _firestore.Collection(CollectionNames.Creators);
         var creatorSs = await creatorRef.GetSnapshotAsync();
 
         var list = new List<Creator>();
@@ -72,17 +70,27 @@ public class RepoGcp : IRepo
 
     public async Task<Gallery[]> GetGalleriesAsync()
     {
-        throw new NotImplementedException();
+        var docRef = _firestore.Collection(CollectionNames.Galleries);
+        var querySnap = await docRef.GetSnapshotAsync();
+
+        return querySnap.Select(docSnap => new Gallery
+        {
+            Id = docSnap.Id,
+            Name = docSnap.GetValue<string>("name"),
+            Location = docSnap.GetValue<string>("location"),
+        }).ToArray();
     }
 
     public async Task<Magazine[]> GetMagazinesAsync()
     {
-        throw new NotImplementedException();
+        // todo
+        await Task.Delay(100);
+        return [];
     }
 
     public async Task<DbInfo> GetDbInfoAsync()
     {
-        var collection = _firestore.Collection(_dataCollection);
+        var collection = _firestore.Collection(CollectionNames.Data);
         var docRef = collection.Document("data");
         var snapshot = await docRef.GetSnapshotAsync();
 
@@ -93,7 +101,15 @@ public class RepoGcp : IRepo
 
         return new()
         {
-            LatestUpdate = snapshot.GetValue<DateTime>(_keyDict[nameof(DbInfo.LatestUpdate)])
+            LatestUpdate = snapshot.GetValue<DateTime>(_keyDict[nameof(DbInfo.LatestUpdate)]),
+            MapUrl = snapshot.GetValue<string>(_keyDict[nameof(DbInfo.MapUrl)]),
         };
     }
+}
+
+static class CollectionNames
+{
+    public static string Creators = "creators";
+    public static string Galleries = "galleries";
+    public static string Data = "data";
 }

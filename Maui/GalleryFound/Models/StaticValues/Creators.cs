@@ -10,10 +10,4 @@ public sealed class Creators : StaticValueBase<Creator>
 
     public override async Task LoadValuesAsync(IRepo repo) => 
         SetCollection(await repo.GetCreatorsAsync());
-
-    /// <summary>
-    /// 全作家の作品一覧を取得
-    /// </summary>
-    public static IEnumerable<Product> GetAllCreatorsProducts() =>
-        Instance.SelectMany(x => x.Products);
 }
