@@ -75,6 +75,7 @@ jobs:
   deploy:
     if: "${{ github.event.pull_request.head.repo.full_name == github.repository }}"
     needs: [setup, prettier, eslint]
+    environment: production
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
