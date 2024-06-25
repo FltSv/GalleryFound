@@ -1,6 +1,5 @@
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
-const webpack = require('webpack');
-const env = require('dotenv').config().parsed;
+const Dotenv = require('dotenv-webpack');
 
 /** @type import('webpack').Configuration */
 module.exports = {
@@ -107,6 +106,6 @@ module.exports = {
         },
       },
     }),
-    new webpack.DefinePlugin({ 'process.env': JSON.stringify(env) }),
+    new Dotenv({ systemvars: true }),
   ],
 };
