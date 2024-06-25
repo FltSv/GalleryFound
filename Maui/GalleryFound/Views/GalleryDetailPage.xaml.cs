@@ -1,5 +1,6 @@
 using GalleryFound.Models;
 using GalleryFound.Models.Services;
+using GalleryFound.Models.StaticValues;
 using System.Windows.Input;
 
 namespace GalleryFound.Views;
@@ -32,7 +33,8 @@ public class GalleryDetailPageVm
 
         OpenGalleryMapCommand = new Command(async () =>
         {
-            var page = new MapPage(Exhibit.Location);
+            var gallery = Galleries.Instance.FirstOrDefault(x => x.Name == Exhibit.Location);
+            var page = new MapPage(gallery);
             await Shell.Current.Navigation.PushAsync(page);
         });
 

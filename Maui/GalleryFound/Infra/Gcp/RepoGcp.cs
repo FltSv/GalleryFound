@@ -17,6 +17,7 @@ public class RepoGcp : IRepo
     private static readonly Dictionary<string, string> _keyDict = new()
     {
         { nameof(DbInfo.LatestUpdate), "latestUpdate" },
+        { nameof(DbInfo.MapUrl), "mapUrl" },
     };
 
     public RepoGcp(FirestoreDb firestore)
@@ -100,7 +101,8 @@ public class RepoGcp : IRepo
 
         return new()
         {
-            LatestUpdate = snapshot.GetValue<DateTime>(_keyDict[nameof(DbInfo.LatestUpdate)])
+            LatestUpdate = snapshot.GetValue<DateTime>(_keyDict[nameof(DbInfo.LatestUpdate)]),
+            MapUrl = snapshot.GetValue<string>(_keyDict[nameof(DbInfo.MapUrl)]),
         };
     }
 }
