@@ -10,6 +10,8 @@ import { Map } from './components/pages/Map';
 import React from 'react';
 import App from './App';
 
+import { Env } from './Env';
+
 // イベント
 document.addEventListener('DOMContentLoaded', () => {
   var element = document.getElementById('app');
@@ -24,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   createRoot(element).render(
     <AuthProvider>
-      <APIProvider apiKey={process.env.MAPS_JS_API ?? ''}>
+      <APIProvider apiKey={Env.MAPS_JS_API}>
         <App />
       </APIProvider>
     </AuthProvider>,

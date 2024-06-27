@@ -8,6 +8,7 @@ import {
   InfoWindow,
   useAdvancedMarkerRef,
 } from '@vis.gl/react-google-maps';
+import { Env } from 'src/Env';
 import { GalleryExhibits, getGalleryExhibits } from 'src/Data';
 
 // 東京駅
@@ -50,7 +51,7 @@ const MapView = ({ coords, error }: MapViewProps) => {
   const centerPos = currPos ?? TOKYO_POS;
 
   return (
-    <APIProvider apiKey={process.env.MAPS_JS_API ?? ''}>
+    <APIProvider apiKey={Env.MAPS_JS_API}>
       {error !== undefined && (
         <p className="bg-red-100 p-1">
           現在位置取得に失敗しました: {error.message}
