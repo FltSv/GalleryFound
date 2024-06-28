@@ -1,11 +1,4 @@
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-} from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 import { User } from 'firebase/auth';
 import {
   getStorage,
@@ -18,6 +11,7 @@ import {
 import imageCompression, { Options } from 'browser-image-compression';
 
 import { db, fbCreatorConverter } from './firebase';
+import { getUlid } from 'src/ULID';
 
 const collectionNames = {
   creators: 'creators',
@@ -162,7 +156,7 @@ async function uploadImageData(user: User, images: ImageStatus[]) {
 
     // Storageへアップロード
     const storage = getStorage();
-    const path = `${collectionNames.creators}/${user.uid}/${crypto.randomUUID()}.png`;
+    const path = `${collectionNames.creators}/${user.uid}/${getUlid()}.png`;
     const storageRef = ref(storage, path);
     const result = await uploadBytes(storageRef, compressedFile);
 
@@ -237,7 +231,7 @@ export async function addGallery(data: Gallery) {
   const { id, ...firebaseData } = { ...data, latLng: latLng };
   void id;
 
-  await addDoc(collection(db, collectionNames.galleries), firebaseData);
+  await setDoc(doc(db, collectionNames.galleries, getUlid()), firebaseData);
 }
 
 /** 住所から緯度経度を取得する */

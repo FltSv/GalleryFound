@@ -23,6 +23,7 @@ import {
   addGallery,
   Gallery,
 } from 'src/Data';
+import { getUlid } from 'src/ULID';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -114,7 +115,7 @@ export const Mypage = () => {
                 for (const file of Array.from(files)) {
                   const url = URL.createObjectURL(file);
                   const product: Product = {
-                    id: crypto.randomUUID(),
+                    id: getUlid(),
                     tmpImageData: url,
                     srcImage: '',
                     imageUrl: '',
@@ -345,7 +346,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const isMatchGallery = matchGallery !== undefined;
 
   const onValid: SubmitHandler<Exhibit> = data => {
-    data.id = exhibit?.id ?? crypto.randomUUID();
+    data.id = exhibit?.id ?? getUlid();
     data.tmpImageData = tmpImage;
     data.imageUrl = exhibit?.imageUrl ?? '';
     onSubmit(data);
