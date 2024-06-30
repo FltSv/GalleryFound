@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Button as MuiJoyButton,
-  IconButton,
-  Card,
-} from '@mui/joy';
+import { Button as MuiJoyButton, IconButton, Card } from '@mui/joy';
 import { Autocomplete, TextField } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { useAuthContext } from 'components/AuthContext';
@@ -316,19 +309,16 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     control,
     register,
     handleSubmit,
+    setError,
     watch,
     formState: { errors },
   } = useForm<ExhibitWithFile>({ defaultValues: exhibit });
 
-  const fetchGalleries = () => {
-    getGalleries()
-      .then(x => {
-        setGalleries(x);
-      })
-      .catch((x: unknown) => {
-        console.error(x);
-      });
-  };
+  const fetchGalleries = () =>
+    void (async () => {
+      const galleries = await getGalleries();
+      setGalleries(galleries);
+    })();
 
   useEffect(fetchGalleries, []);
 
@@ -346,9 +336,17 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const isMatchGallery = matchGallery !== undefined;
 
   const onValid: SubmitHandler<Exhibit> = data => {
+    if (!isMatchGallery) {
+      setError('location', {
+        message: 'ギャラリー情報の指定または入力が必要です。',
+      });
+      return;
+    }
+
     data.id = exhibit?.id ?? getUlid();
     data.tmpImageData = tmpImage;
     data.imageUrl = exhibit?.imageUrl ?? '';
+    data.galleryId = matchGallery.id;
     onSubmit(data);
   };
 
@@ -425,7 +423,13 @@ const ExhibitForm = (props: ExhibitFormProps) => {
                 </div>
               </Card>
             ) : (
-              <NoGalleryInfo newName={location} onChange={fetchGalleries} />
+              <NoGalleryInfo
+                newName={location}
+                onChange={() => {
+                  fetchGalleries();
+                  setError('location', {});
+                }}
+              />
             )}
           </div>
           <div>
@@ -472,39 +476,36 @@ const NoGalleryInfo = (props: NoGalleryProps) => {
 
   return (
     <Card size="sm">
-      <p>情報がありません。</p>
-      <Accordion>
-        <AccordionSummary>
-          <p>ギャラリー情報の新規追加</p>
-        </AccordionSummary>
-        <AccordionDetails>
-          <div className="flex flex-col gap-2">
-            <div>
-              <p>所在地</p>
-              <input
-                type="text"
-                autoComplete="off"
-                className="rounded-md border border-neutral-800 p-1"
-                {...register('location', {
-                  required: 'ギャラリーの所在地を入力してください。',
-                })}
-              />
-              <p className="text-xs text-red-600">{errors.name?.message}</p>
-              <p className="text-xs text-red-600">{errors.location?.message}</p>
-            </div>
-            <MuiJoyButton
-              size="sm"
-              variant="soft"
-              color="neutral"
-              startDecorator={<FaPlus />}
-              className="w-fit"
-              loading={isSubmitting}
-              onClick={() => void handleSubmit(onValid)()}>
-              追加
-            </MuiJoyButton>
-          </div>
-        </AccordionDetails>
-      </Accordion>
+      <p>
+        情報がありません。
+        <br />
+        ギャラリー情報の新規追加
+      </p>
+      <div className="flex flex-col gap-2">
+        <div>
+          <p>住所</p>
+          <input
+            type="text"
+            autoComplete="off"
+            className="rounded-md border border-neutral-800 p-1"
+            {...register('location', {
+              required: 'ギャラリーの住所を入力してください。',
+            })}
+          />
+          <p className="text-xs text-red-600">{errors.name?.message}</p>
+          <p className="text-xs text-red-600">{errors.location?.message}</p>
+        </div>
+        <MuiJoyButton
+          size="sm"
+          variant="soft"
+          color="neutral"
+          startDecorator={<FaPlus />}
+          className="w-fit"
+          loading={isSubmitting}
+          onClick={() => void handleSubmit(onValid)()}>
+          追加
+        </MuiJoyButton>
+      </div>
     </Card>
   );
 };

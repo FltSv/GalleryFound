@@ -42,6 +42,7 @@ export interface Exhibit {
   id: string;
   title: string;
   location: string;
+  galleryId: string;
   date: string;
   image: string;
 }

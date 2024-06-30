@@ -71,6 +71,7 @@ export async function getCreatorData(user: User) {
     title: x.title,
     location: x.location,
     date: x.date,
+    galleryId: x.galleryId,
     srcImage: x.image,
     imageUrl: creatorUrl + x.image,
     tmpImageData: '',
@@ -101,6 +102,7 @@ export async function setCreatorData(user: User, data: Creator) {
       id: x.id,
       title: x.title,
       location: x.location,
+      galleryId: x.galleryId,
       date: x.date,
       image: x.srcImage,
     })),
@@ -179,6 +181,7 @@ export async function getAllExhibits() {
     const exhibits: Exhibit[] =
       data.exhibits?.map(x => ({
         ...x,
+        galleryId: x.galleryId,
         srcImage: x.image,
         imageUrl: getCreatorStorageUrl(creatorDocSnap.id) + x.image,
         tmpImageData: '',
@@ -287,6 +290,7 @@ export interface Exhibit extends ImageStatus {
 
   /** 展示場所 */
   location: string;
+  galleryId: string;
 
   /** 展示期間 */
   date: string;
