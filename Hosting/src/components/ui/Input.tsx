@@ -4,14 +4,15 @@ import { FieldError } from 'react-hook-form';
 import {
   Button as MuiJoyButton,
   ButtonProps,
-  CircularProgress,
   Input,
   InputProps,
   FormControl,
+  styled,
 } from '@mui/joy';
+import { FaCloudUploadAlt } from 'react-icons/fa';
 
 interface TextboxProps extends InputProps {
-  type: 'text' | 'password';
+  type?: 'text' | 'password';
   label: string;
   fieldError?: FieldError;
 }
@@ -27,7 +28,9 @@ export const Textbox = forwardRef<HTMLInputElement, TextboxProps>(
         <Input
           {...others}
           ref={ref}
-          className="my-1 rounded-full border bg-transparent"
+          type={others.type ?? 'text'}
+          autoComplete={others.autoComplete ?? 'off'}
+          className={`my-1 border bg-transparent ${others.className ?? ''}`}
           sx={{
             borderColor: 'black', //isError ? 'red' : 'black',
           }}
@@ -51,26 +54,51 @@ export const Button: FC<ButtonProps> = props => {
   );
 };
 
-interface SubmitButtonProps extends ButtonProps {
-  isSubmitted: boolean;
-}
-
-export const SubmitButton: FC<SubmitButtonProps> = props => {
-  const { isSubmitted, ...otherProps } = props;
-  const disabled = props.isSubmitted || props.disabled;
+export const SubmitButton: FC<ButtonProps> = props => {
+  const disabled = props.loading || props.disabled;
 
   return (
     <MuiJoyButton
-      {...otherProps}
+      {...props}
       type="submit"
       className={`rounded-full font-normal transition
         ${disabled ? '' : 'hover:opacity-80'} ${props.className ?? ''}`}
       sx={{ opacity: disabled ? 0.4 : 1 }}
-      startDecorator={
-        isSubmitted ? <CircularProgress size="sm" /> : props.startDecorator
-      }
+      startDecorator={props.startDecorator}
+      loadingPosition="start"
       disabled={disabled}>
-      {isSubmitted ? 'Loading...' : props.children}
+      {props.loading ? 'Loading...' : props.children}
     </MuiJoyButton>
   );
 };
+
+const VisuallyHiddenInput = styled('input')`
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  white-space: nowrap;
+  width: 1px;
+`;
+
+interface FileInputProps extends InputProps {
+  multiple?: boolean;
+  accept: string;
+}
+
+export const FileInput = forwardRef<HTMLInputElement, FileInputProps>(
+  (props, ref) => (
+    <Button
+      className="min-w-fit bg-white"
+      component="label"
+      variant="outlined"
+      color="neutral"
+      startDecorator={<FaCloudUploadAlt />}>
+      ファイルを選択
+      <VisuallyHiddenInput {...props} type="file" ref={ref} size={undefined} />
+    </Button>
+  ),
+);
