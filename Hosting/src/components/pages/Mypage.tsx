@@ -174,7 +174,7 @@ export const Mypage = () => {
         <SubmitButton
           className="w-fit rounded-md border bg-white text-black"
           startDecorator={<FaCheck />}
-          isSubmitted={isSubmitting}>
+          loading={isSubmitting}>
           確定
         </SubmitButton>
       </form>

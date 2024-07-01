@@ -4,7 +4,6 @@ import { FieldError } from 'react-hook-form';
 import {
   Button as MuiJoyButton,
   ButtonProps,
-  CircularProgress,
   Input,
   InputProps,
   FormControl,
@@ -53,26 +52,20 @@ export const Button: FC<ButtonProps> = props => {
   );
 };
 
-interface SubmitButtonProps extends ButtonProps {
-  isSubmitted: boolean;
-}
-
-export const SubmitButton: FC<SubmitButtonProps> = props => {
-  const { isSubmitted, ...otherProps } = props;
-  const disabled = props.isSubmitted || props.disabled;
+export const SubmitButton: FC<ButtonProps> = props => {
+  const disabled = props.loading || props.disabled;
 
   return (
     <MuiJoyButton
-      {...otherProps}
+      {...props}
       type="submit"
       className={`rounded-full font-normal transition
         ${disabled ? '' : 'hover:opacity-80'} ${props.className ?? ''}`}
       sx={{ opacity: disabled ? 0.4 : 1 }}
-      startDecorator={
-        isSubmitted ? <CircularProgress size="sm" /> : props.startDecorator
-      }
+      startDecorator={props.startDecorator}
+      loadingPosition="start"
       disabled={disabled}>
-      {isSubmitted ? 'Loading...' : props.children}
+      {props.loading ? 'Loading...' : props.children}
     </MuiJoyButton>
   );
 };

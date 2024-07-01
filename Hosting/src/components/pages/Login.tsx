@@ -139,7 +139,7 @@ export const Login = () => {
         />
         <SubmitButton
           className="w-full bg-gradient-to-r from-fuchsia-400 to-indigo-500 font-redhatdisp text-white"
-          isSubmitted={isSubmitting}>
+          loading={isSubmitting}>
           {actionText}
         </SubmitButton>
         {loginErrorMsg && <p className="text-red-600">{loginErrorMsg}</p>}
