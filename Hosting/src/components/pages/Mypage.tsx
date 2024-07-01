@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
-import { Button as MuiJoyButton, IconButton, Card } from '@mui/joy';
-import { Autocomplete, TextField } from '@mui/material';
+import { Button as MuiJoyButton, IconButton, Card, Input } from '@mui/joy';
+import { Autocomplete } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { useAuthContext } from 'components/AuthContext';
-import { Button, SubmitButton } from 'components/ui/Input';
+import { Button, SubmitButton, Textbox } from 'components/ui/Input';
 import { Popup } from 'components/ui/Popup';
 import {
   getCreatorData,
@@ -77,18 +77,15 @@ export const Mypage = () => {
     <>
       <form
         className="mx-auto flex w-full max-w-xl flex-col gap-4"
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onSubmit={handleSubmit(onValid)}>
+        onSubmit={e => void handleSubmit(onValid)(e)}>
         <h2>My Page</h2>
-        <div>
-          <p>表示作家名</p>
-          <input
-            type="text"
-            defaultValue={creator?.name}
-            {...register('name', { required: '1文字以上の入力が必要です。' })}
-          />
-          <p className="text-xs text-red-600">{errors.name?.message}</p>
-        </div>
+        <Textbox
+          label="表示作家名"
+          defaultValue={creator?.name}
+          className="w-1/2"
+          fieldError={errors.name}
+          {...register('name', { required: '1文字以上の入力が必要です。' })}
+        />
 
         <div>
           <div className="mb-2 flex gap-2">
@@ -384,32 +381,39 @@ const ExhibitForm = (props: ExhibitFormProps) => {
           />
         </div>
         <div className="flex basis-1/2 flex-col gap-2 p-2 md:w-max">
-          <div>
-            <p>展示名</p>
-            <input
-              type="text"
-              {...register('title', {
-                required: reqMessage,
-              })}
-            />{' '}
-            <p className="text-xs text-red-600">{errors.title?.message}</p>
-          </div>
+          <Textbox
+            label="展示名"
+            {...register('title', { required: reqMessage })}
+            fieldError={errors.title}
+          />
           <div>
             <p>場所</p>
             <Controller
               control={control}
               name="location"
               rules={{ required: reqMessage }}
-              render={({ field: { onChange, value } }) => (
+              render={({ field }) => (
                 <Autocomplete
                   freeSolo
                   options={galleries?.map(x => x.name) ?? []}
                   onChange={(e, value) => {
-                    onChange(value);
+                    field.onChange(value);
                   }}
-                  value={value}
+                  value={field.value || null}
                   renderInput={params => (
-                    <TextField {...params} size="small" onChange={onChange} />
+                    <Input
+                      slotProps={{
+                        root: { ref: params.InputProps.ref },
+                        input: {
+                          ...params.inputProps,
+                          onChange: e => {
+                            field.onChange(e);
+                            params.inputProps.onChange?.(e);
+                          },
+                        },
+                      }}
+                      sx={{ borderColor: 'black' }}
+                    />
                   )}
                 />
               )}
@@ -432,14 +436,11 @@ const ExhibitForm = (props: ExhibitFormProps) => {
               />
             )}
           </div>
-          <div>
-            <p>日時</p>
-            <input
-              type="text"
-              {...register('date', { required: reqMessage })}
-            />
-            <p className="text-xs text-red-600">{errors.date?.message}</p>
-          </div>
+          <Textbox
+            label="日時"
+            fieldError={errors.date}
+            {...register('date', { required: reqMessage })}
+          />
         </div>
       </div>
 
@@ -482,19 +483,14 @@ const NoGalleryInfo = (props: NoGalleryProps) => {
         ギャラリー情報の新規追加
       </p>
       <div className="flex flex-col gap-2">
-        <div>
-          <p>住所</p>
-          <input
-            type="text"
-            autoComplete="off"
-            className="rounded-md border border-neutral-800 p-1"
-            {...register('location', {
-              required: 'ギャラリーの住所を入力してください。',
-            })}
-          />
-          <p className="text-xs text-red-600">{errors.name?.message}</p>
-          <p className="text-xs text-red-600">{errors.location?.message}</p>
-        </div>
+        <Textbox
+          label="住所"
+          size="sm"
+          {...register('location', {
+            required: 'ギャラリーの住所を入力してください。',
+          })}
+          fieldError={errors.name || errors.location}
+        />
         <MuiJoyButton
           size="sm"
           variant="soft"

@@ -85,11 +85,10 @@ export const Login = () => {
   return (
     <form
       className="mx-auto flex flex-col items-center gap-8"
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      onSubmit={handleSubmit(onValid)}>
+      onSubmit={e => void handleSubmit(onValid)(e)}>
       <div className="flex w-full max-w-xs flex-col gap-4">
         <Textbox
-          type="text"
+          className="rounded-full"
           autoComplete="username"
           label="メールアドレス"
           {...register('mail', {
@@ -103,6 +102,7 @@ export const Login = () => {
         />
         <Textbox
           type={visiblePwd ? 'text' : 'password'}
+          className="rounded-full"
           autoComplete="current-password"
           label="パスワード"
           {...register('password', {
@@ -114,6 +114,7 @@ export const Login = () => {
         {isRegister && (
           <Textbox
             type={visiblePwd ? 'text' : 'password'}
+            className="rounded-full"
             autoComplete="new-password"
             label="パスワード（確認）"
             {...register('passCheck', {

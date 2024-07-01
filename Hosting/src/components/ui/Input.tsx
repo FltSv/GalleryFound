@@ -11,7 +11,7 @@ import {
 } from '@mui/joy';
 
 interface TextboxProps extends InputProps {
-  type: 'text' | 'password';
+  type?: 'text' | 'password';
   label: string;
   fieldError?: FieldError;
 }
@@ -27,7 +27,9 @@ export const Textbox = forwardRef<HTMLInputElement, TextboxProps>(
         <Input
           {...others}
           ref={ref}
-          className="my-1 rounded-full border bg-transparent"
+          type={others.type ?? 'text'}
+          autoComplete={others.autoComplete ?? 'off'}
+          className={`my-1 border bg-transparent ${others.className ?? ''}`}
           sx={{
             borderColor: 'black', //isError ? 'red' : 'black',
           }}
