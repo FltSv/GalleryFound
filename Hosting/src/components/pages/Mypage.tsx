@@ -4,7 +4,7 @@ import { Button as MuiJoyButton, IconButton, Card, Input } from '@mui/joy';
 import { Autocomplete } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { useAuthContext } from 'components/AuthContext';
-import { Button, SubmitButton, Textbox } from 'components/ui/Input';
+import { Button, FileInput, SubmitButton, Textbox } from 'components/ui/Input';
 import { Popup } from 'components/ui/Popup';
 import {
   getCreatorData,
@@ -90,8 +90,7 @@ export const Mypage = () => {
         <div>
           <div className="mb-2 flex gap-2">
             <p className="mt-auto w-full">発表作品</p>
-            <input
-              type="file"
+            <FileInput
               multiple
               accept="image/*"
               className="min-w-fit"
@@ -357,8 +356,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
       <div className="my-2 flex max-w-2xl flex-col md:flex-row">
         <div className="flex max-w-max basis-1/2 flex-col gap-2 p-2">
-          <input
-            type="file"
+          <FileInput
             accept="image/*"
             {...register('selectedFiles', {
               validate: value => {

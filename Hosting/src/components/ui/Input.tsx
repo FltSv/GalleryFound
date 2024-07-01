@@ -7,7 +7,9 @@ import {
   Input,
   InputProps,
   FormControl,
+  styled,
 } from '@mui/joy';
+import { FaCloudUploadAlt } from 'react-icons/fa';
 
 interface TextboxProps extends InputProps {
   type?: 'text' | 'password';
@@ -69,3 +71,34 @@ export const SubmitButton: FC<ButtonProps> = props => {
     </MuiJoyButton>
   );
 };
+
+const VisuallyHiddenInput = styled('input')`
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  white-space: nowrap;
+  width: 1px;
+`;
+
+interface FileInputProps extends InputProps {
+  multiple?: boolean;
+  accept: string;
+}
+
+export const FileInput = forwardRef<HTMLInputElement, FileInputProps>(
+  (props, ref) => (
+    <Button
+      className="min-w-fit bg-white"
+      component="label"
+      variant="outlined"
+      color="neutral"
+      startDecorator={<FaCloudUploadAlt />}>
+      ファイルを選択
+      <VisuallyHiddenInput {...props} type="file" ref={ref} size={undefined} />
+    </Button>
+  ),
+);
