@@ -295,8 +295,10 @@ interface ExhibitFormProps {
   onSubmit: (newValue: Exhibit) => void;
 }
 
-interface ExhibitWithFile extends Exhibit {
+interface ExhibitFormValues extends Exhibit {
   selectedFiles?: FileList;
+  startDateString: string;
+  endDateString: string;
 }
 
 const ExhibitForm = (props: ExhibitFormProps) => {
@@ -304,12 +306,13 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const [galleries, setGalleries] = useState<Gallery[] | undefined>(undefined);
   const {
     control,
+    getValues,
     register,
     handleSubmit,
     setError,
     watch,
     formState: { errors },
-  } = useForm<ExhibitWithFile>({ defaultValues: exhibit });
+  } = useForm<ExhibitFormValues>({ defaultValues: exhibit });
 
   const fetchGalleries = () =>
     void (async () => {
@@ -319,7 +322,8 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
   useEffect(fetchGalleries, []);
 
-  const reqMessage = '1文字以上の入力が必要です。';
+  const requireMsg = '1文字以上の入力が必要です。';
+  const invalidDateMsg = '有効な日付を入力してください。';
   const isAdd = exhibit === undefined;
 
   const selectedFiles = watch('selectedFiles');
@@ -332,7 +336,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const matchGallery = galleries?.find(x => x.name === location);
   const isMatchGallery = matchGallery !== undefined;
 
-  const onValid: SubmitHandler<Exhibit> = data => {
+  const onValid: SubmitHandler<ExhibitFormValues> = data => {
     if (!isMatchGallery) {
       setError('location', {
         message: 'ギャラリー情報の指定または入力が必要です。',
@@ -340,11 +344,19 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       return;
     }
 
-    data.id = exhibit?.id ?? getUlid();
-    data.tmpImageData = tmpImage;
-    data.imageUrl = exhibit?.imageUrl ?? '';
-    data.galleryId = matchGallery.id;
-    onSubmit(data);
+    const submitData: Exhibit = {
+      id: exhibit?.id ?? getUlid(),
+      title: data.title,
+      location: data.location,
+      galleryId: matchGallery.id,
+      startDate: new Date(data.startDateString + 'T00:00:00'),
+      endDate: new Date(data.endDateString + 'T23:59:59'),
+      srcImage: data.srcImage,
+      tmpImageData: tmpImage,
+      imageUrl: exhibit?.imageUrl ?? '',
+    };
+
+    onSubmit(submitData);
   };
 
   return (
@@ -382,7 +394,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         <div className="flex basis-1/2 flex-col gap-2 p-2 md:w-max">
           <Textbox
             label="展示名"
-            {...register('title', { required: reqMessage })}
+            {...register('title', { required: requireMsg })}
             fieldError={errors.title}
           />
           <div>
@@ -390,7 +402,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             <Controller
               control={control}
               name="location"
-              rules={{ required: reqMessage }}
+              rules={{ required: requireMsg }}
               render={({ field }) => (
                 <Autocomplete
                   freeSolo
@@ -437,13 +449,34 @@ const ExhibitForm = (props: ExhibitFormProps) => {
           </div>
           <Textbox
             label="開始日時"
-            fieldError={errors.startDate}
-            {...register('startDate', { required: reqMessage })}
+            type="date"
+            defaultDateValue={exhibit?.startDate}
+            fieldError={errors.startDateString}
+            {...register('startDateString', {
+              validate: v => !isNaN(new Date(v).getDate()) || invalidDateMsg,
+            })}
           />
           <Textbox
             label="終了日時"
-            fieldError={errors.endDate}
-            {...register('endDate', { required: reqMessage })}
+            type="date"
+            defaultDateValue={exhibit?.endDate}
+            fieldError={errors.endDateString}
+            {...register('endDateString', {
+              validate: v => {
+                const endDate = new Date(v);
+                const startDate = new Date(getValues('startDateString'));
+
+                if (isNaN(endDate.getDate())) {
+                  return invalidDateMsg;
+                }
+
+                if (endDate < startDate) {
+                  return '終了日は開始日以降である必要があります。';
+                }
+
+                return true;
+              },
+            })}
           />
         </div>
       </div>

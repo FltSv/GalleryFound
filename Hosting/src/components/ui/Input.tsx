@@ -12,15 +12,16 @@ import {
 import { FaCloudUploadAlt } from 'react-icons/fa';
 
 interface TextboxProps extends InputProps {
-  type?: 'text' | 'password';
   label: string;
   fieldError?: FieldError;
+  defaultDateValue?: Date;
 }
 
 export const Textbox = forwardRef<HTMLInputElement, TextboxProps>(
   (props, ref) => {
-    const { fieldError, ...others } = props;
+    const { fieldError, defaultDateValue, ...others } = props;
     const isError = props.fieldError !== undefined;
+    const defaultDate = defaultDateValue?.toISOString().split('T')[0];
 
     return (
       <FormControl error={isError}>
@@ -31,6 +32,7 @@ export const Textbox = forwardRef<HTMLInputElement, TextboxProps>(
           type={others.type ?? 'text'}
           autoComplete={others.autoComplete ?? 'off'}
           className={`my-1 border bg-transparent ${others.className ?? ''}`}
+          defaultValue={defaultDate ?? others.defaultValue}
           sx={{
             borderColor: 'black', //isError ? 'red' : 'black',
           }}
