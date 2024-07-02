@@ -1,4 +1,11 @@
-import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  Timestamp,
+} from 'firebase/firestore';
 import { User } from 'firebase/auth';
 import {
   getStorage,
@@ -66,11 +73,13 @@ export async function getCreatorData(user: User) {
 
   // 展示登録
   const fbExhibits = data.exhibits ?? [];
+  const today = new Date();
   creator.exhibits = fbExhibits.map(x => ({
     id: x.id,
     title: x.title,
     location: x.location,
-    date: x.date,
+    startDate: x.startDate?.toDate() ?? today,
+    endDate: x.endDate?.toDate() ?? today,
     galleryId: x.galleryId,
     srcImage: x.image,
     imageUrl: creatorUrl + x.image,
@@ -103,7 +112,8 @@ export async function setCreatorData(user: User, data: Creator) {
       title: x.title,
       location: x.location,
       galleryId: x.galleryId,
-      date: x.date,
+      startDate: Timestamp.fromDate(x.startDate),
+      endDate: Timestamp.fromDate(x.endDate),
       image: x.srcImage,
     })),
   });
@@ -178,9 +188,12 @@ export async function getAllExhibits() {
   );
   const exhibitsPromises = creatorsSnap.docs.map(creatorDocSnap => {
     const data = creatorDocSnap.data();
+    const today = new Date();
     const exhibits: Exhibit[] =
       data.exhibits?.map(x => ({
         ...x,
+        startDate: x.startDate?.toDate() ?? today,
+        endDate: x.endDate?.toDate() ?? today,
         galleryId: x.galleryId,
         srcImage: x.image,
         imageUrl: getCreatorStorageUrl(creatorDocSnap.id) + x.image,
@@ -264,6 +277,13 @@ async function getLatLngFromAddress(address: string) {
   return response.results[0].geometry.location.toJSON();
 }
 
+/** 日付の期間の表示値を返す */
+export function getDatePeriodString(start: Date, end: Date) {
+  const startString = start.toLocaleDateString();
+  const endString = end.toLocaleDateString();
+  return `${startString} ～ ${endString}`;
+}
+
 /** 作家 */
 export interface Creator {
   /** 表示名 */
@@ -293,7 +313,8 @@ export interface Exhibit extends ImageStatus {
   galleryId: string;
 
   /** 展示期間 */
-  date: string;
+  startDate: Date;
+  endDate: Date;
 }
 
 interface ImageStatus {

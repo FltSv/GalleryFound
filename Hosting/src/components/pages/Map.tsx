@@ -9,7 +9,11 @@ import {
   useAdvancedMarkerRef,
 } from '@vis.gl/react-google-maps';
 import { Env } from 'src/Env';
-import { GalleryExhibits, getGalleryExhibits } from 'src/Data';
+import {
+  GalleryExhibits,
+  getDatePeriodString,
+  getGalleryExhibits,
+} from 'src/Data';
 
 // 東京駅
 const TOKYO_POS = {
@@ -114,7 +118,7 @@ const GalleryMarker = (props: { item: GalleryExhibits }) => {
               <img className="inline w-16" src={x.imageUrl} />
               <div>
                 <p className="text-base font-bold">{x.title}</p>
-                <p>{x.date}</p>
+                <p>{getDatePeriodString(x.startDate, x.endDate)}</p>
               </div>
             </div>
           ))}

@@ -1,6 +1,10 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, FirestoreDataConverter } from 'firebase/firestore';
+import {
+  getFirestore,
+  FirestoreDataConverter,
+  Timestamp,
+} from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDqf-8M_mqa1u3nF3eY3i0eEzhZi4Wow34',
@@ -43,7 +47,8 @@ export interface Exhibit {
   title: string;
   location: string;
   galleryId: string;
-  date: string;
+  startDate?: Timestamp;
+  endDate?: Timestamp;
   image: string;
 }
 

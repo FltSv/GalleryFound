@@ -15,6 +15,7 @@ import {
   getGalleries,
   addGallery,
   Gallery,
+  getDatePeriodString,
 } from 'src/Data';
 import { getUlid } from 'src/ULID';
 
@@ -259,7 +260,7 @@ const ExhibitRow = (props: ExhibitRowProps) => {
         <div className="flex w-full flex-col gap-1 align-top">
           <p>{data.title}</p>
           <p>{data.location}</p>
-          <p>{data.date}</p>
+          <p>{getDatePeriodString(data.startDate, data.endDate)}</p>
         </div>
         {/* 編集/削除ボタン */}
         <div className="flex min-w-max flex-col gap-1 align-top">
@@ -435,9 +436,14 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             )}
           </div>
           <Textbox
-            label="日時"
-            fieldError={errors.date}
-            {...register('date', { required: reqMessage })}
+            label="開始日時"
+            fieldError={errors.startDate}
+            {...register('startDate', { required: reqMessage })}
+          />
+          <Textbox
+            label="終了日時"
+            fieldError={errors.endDate}
+            {...register('endDate', { required: reqMessage })}
           />
         </div>
       </div>
