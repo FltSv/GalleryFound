@@ -1,4 +1,12 @@
-import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  GeoPoint,
+  getDoc,
+  getDocs,
+  setDoc,
+  Timestamp,
+} from 'firebase/firestore';
 import { User } from 'firebase/auth';
 import {
   getStorage,
@@ -10,7 +18,7 @@ import {
 } from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
 
-import { db, fbCreatorConverter } from './firebase';
+import { db, fbCreatorConverter, fbGalleryConverter } from './firebase';
 import { getUlid } from 'src/ULID';
 
 const collectionNames = {
@@ -66,11 +74,13 @@ export async function getCreatorData(user: User) {
 
   // 展示登録
   const fbExhibits = data.exhibits ?? [];
+  const today = new Date();
   creator.exhibits = fbExhibits.map(x => ({
     id: x.id,
     title: x.title,
     location: x.location,
-    date: x.date,
+    startDate: x.startDate?.toDate() ?? today,
+    endDate: x.endDate?.toDate() ?? today,
     galleryId: x.galleryId,
     srcImage: x.image,
     imageUrl: creatorUrl + x.image,
@@ -103,7 +113,8 @@ export async function setCreatorData(user: User, data: Creator) {
       title: x.title,
       location: x.location,
       galleryId: x.galleryId,
-      date: x.date,
+      startDate: Timestamp.fromDate(x.startDate),
+      endDate: Timestamp.fromDate(x.endDate),
       image: x.srcImage,
     })),
   });
@@ -178,9 +189,12 @@ export async function getAllExhibits() {
   );
   const exhibitsPromises = creatorsSnap.docs.map(creatorDocSnap => {
     const data = creatorDocSnap.data();
+    const today = new Date();
     const exhibits: Exhibit[] =
       data.exhibits?.map(x => ({
         ...x,
+        startDate: x.startDate?.toDate() ?? today,
+        endDate: x.endDate?.toDate() ?? today,
         galleryId: x.galleryId,
         srcImage: x.image,
         imageUrl: getCreatorStorageUrl(creatorDocSnap.id) + x.image,
@@ -221,20 +235,24 @@ export async function getGalleryExhibits() {
 
 /** ギャラリー情報の一覧を取得 */
 export async function getGalleries() {
-  const querySnap = await getDocs(collection(db, collectionNames.galleries));
+  const colRef = collection(db, collectionNames.galleries);
+  const querySnap = await getDocs(colRef.withConverter(fbGalleryConverter));
+
   return querySnap.docs.map(doc => {
     const data = doc.data();
-    return { ...data, id: doc.id } as Gallery;
+    const { latitude, longitude } = data.latLng.toJSON();
+    return { ...data, id: doc.id, latLng: { lat: latitude, lng: longitude } };
   });
 }
 
 /** ギャラリー情報を追加 */
 export async function addGallery(data: Gallery) {
-  const latLng = await getLatLngFromAddress(data.location);
-  const { id, ...firebaseData } = { ...data, latLng: latLng };
+  const { lat, lng } = await getLatLngFromAddress(data.location);
+  const { id, ...firebaseData } = { ...data, latLng: new GeoPoint(lat, lng) };
   void id;
 
-  await setDoc(doc(db, collectionNames.galleries, getUlid()), firebaseData);
+  const docRef = doc(db, collectionNames.galleries, getUlid());
+  await setDoc(docRef.withConverter(fbGalleryConverter), firebaseData);
 }
 
 /** 住所から緯度経度を取得する */
@@ -262,6 +280,13 @@ async function getLatLngFromAddress(address: string) {
   );
 
   return response.results[0].geometry.location.toJSON();
+}
+
+/** 日付の期間の表示値を返す */
+export function getDatePeriodString(start: Date, end: Date) {
+  const startString = start.toLocaleDateString();
+  const endString = end.toLocaleDateString();
+  return `${startString} ～ ${endString}`;
 }
 
 /** 作家 */
@@ -293,7 +318,8 @@ export interface Exhibit extends ImageStatus {
   galleryId: string;
 
   /** 展示期間 */
-  date: string;
+  startDate: Date;
+  endDate: Date;
 }
 
 interface ImageStatus {

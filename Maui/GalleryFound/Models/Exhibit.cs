@@ -23,8 +23,18 @@
         public string Image { get; init; }
 
         /// <summary>
-        /// 展示日時
+        /// 展示開始日
         /// </summary>
-        public string Date { get; init; }
+        public DateTime StartDate { get; init; }
+
+        /// <summary>
+        /// 展示終了日
+        /// </summary>
+        public DateTime EndDate { get; init; }
+
+        /// <summary>
+        /// 展示日の表示
+        /// </summary>
+        public string DisplayDate => $"{StartDate:yyyy/MM/dd} ～ {EndDate:yyyy/MM/dd}";
     }
 }
