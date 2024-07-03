@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  GeoPoint,
   getDoc,
   getDocs,
   setDoc,
@@ -17,7 +18,7 @@ import {
 } from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
 
-import { db, fbCreatorConverter } from './firebase';
+import { db, fbCreatorConverter, fbGalleryConverter } from './firebase';
 import { getUlid } from 'src/ULID';
 
 const collectionNames = {
@@ -234,20 +235,24 @@ export async function getGalleryExhibits() {
 
 /** ギャラリー情報の一覧を取得 */
 export async function getGalleries() {
-  const querySnap = await getDocs(collection(db, collectionNames.galleries));
+  const colRef = collection(db, collectionNames.galleries);
+  const querySnap = await getDocs(colRef.withConverter(fbGalleryConverter));
+
   return querySnap.docs.map(doc => {
     const data = doc.data();
-    return { ...data, id: doc.id } as Gallery;
+    const { latitude, longitude } = data.latLng.toJSON();
+    return { ...data, id: doc.id, latLng: { lat: latitude, lng: longitude } };
   });
 }
 
 /** ギャラリー情報を追加 */
 export async function addGallery(data: Gallery) {
-  const latLng = await getLatLngFromAddress(data.location);
-  const { id, ...firebaseData } = { ...data, latLng: latLng };
+  const { lat, lng } = await getLatLngFromAddress(data.location);
+  const { id, ...firebaseData } = { ...data, latLng: new GeoPoint(lat, lng) };
   void id;
 
-  await setDoc(doc(db, collectionNames.galleries, getUlid()), firebaseData);
+  const docRef = doc(db, collectionNames.galleries, getUlid());
+  await setDoc(docRef.withConverter(fbGalleryConverter), firebaseData);
 }
 
 /** 住所から緯度経度を取得する */

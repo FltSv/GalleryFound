@@ -4,6 +4,7 @@ import {
   getFirestore,
   FirestoreDataConverter,
   Timestamp,
+  GeoPoint,
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -26,6 +27,11 @@ export const fbCreatorConverter: FirestoreDataConverter<Creator> = {
     const data = snapshot.data(options);
     return data as Creator;
   },
+};
+
+export const fbGalleryConverter: FirestoreDataConverter<Gallery> = {
+  toFirestore: obj => obj,
+  fromFirestore: (snapshot, options?) => snapshot.data(options) as Gallery,
 };
 
 /** firestore Creator */
@@ -56,5 +62,5 @@ export interface Exhibit {
 export interface Gallery {
   name: string;
   location: string;
-  latLng: google.maps.LatLngLiteral;
+  latLng: GeoPoint;
 }
