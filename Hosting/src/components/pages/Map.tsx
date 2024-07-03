@@ -21,6 +21,8 @@ const TOKYO_POS = {
   lng: 139.766965,
 } as const satisfies google.maps.LatLngLiteral;
 
+const TODAY = new Date();
+
 export const Map = () => (
   <div className="h-svh w-svw bg-white">
     <GeolocationWrapper
@@ -41,7 +43,14 @@ const MapView = ({ coords, error }: MapViewProps) => {
 
   useEffect(() => {
     void (async () => {
-      setGalleries(await getGalleryExhibits());
+      const galleries = await getGalleryExhibits();
+      const conditionally = galleries
+        .map(x => ({
+          ...x,
+          exhibits: x.exhibits.filter(ex => ex.endDate >= TODAY),
+        }))
+        .filter(x => x.exhibits.length > 0);
+      setGalleries(conditionally);
     })();
   }, []);
 
