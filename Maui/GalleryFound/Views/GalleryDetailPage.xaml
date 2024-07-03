@@ -40,7 +40,7 @@
             Margin="10"
             Spacing="10">
 
-            <Label Text="{Binding Exhibit.Date}" />
+            <Label Text="{Binding Exhibit.DisplayDate}" />
             <Label Style="{StaticResource LinkLabelStyle}" Text="{Binding Exhibit.Location}">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding OpenGalleryMapCommand}" />

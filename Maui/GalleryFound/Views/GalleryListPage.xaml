@@ -62,7 +62,7 @@
                         Padding="10,0"
                         Spacing="5">
 
-                            <Label Text="{Binding Exhibit.Date}" />
+                            <Label Text="{Binding Exhibit.DisplayDate}" />
                             <Label Text="{Binding Exhibit.Title}" />
                             <Label Text="{Binding Creator.Name}" />
 

@@ -1,10 +1,4 @@
-﻿using System.Reflection;
-using Firebase.Auth;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Storage.v1.Data;
-using Google.Cloud.Firestore;
-using Google.Cloud.Firestore.V1;
-using Google.Cloud.Storage.V1;
+﻿using Google.Cloud.Firestore;
 using GalleryFound.Models;
 using GalleryFound.Models.Repositories;
 
@@ -49,16 +43,20 @@ public class RepoGcp : IRepo
                 });
             }
 
-            var exhibits = item.GetValue<List<Dictionary<string, string>>>("exhibits");
+            var exhibits = item.GetValue<List<Dictionary<string, object>>>("exhibits");
             foreach (var exhibitItem in exhibits)
             {
+                var startTimestamp = (Timestamp)exhibitItem["startDate"];
+                var endTimestamp = (Timestamp)exhibitItem["endDate"];
+
                 creator.Exhibits.Add(new Exhibit
                 {
-                    Id = exhibitItem["id"],
-                    Title = exhibitItem["title"],
-                    Date = exhibitItem["date"],
-                    Image = exhibitItem["image"],
-                    Location = exhibitItem["location"]
+                    Id = exhibitItem["id"] as string,
+                    Title = exhibitItem["title"] as string,
+                    StartDate = startTimestamp.ToDateTime(),
+                    EndDate = endTimestamp.ToDateTime(),
+                    Image = exhibitItem["image"] as string,
+                    Location = exhibitItem["location"] as string,
                 });
             }
 
