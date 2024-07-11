@@ -13,25 +13,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Gallery Found',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
+      theme: ThemeData.light(useMaterial3: true).copyWith(
+        brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
       ),
+      darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
+      themeMode: ThemeMode.system,
       home: const TopPage(),
     );
   }
@@ -61,13 +51,14 @@ class TopPage extends StatelessWidget {
       ButtonProp(Icons.person, Colors.purple, creatorsFunc),
     ];
 
-    return Center(
-      child: Container(
+    return Scaffold(
+      body: Container(
         alignment: Alignment.center,
-        decoration: const BoxDecoration(
-          color: Color(0x413c4300),
+        decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/palette_background.png'),
+            image: AssetImage(Theme.of(context).brightness == Brightness.light
+                ? 'assets/palette_background_light.png'
+                : 'assets/palette_background_dark.png'),
           ),
         ),
         child: Stack(
