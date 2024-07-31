@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/screens/top_screen.dart';
 
-void main() {
+void main() async {
+  // データの取得
+  await DataProvider().fetchData();
+
   runApp(const MyApp());
 }
 
