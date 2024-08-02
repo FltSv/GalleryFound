@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 import 'package:mobile/screens/creator_list_screen.dart';
+import 'package:mobile/screens/exhibit_list_screen.dart';
 import 'package:mobile/screens/map_screen.dart';
 
 class TopScreen extends StatelessWidget {
@@ -18,7 +19,7 @@ class TopScreen extends StatelessWidget {
     final List<_ButtonProp> props = [
       _ButtonProp(Icons.menu_book, Colors.green, null),
       _ButtonProp(Icons.location_on, Colors.blue, const MapScreen()),
-      _ButtonProp(Icons.brush, Colors.red, null),
+      _ButtonProp(Icons.brush, Colors.red, const ExhibitListScreen()),
       _ButtonProp(Icons.person, Colors.purple, const CreatorListScreen()),
     ];
 

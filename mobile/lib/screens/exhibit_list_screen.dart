@@ -1,0 +1,45 @@
+import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:intersperse/intersperse.dart';
+import 'package:mobile/models/creator.dart';
+import 'package:mobile/providers/data_provider.dart';
+import 'package:mobile/screens/exhibit_detail_screen.dart';
+import 'package:mobile/widgets/exhibit_item.dart';
+
+class ExhibitListScreen extends StatefulWidget {
+  const ExhibitListScreen({super.key});
+
+  @override
+  State<ExhibitListScreen> createState() => _ExhibitListScreenState();
+}
+
+class _ExhibitListScreenState extends State<ExhibitListScreen> {
+  final List<Creator> creators = DataProvider().creators;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('展示一覧'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: creators
+            .map((creator) => creator.exhibits.map(
+                (exhibit) => ExhibitItem(exhibit: exhibit, creator: creator)))
+            .expand((element) => element)
+            .map<Widget>((item) => GestureDetector(
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: ((context) => ExhibitDetailScreen(
+                          creator: item.creator,
+                          exhibit: item.exhibit,
+                        )),
+                  )),
+                  child: item,
+                ))
+            .intersperse(const Gap(8))
+            .toList(),
+      ),
+    );
+  }
+}

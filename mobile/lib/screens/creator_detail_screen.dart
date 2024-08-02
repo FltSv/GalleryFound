@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/creator.dart';
-import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/models/product.dart';
 import 'package:mobile/providers/data_provider.dart';
+import 'package:mobile/widgets/exhibit_item.dart';
 
 class CreatorDetailScreen extends StatefulWidget {
   const CreatorDetailScreen({super.key, required this.creator});
@@ -36,7 +36,7 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
             children: creator.exhibits
                 .map<Widget>((exhibit) => ExhibitItem(
                       exhibit: exhibit,
-                      creatorId: creator.id,
+                      creator: creator,
                     ))
                 .intersperse(const Gap(8))
                 .toList(),
@@ -61,51 +61,6 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
           ),
         ].intersperse(const Gap(16)).toList(),
       ),
-    );
-  }
-}
-
-class ExhibitItem extends StatelessWidget {
-  const ExhibitItem({
-    super.key,
-    required this.exhibit,
-    required this.creatorId,
-  });
-
-  final Exhibit exhibit;
-  final String creatorId;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: 3,
-          child: Image.network(
-              DataProvider().getImageUrl(creatorId, exhibit.image)),
-        ),
-        Expanded(
-          flex: 4,
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  exhibit.title,
-                  style: theme.textTheme.titleMedium,
-                ),
-                const Gap(0),
-                Text(exhibit.location),
-                Text(exhibit.displayDate),
-              ].intersperse(const Gap(4)).toList(),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
