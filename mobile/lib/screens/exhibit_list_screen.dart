@@ -25,15 +25,13 @@ class _ExhibitListScreenState extends State<ExhibitListScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: creators
-            .map((creator) => creator.exhibits.map(
-                (exhibit) => ExhibitItem(exhibit: exhibit, creator: creator)))
+            .map((creator) => creator.exhibits
+                .map((exhibit) => ExhibitItem(exhibit: exhibit)))
             .expand((element) => element)
             .map<Widget>((item) => GestureDetector(
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: ((context) => ExhibitDetailScreen(
-                          creator: item.creator,
-                          exhibit: item.exhibit,
-                        )),
+                    builder: ((context) =>
+                        ExhibitDetailScreen(exhibit: item.exhibit)),
                   )),
                   child: item,
                 ))

@@ -1,4 +1,6 @@
 import 'package:intl/intl.dart';
+import 'package:mobile/models/creator.dart';
+import 'package:mobile/providers/data_provider.dart';
 
 /// 展示
 class Exhibit {
@@ -23,6 +25,7 @@ class Exhibit {
 
   /// イメージ画像のファイル名＋トークン
   final String image;
+  String get imageUrl => DataProvider().getImageUrl(creator.id, image);
 
   /// 展示開始日
   final DateTime startDate;
@@ -34,4 +37,6 @@ class Exhibit {
   static final DateFormat _dateFormat = DateFormat('yyyy/MM/dd');
   String get displayDate =>
       "${_dateFormat.format(startDate)} ～ ${_dateFormat.format(endDate)}";
+
+  late final Creator creator;
 }

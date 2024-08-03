@@ -7,7 +7,14 @@ class Creator {
     required this.name,
     required this.products,
     required this.exhibits,
-  });
+  }) {
+    for (var product in products) {
+      product.creator = this;
+    }
+    for (var exhibit in exhibits) {
+      exhibit.creator = this;
+    }
+  }
 
   final String id;
 

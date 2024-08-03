@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
-import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/exhibit.dart';
-import 'package:mobile/providers/data_provider.dart';
 
 class ExhibitItem extends StatelessWidget {
   const ExhibitItem({
     super.key,
     required this.exhibit,
-    required this.creator,
   });
 
   final Exhibit exhibit;
-  final Creator creator;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +20,7 @@ class ExhibitItem extends StatelessWidget {
       children: [
         Expanded(
           flex: 3,
-          child: Image.network(
-              DataProvider().getImageUrl(creator.id, exhibit.image)),
+          child: Image.network(exhibit.imageUrl),
         ),
         Expanded(
           flex: 4,
