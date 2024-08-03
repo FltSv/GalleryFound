@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/providers/data_provider.dart';
+import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/exhibit_detail_screen.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
 
@@ -29,10 +30,8 @@ class _ExhibitListScreenState extends State<ExhibitListScreen> {
                 .map((exhibit) => ExhibitItem(exhibit: exhibit)))
             .expand((element) => element)
             .map<Widget>((item) => GestureDetector(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: ((context) =>
-                        ExhibitDetailScreen(exhibit: item.exhibit)),
-                  )),
+                  onTap: () => NavigateProvider.push(
+                      context, ExhibitDetailScreen(exhibit: item.exhibit)),
                   child: item,
                 ))
             .intersperse(const Gap(8))
