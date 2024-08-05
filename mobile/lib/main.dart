@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:mobile/firebase_options.dart';
 import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/screens/top_screen.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   // データの取得
   await DataProvider().fetchData();
 
