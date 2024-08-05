@@ -4,15 +4,17 @@ import 'package:mobile/firebase_options.dart';
 import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/screens/top_screen.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  Future(() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-  // データの取得
-  await DataProvider().fetchData();
+    // データの取得
+    await DataProvider().fetchData();
+  });
 
   runApp(const MyApp());
 }
