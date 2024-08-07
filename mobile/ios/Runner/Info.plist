@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- geolocator Section -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Required to post location information when posting photos and videos.</string>
 </dict>
 </plist>

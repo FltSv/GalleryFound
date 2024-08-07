@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:mobile/firebase_options.dart';
+import 'package:mobile/providers/config_provider.dart';
 import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/screens/top_screen.dart';
 
@@ -28,6 +29,7 @@ void main() {
     }
 
     // データの取得
+    await ConfigProvider().init();
     await DataProvider().fetchData();
   });
 
