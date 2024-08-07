@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/providers/navigate_provider.dart';
 import 'dart:math';
 
 import 'package:mobile/screens/creator_list_screen.dart';
@@ -51,28 +52,43 @@ class TopScreen extends StatelessWidget {
 
   Widget _iconButton(
       BuildContext context, _ButtonProp prop, double x, double y, double size) {
-    return Positioned(
-      left: x - size,
-      top: y - size,
-      child: IconButton.filled(
-        icon: Icon(prop.icon),
-        iconSize: size,
-        padding: EdgeInsets.all(size * 0.5),
-        style: IconButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: prop.color,
-        ),
-        onPressed: () {
-          final screen = prop.screen;
-          if (screen == null) return;
+    final isEnable = prop.screen != null;
 
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: ((context) => screen),
+    return Stack(
+      children: [
+        Positioned(
+          left: x - size,
+          top: y - size,
+          child: IconButton.filled(
+            disabledColor: Colors.grey,
+            icon: Icon(prop.icon),
+            iconSize: size,
+            padding: EdgeInsets.all(size * 0.5),
+            style: IconButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: isEnable ? prop.color : Colors.grey,
             ),
-          );
-        },
-      ),
+            onPressed: () {
+              final screen = prop.screen;
+              if (screen == null) return;
+              NavigateProvider.push(context, screen);
+            },
+          ),
+        ),
+        if (!isEnable)
+          Positioned(
+            left: x,
+            top: y + size / 2,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              color: Colors.black.withOpacity(0.5),
+              child: const Text(
+                "準備中...",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

@@ -43,6 +43,7 @@ dependencies:
   permission_handler: ^11.3.1
   flutter_inappwebview: ^6.0.0
   firebase_remote_config: ^5.0.4
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
@@ -97,3 +98,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/launcher/icon.png"
+  adaptive_icon_background: "#bb67bf"
+  adaptive_icon_foreground: "assets/launcher/icon_foreground.png"
