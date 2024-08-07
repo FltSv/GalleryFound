@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/product.dart';
+import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
 
 class CreatorDetailScreen extends StatefulWidget {
@@ -31,6 +32,7 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
             '展示歴',
             style: theme.textTheme.headlineMedium,
           ),
+          if (creator.exhibits.isEmpty) const EmptyState(),
           Column(
             children: creator.exhibits
                 .map<Widget>((exhibit) => ExhibitItem(exhibit: exhibit))
@@ -42,6 +44,7 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
             '発表作品',
             style: theme.textTheme.headlineMedium,
           ),
+          if (creator.products.isEmpty) const EmptyState(),
           GridView.count(
             crossAxisCount: 2,
             mainAxisSpacing: 8,

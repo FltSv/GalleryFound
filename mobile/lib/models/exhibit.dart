@@ -39,4 +39,8 @@ class Exhibit {
       "${_dateFormat.format(startDate)} ～ ${_dateFormat.format(endDate)}";
 
   late final Creator creator;
+
+  /// 期間内であるか
+  bool isWithin(DateTime dateTime) =>
+      dateTime.isAfter(startDate) && dateTime.isBefore(endDate);
 }
