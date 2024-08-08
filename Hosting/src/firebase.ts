@@ -1,4 +1,9 @@
 import { initializeApp } from 'firebase/app';
+import {
+  initializeAppCheck,
+  ReCaptchaV3Provider,
+  getToken,
+} from 'firebase/app-check';
 import { getAuth } from 'firebase/auth';
 import {
   getFirestore,
@@ -16,6 +21,8 @@ const firebaseConfig = {
   appId: '1:985501114281:web:0e6ad563fee57fb8826eb8',
 };
 
+const reCAPTCHA_PUBLIC_KEY = '6LeS8AcqAAAAABQnEgiC2-HGfuuHFeNK_kMUD0Zq';
+
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
@@ -28,6 +35,29 @@ export const fbCreatorConverter: FirestoreDataConverter<Creator> = {
     return data as Creator;
   },
 };
+
+declare global {
+  interface Window {
+    FIREBASE_APPCHECK_DEBUG_TOKEN: boolean;
+  }
+}
+
+if (process.env.NODE_ENV === 'development') {
+  window.self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+}
+
+const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider(reCAPTCHA_PUBLIC_KEY),
+  isTokenAutoRefreshEnabled: true,
+});
+
+getToken(appCheck)
+  .then(result => {
+    console.debug('appCheck Success!: ', result);
+  })
+  .catch((e: unknown) => {
+    console.error(e);
+  });
 
 export const fbGalleryConverter: FirestoreDataConverter<Gallery> = {
   toFirestore: obj => obj,
