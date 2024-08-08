@@ -44,6 +44,7 @@ dependencies:
   flutter_inappwebview: ^6.0.0
   firebase_remote_config: ^5.0.4
   flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.1
 
 dev_dependencies:
   flutter_test:
@@ -106,3 +107,15 @@ flutter_launcher_icons:
   image_path: "assets/launcher/icon.png"
   adaptive_icon_background: "#bb67bf"
   adaptive_icon_foreground: "assets/launcher/icon_foreground.png"
+
+flutter_native_splash:
+  image: "assets/splash/splash_light.png"
+  color: "#bb67bf"
+  image_dark: "assets/splash/splash_dark.png"
+  color_dark: "#262626"
+  fullscreen: true
+  android_12:
+    image: "assets/splash/splash_light.png"
+    icon_background_color: "#bb67bf"
+    image_dark: "assets/splash/splash_dark.png"
+    icon_background_color_dark: "#262626"
