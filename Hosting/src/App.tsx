@@ -13,6 +13,7 @@ import Header from './components/ui/Header';
 
 import { useAuthContext } from './components/AuthContext';
 import { ReactNode } from 'react';
+import { Policy } from './components/pages/Policy';
 
 const AuthRouting = (props: { page: ReactNode }) => {
   const { user, loading } = useAuthContext();
@@ -47,6 +48,7 @@ const App = () => (
           path="galleries"
           element={<AuthRouting page={<Galleries />} />}
         />
+        <Route path="policy" element={<Policy />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
