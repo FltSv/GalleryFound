@@ -1,9 +1,9 @@
 import { CSSProperties } from 'react';
+import { Link } from 'react-router-dom';
 
 const screenshot: CSSProperties = {
   margin: '0 1rem',
-  clipPath: 'inset(0 0 25% 0)' /* 上部4/5を表示 */,
-  maskImage: 'linear-gradient(to bottom, black 10%, transparent)',
+  maskImage: 'linear-gradient(to bottom, black 50%, transparent)',
 };
 
 export const Top = () => (
@@ -14,7 +14,7 @@ export const Top = () => (
 
     <div className="flex items-center">
       <img
-        src="img/app-screen-1.png"
+        src="img/exhibit-screen.png"
         style={screenshot}
         className="w-24 md:w-40"
       />
@@ -26,7 +26,7 @@ export const Top = () => (
 
     <div className="flex flex-row-reverse items-center">
       <img
-        src="img/app-screen-2.png"
+        src="img/map-screen.png"
         style={screenshot}
         className="w-24 md:w-40"
       />
@@ -39,7 +39,8 @@ export const Top = () => (
       </div>
     </div>
 
-    <div className="flex items-center">
+    {/* todo 画面ができたら差し替える */}
+    {/* <div className="flex items-center">
       <img
         src="img/Screenshot_20231215-150650.png"
         style={screenshot}
@@ -49,11 +50,11 @@ export const Top = () => (
         <h2>雑誌リスト</h2>
         <p>美術雑誌も一目で分かりやすく。</p>
       </div>
-    </div>
+    </div> */}
 
-    <div className="flex flex-row-reverse items-center">
+    <div className="flex items-center">
       <img
-        src="img/Screenshot_20231215-150642.png"
+        src="img/creator-screen.png"
         style={screenshot}
         className="w-24 md:w-40"
       />
@@ -62,7 +63,9 @@ export const Top = () => (
         <p>気になってるあの作家を一覧で見れる！</p>
       </div>
     </div>
-    <div className="mx-auto flex gap-1 md:gap-4">
+
+    {/* アプリDLボタン */}
+    <div className="mx-auto my-16 flex gap-1 md:gap-4">
       <div className="relative">
         <a
           href="#"
@@ -91,6 +94,9 @@ export const Top = () => (
           準備中
         </div>
       </div>
+    </div>
+    <div className="mx-auto">
+      <Link to="Policy">プライバシーポリシー・利用規約</Link>
     </div>
   </div>
 );
