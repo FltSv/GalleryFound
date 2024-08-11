@@ -18,7 +18,12 @@ import {
 } from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
 
-import { db, fbCreatorConverter, fbGalleryConverter } from './firebase';
+import {
+  db,
+  fbCreatorConverter,
+  fbGalleryConverter,
+  getConfig,
+} from './firebase';
 import { getUlid } from 'src/ULID';
 
 const collectionNames = {
@@ -187,22 +192,29 @@ export async function getAllExhibits() {
   const creatorsSnap = await getDocs(
     collection(db, collectionNames.creators).withConverter(fbCreatorConverter),
   );
-  const exhibitsPromises = creatorsSnap.docs.map(creatorDocSnap => {
-    const data = creatorDocSnap.data();
-    const today = new Date();
-    const exhibits: Exhibit[] =
-      data.exhibits?.map(x => ({
-        ...x,
-        startDate: x.startDate?.toDate() ?? today,
-        endDate: x.endDate?.toDate() ?? today,
-        galleryId: x.galleryId,
-        srcImage: x.image,
-        imageUrl: getCreatorStorageUrl(creatorDocSnap.id) + x.image,
-        tmpImageData: '',
-      })) ?? [];
 
-    return exhibits;
-  });
+  const config = await getConfig();
+  const ignoreIds = config.debugUserIds;
+  const isDebug = process.env.NODE_ENV === 'development';
+
+  const exhibitsPromises = creatorsSnap.docs
+    .filter(d => isDebug || !ignoreIds.includes(d.id))
+    .map(creatorDocSnap => {
+      const data = creatorDocSnap.data();
+      const today = new Date();
+      const exhibits: Exhibit[] =
+        data.exhibits?.map(x => ({
+          ...x,
+          startDate: x.startDate?.toDate() ?? today,
+          endDate: x.endDate?.toDate() ?? today,
+          galleryId: x.galleryId,
+          srcImage: x.image,
+          imageUrl: getCreatorStorageUrl(creatorDocSnap.id) + x.image,
+          tmpImageData: '',
+        })) ?? [];
+
+      return exhibits;
+    });
 
   const resolvedExhibits = await Promise.all(exhibitsPromises);
   return resolvedExhibits.flat();

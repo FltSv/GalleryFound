@@ -11,6 +11,11 @@ import {
   Timestamp,
   GeoPoint,
 } from 'firebase/firestore';
+import {
+  fetchAndActivate,
+  getRemoteConfig,
+  getValue,
+} from 'firebase/remote-config';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDqf-8M_mqa1u3nF3eY3i0eEzhZi4Wow34',
@@ -26,6 +31,21 @@ const reCAPTCHA_PUBLIC_KEY = '6LeS8AcqAAAAABQnEgiC2-HGfuuHFeNK_kMUD0Zq';
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Remote Config
+// 最小フェッチ時間: dev1分、prod1時間
+const config = getRemoteConfig(app);
+config.settings.minimumFetchIntervalMillis =
+  process.env.NODE_ENV === 'development' ? 60000 : 3600000;
+
+export async function getConfig(): Promise<Config> {
+  await fetchAndActivate(config);
+  return {
+    debugUserIds: JSON.parse(
+      getValue(config, 'debug_user_ids').asString(),
+    ) as string[],
+  };
+}
 
 export const fbCreatorConverter: FirestoreDataConverter<Creator> = {
   toFirestore: modelObject => modelObject,
@@ -93,4 +113,9 @@ export interface Gallery {
   name: string;
   location: string;
   latLng: GeoPoint;
+}
+
+/** Remote Config */
+interface Config {
+  debugUserIds: string[];
 }
