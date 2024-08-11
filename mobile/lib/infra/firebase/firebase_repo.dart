@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/models/product.dart';
+import 'package:mobile/providers/config_provider.dart';
 import 'package:mobile/repos/data_repo_base.dart';
 
 class FirebaseRepo implements DataRepoBase {
@@ -10,7 +12,11 @@ class FirebaseRepo implements DataRepoBase {
     final db = FirebaseFirestore.instance;
     final querySnap = await db.collection("creators").get();
 
-    return querySnap.docs.map((docSnap) {
+    final ignoreIds = ConfigProvider().config.debugUserIds;
+
+    return querySnap.docs
+        .where((docSnap) => kDebugMode || !ignoreIds.contains(docSnap.id))
+        .map((docSnap) {
       final exhibits = (docSnap.get("exhibits") as List<dynamic>)
           .cast<Map<String, dynamic>>();
       final products = (docSnap.get("products") as List<dynamic>)
