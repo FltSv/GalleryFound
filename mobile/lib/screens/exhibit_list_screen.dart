@@ -36,7 +36,7 @@ class _ExhibitListScreenState extends State<ExhibitListScreen> {
         .map((creator) =>
             creator.exhibits.map((exhibit) => ExhibitItem(exhibit: exhibit)))
         .expand((element) => element)
-        .where((item) => item.exhibit.isWithin(DateTime.now()))
+        .where((item) => item.exhibit.endDate.isAfter(DateTime.now()))
         .map<Widget>((item) => GestureDetector(
               onTap: () => NavigateProvider.push(
                   context, ExhibitDetailScreen(exhibit: item.exhibit)),
