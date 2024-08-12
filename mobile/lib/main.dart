@@ -7,6 +7,7 @@ import 'package:mobile/firebase_options.dart';
 import 'package:mobile/providers/config_provider.dart';
 import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/screens/top_screen.dart';
+import 'package:mobile/services/version_service.dart';
 
 void main() {
   final widgetBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -34,11 +35,13 @@ void main() {
     await ConfigProvider().init();
     await DataProvider().fetchData();
 
+    // 更新の確認
+    await VersionService.checkUpdateRequired();
+
     // スプラッシュ画面を解除
     FlutterNativeSplash.remove();
+    runApp(const MyApp());
   });
-
-  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -58,7 +61,16 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       themeMode: ThemeMode.system,
-      home: const TopScreen(),
+      home: Builder(builder: (context) {
+        // アップデートが必要な場合、ポップアップを表示
+        if (VersionService.isUpdateRequired) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            VersionService.showUpdatePopup(context);
+          });
+        }
+
+        return const TopScreen();
+      }),
     );
   }
 }
