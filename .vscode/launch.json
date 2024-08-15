@@ -4,7 +4,7 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "debug",
+      "name": "web debug",
       "preLaunchTask": "npm: start",
       "url": "http://localhost:5000",
       "webRoot": "${workspaceFolder}/Hosting",
