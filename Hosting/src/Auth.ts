@@ -38,3 +38,13 @@ export async function signupWithEmail(email: string, pass: string) {
 export async function signOut() {
   await getAuth().signOut();
 }
+
+/**
+ * メールアドレス確認メールを再送信する
+ */
+export async function sendVerifyEmail() {
+  const user = getAuth().currentUser;
+  if (user) {
+    await sendEmailVerification(user);
+  }
+}
