@@ -1,4 +1,6 @@
 import { ReactNode, Dispatch, SetStateAction } from 'react';
+import { Modal, ModalDialog, ModalOverflow } from '@mui/joy';
+import { FaXmark } from 'react-icons/fa6';
 
 interface PopupProps {
   visible: boolean;
@@ -9,22 +11,29 @@ interface PopupProps {
 export const Popup = (props: PopupProps) => {
   const { visible, setVisible, children } = props;
 
-  if (!visible) {
-    return <></>;
-  }
-
   return (
-    <div className="fixed left-0 top-0 z-50 block h-screen w-full bg-neutral-500/50">
-      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-neutral-50 p-5 shadow-lg shadow-neutral-800">
-        <label
-          className="absolute -top-6 right-0 cursor-pointer text-white"
-          onClick={() => {
-            setVisible(false);
-          }}>
-          <i className="fa-solid fa-xmark" />
-        </label>
-        {children}
-      </div>
-    </div>
+    <Modal
+      open={visible}
+      onClose={() => {
+        setVisible(false);
+      }}
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      <ModalOverflow>
+        <ModalDialog layout="center">
+          <label
+            className="absolute right-4 top-4 cursor-pointer"
+            onClick={() => {
+              setVisible(false);
+            }}>
+            <FaXmark />
+          </label>
+          {children}
+        </ModalDialog>
+      </ModalOverflow>
+    </Modal>
   );
 };
