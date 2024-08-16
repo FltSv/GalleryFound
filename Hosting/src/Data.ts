@@ -270,28 +270,29 @@ export async function addGallery(data: Gallery) {
 /** 住所から緯度経度を取得する */
 async function getLatLngFromAddress(address: string) {
   const geocoder = new google.maps.Geocoder();
-  const response = await geocoder.geocode(
-    { address: address },
-    (results, status) => {
-      if (status !== google.maps.GeocoderStatus.OK) {
-        console.error('Geocoding API returned status:', status);
-        throw new Error(status);
-      }
+  const geocodingTask = new Promise<google.maps.GeocoderResult[]>(
+    (resolve, reject) =>
+      void geocoder.geocode({ address: address }, (results, status) => {
+        if (status !== google.maps.GeocoderStatus.OK) {
+          reject(new Error(status));
+        }
 
-      if (results === null) {
-        throw new Error('result is null');
-      }
+        if (results !== null) {
+          resolve(results);
+        }
 
-      return;
-    },
+        reject(new Error('result is null'));
+      }),
   );
+
+  const results = await geocodingTask;
 
   console.debug(
     `get geocode: "${address}": `,
-    response.results[0].geometry.location.toJSON(),
+    results[0].geometry.location.toJSON(),
   );
 
-  return response.results[0].geometry.location.toJSON();
+  return results[0].geometry.location.toJSON();
 }
 
 /** 日付の期間の表示値を返す */

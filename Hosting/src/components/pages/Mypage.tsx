@@ -499,16 +499,24 @@ const NoGalleryInfo = (props: NoGalleryProps) => {
     register,
     handleSubmit,
     setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<Gallery>({ defaultValues: { name: props.newName } as Gallery });
 
   const onValid: SubmitHandler<Gallery> = async data => {
-    if (props.newName === '') {
+    if (!props.newName) {
       setError('name', { message: '場所（ギャラリー名称）が未入力です。' });
       return;
     }
 
-    await addGallery({ ...data, name: props.newName });
+    try {
+      await addGallery({ ...data, name: props.newName });
+    } catch (error) {
+      console.error('error: ', error);
+      setError('name', { message: '入力された住所が見つかりませんでした。' });
+      return;
+    }
+
     props.onChange();
   };
 
@@ -535,7 +543,10 @@ const NoGalleryInfo = (props: NoGalleryProps) => {
           startDecorator={<FaPlus />}
           className="w-fit"
           loading={isSubmitting}
-          onClick={() => void handleSubmit(onValid)()}>
+          onClick={e => {
+            clearErrors('name');
+            void handleSubmit(onValid)(e);
+          }}>
           追加
         </MuiJoyButton>
       </div>
