@@ -3,6 +3,9 @@ import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/product.dart';
+import 'package:mobile/providers/navigate_provider.dart';
+import 'package:mobile/screens/exhibit_detail_screen.dart';
+import 'package:mobile/screens/product_detail_screen.dart';
 import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
 
@@ -35,7 +38,12 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
           if (creator.exhibits.isEmpty) const EmptyState(),
           Column(
             children: creator.exhibits
-                .map<Widget>((exhibit) => ExhibitItem(exhibit: exhibit))
+                .map<ExhibitItem>((exhibit) => ExhibitItem(exhibit: exhibit))
+                .map<Widget>((item) => GestureDetector(
+                      onTap: () => NavigateProvider.push(
+                          context, ExhibitDetailScreen(exhibit: item.exhibit)),
+                      child: item,
+                    ))
                 .intersperse(const Gap(8))
                 .toList(),
           ),
@@ -53,6 +61,11 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
             shrinkWrap: true, // GridViewの高さをコンテンツに合わせる
             children: creator.products
                 .map((product) => ProductItem(product: product))
+                .map<Widget>((item) => GestureDetector(
+                      onTap: () => NavigateProvider.push(
+                          context, ProductDetailScreen(product: item.product)),
+                      child: item,
+                    ))
                 .toList(),
           ),
         ].intersperse(const Gap(16)).toList(),
