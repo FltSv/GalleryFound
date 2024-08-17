@@ -6,7 +6,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
 import { FirebaseError } from 'firebase/app';
 import { Button, SubmitButton, Textbox } from '../ui/Input';
-import { loginWithEmail, signupWithEmail } from '../../Auth';
+import { loginWithEmail, loginWith, signupWithEmail } from '../../Auth';
 import { useAuthContext } from '../AuthContext';
 
 interface Inputs {
@@ -147,18 +147,18 @@ export const Login = () => {
 
       {/* ソーシャルログイン */}
       <Divider className="text-base">or</Divider>
-      {/* 実装まで無効化 */}
       <div className="flex gap-4">
         <Button
-          disabled
           startDecorator={<FcGoogle />}
-          className="w-fit bg-white text-black">
+          className="w-fit bg-white text-black"
+          onClick={() => void loginWith('google')}>
           Continue with Google
         </Button>
+        {/* 手間が掛かりそうなので一旦非表示 */}
         <Button
-          disabled
           startDecorator={<FaFacebook color="#1877F2" />}
-          className="w-fit bg-white text-black">
+          className="hidden w-fit bg-white text-black"
+          onClick={() => void loginWith('facebook')}>
           Continue with Facebook
         </Button>
       </div>
