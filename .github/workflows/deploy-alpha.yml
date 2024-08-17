@@ -1,0 +1,28 @@
+# developブランチへのマージ時にalphaチャンネルへのデプロイを行います。
+
+name: Deploy Alpha Channel
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+jobs:
+  build_and_deploy:
+    environment: production
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Hosting
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+        env:
+          MAPS_JS_API: ${{ secrets.MAPS_JS_API }}
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_GALLERY_FOUND }}
+          entryPoint: ./Hosting
+          expires: 30d
+          channelId: alpha
+          projectId: gallery-found
