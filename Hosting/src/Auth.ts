@@ -54,7 +54,9 @@ export async function loginWith(providerType: providerTypes) {
   }
 
   // ポップアップでログイン
-  return await signInWithPopup(getAuth(), provider);
+  return await signInWithPopup(getAuth(), provider).catch((error: unknown) => {
+    console.error(error);
+  });
 }
 
 /**

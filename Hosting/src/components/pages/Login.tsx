@@ -154,10 +154,9 @@ export const Login = () => {
           onClick={() => void loginWith('google')}>
           Continue with Google
         </Button>
-        {/* 手間が掛かりそうなので一旦非表示 */}
         <Button
           startDecorator={<FaFacebook color="#1877F2" />}
-          className="hidden w-fit bg-white text-black"
+          className="w-fit bg-white text-black"
           onClick={() => void loginWith('facebook')}>
           Continue with Facebook
         </Button>
