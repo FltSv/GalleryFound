@@ -1,9 +1,14 @@
 import {
   createUserWithEmailAndPassword,
+  FacebookAuthProvider,
   getAuth,
+  GoogleAuthProvider,
   sendEmailVerification,
   signInWithEmailAndPassword,
+  signInWithPopup,
 } from 'firebase/auth';
+
+type providerTypes = 'google' | 'facebook' | 'email';
 
 /**
  * メール・パスワードによるログイン処理
@@ -30,6 +35,28 @@ export async function signupWithEmail(email: string, pass: string) {
   // メールアドレス確認メールを送信する
   await sendEmailVerification(userCredential.user);
   return userCredential;
+}
+
+/** Googleログイン・新規登録 */
+export async function loginWith(providerType: providerTypes) {
+  let provider;
+  switch (providerType) {
+    case 'google':
+      provider = new GoogleAuthProvider();
+      break;
+
+    case 'facebook':
+      provider = new FacebookAuthProvider();
+      break;
+
+    default:
+      throw new Error('Invalid provider type');
+  }
+
+  // ポップアップでログイン
+  return await signInWithPopup(getAuth(), provider).catch((error: unknown) => {
+    console.error(error);
+  });
 }
 
 /**
