@@ -28,6 +28,8 @@ class FirebaseRepo implements DataRepoBase {
         products: products
             .map((product) => Product(
                   id: product["id"],
+                  title: product["title"] ?? "",
+                  detail: product["detail"] ?? "",
                   image: product["image"],
                 ))
             .toList(),
