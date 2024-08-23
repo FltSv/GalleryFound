@@ -18,6 +18,7 @@ import {
   getDatePeriodString,
 } from 'src/Data';
 import { getUlid } from 'src/ULID';
+import { DraggableList, SortableProps } from 'components/ui/DraggableList';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -118,21 +119,34 @@ export const Mypage = () => {
             />
           </div>
 
-          <div className="flex overflow-x-auto">
-            {creator?.products.map(product => (
-              <ProductCell
-                key={product.id}
-                data={product}
-                onDelete={() => {
-                  const newProducts = creator.products.filter(
-                    x => x.id !== product.id,
-                  );
+          {creator && (
+            <DraggableList
+              items={creator.products}
+              setItems={items => {
+                const newProducts = items
+                  .map(item =>
+                    creator.products.find(product => product.id === item.id),
+                  )
+                  .filter(x => x !== undefined);
 
-                  setCreator({ ...creator, products: newProducts });
-                }}
-              />
-            ))}
-          </div>
+                setCreator({ ...creator, products: newProducts });
+              }}
+              renderItem={(product, props) => (
+                <ProductCell
+                  key={product.id}
+                  data={product}
+                  onDelete={() => {
+                    const newProducts = creator.products.filter(
+                      x => x.id !== product.id,
+                    );
+
+                    setCreator({ ...creator, products: newProducts });
+                  }}
+                  sortableProps={props}
+                />
+              )}
+            />
+          )}
         </div>
 
         <div>
@@ -211,10 +225,11 @@ export const Mypage = () => {
 interface ProductCellProps {
   data: Product;
   onDelete: (product: Product) => void;
+  sortableProps: SortableProps;
 }
 
 const ProductCell = (props: ProductCellProps) => {
-  const { data, onDelete } = props;
+  const { data, onDelete, sortableProps } = props;
 
   return (
     <div className="relative min-w-fit">
@@ -222,6 +237,7 @@ const ProductCell = (props: ProductCellProps) => {
         className="h-28 p-2 md:h-40"
         key={data.id}
         src={data.tmpImageData || data.imageUrl}
+        {...sortableProps}
       />
       <IconButton
         size="sm"
