@@ -72,6 +72,8 @@ export async function getCreatorData(user: User) {
   const fbProducts = data.products ?? [];
   creator.products = fbProducts.map(x => ({
     id: x.id,
+    title: x.title ?? '',
+    detail: x.detail ?? '',
     srcImage: x.image,
     imageUrl: creatorUrl + x.image,
     tmpImageData: '',
@@ -112,7 +114,12 @@ export async function setCreatorData(user: User, data: Creator) {
   );
   await setDoc(docRef, {
     name: data.name,
-    products: data.products.map(x => ({ id: x.id, image: x.srcImage })),
+    products: data.products.map(x => ({
+      id: x.id,
+      title: x.title,
+      detail: x.detail,
+      image: x.srcImage,
+    })),
     exhibits: data.exhibits.map(x => ({
       id: x.id,
       title: x.title,
@@ -317,6 +324,12 @@ export interface Creator {
 /** 発表作品 */
 export interface Product extends ImageStatus {
   id: string;
+
+  /** 作品名 */
+  title: string;
+
+  /** 作品説明、他 */
+  detail: string;
 }
 
 /** 展示 */

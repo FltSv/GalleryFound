@@ -1,6 +1,12 @@
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
-import { Button as MuiJoyButton, IconButton, Card, Input } from '@mui/joy';
+import {
+  Button as MuiJoyButton,
+  IconButton,
+  Card,
+  Input,
+  Textarea,
+} from '@mui/joy';
 import { Autocomplete } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { useAuthContext } from 'components/AuthContext';
@@ -24,9 +30,11 @@ export const Mypage = () => {
   const { user } = useAuthContext();
   const [creator, setCreator] = useState<Creator>();
   const [loading, setLoading] = useState(true);
-  const [visiblePopup, setVisiblePopup] = useState(false);
+  const [visibleProductPopup, setVisibleProductPopup] = useState(false);
+  const [visibleExhibitPopup, setVisibleExhibitPopup] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [editExhibit, setEditExhibit] = useState<Exhibit | undefined>();
+  const [editExhibit, setEditExhibit] = useState<Exhibit>();
+  const [editProduct, setEditProduct] = useState<Product>();
 
   useEffect(() => {
     // データの取得
@@ -107,6 +115,8 @@ export const Mypage = () => {
                   const url = URL.createObjectURL(file);
                   const product: Product = {
                     id: getUlid(),
+                    title: '',
+                    detail: '',
                     tmpImageData: url,
                     srcImage: '',
                     imageUrl: '',
@@ -135,6 +145,10 @@ export const Mypage = () => {
                 <ProductCell
                   key={product.id}
                   data={product}
+                  onEdit={() => {
+                    setEditProduct(product);
+                    setVisibleProductPopup(true);
+                  }}
                   onDelete={() => {
                     const newProducts = creator.products.filter(
                       x => x.id !== product.id,
@@ -157,7 +171,7 @@ export const Mypage = () => {
               startDecorator={<FaPlus />}
               onClick={() => {
                 setEditExhibit(undefined);
-                setVisiblePopup(true);
+                setVisibleExhibitPopup(true);
               }}>
               展示追加
             </Button>
@@ -170,7 +184,7 @@ export const Mypage = () => {
                   data={exhibit}
                   onEdit={() => {
                     setEditExhibit(exhibit);
-                    setVisiblePopup(true);
+                    setVisibleExhibitPopup(true);
                   }}
                   onDelete={() => {
                     const newExhibits = creator.exhibits.filter(
@@ -193,8 +207,30 @@ export const Mypage = () => {
         </SubmitButton>
       </form>
 
-      {/* <!-- popup window --> */}
-      <Popup visible={visiblePopup} setVisible={setVisiblePopup}>
+      {/* 発表作品 */}
+      {editProduct && (
+        <ProductPopup
+          visible={visibleProductPopup}
+          setVisible={setVisibleProductPopup}
+          product={editProduct}
+          onSubmit={newValue => {
+            if (creator === undefined) {
+              return;
+            }
+
+            const editIndex = creator.products.indexOf(editProduct);
+            if (editIndex !== -1) {
+              creator.products[editIndex] = newValue;
+            }
+
+            setCreator(creator);
+            setVisibleProductPopup(false);
+          }}
+        />
+      )}
+
+      {/* 展示登録 */}
+      <Popup visible={visibleExhibitPopup} setVisible={setVisibleExhibitPopup}>
         <ExhibitForm
           exhibit={editExhibit}
           onSubmit={newValue => {
@@ -214,7 +250,7 @@ export const Mypage = () => {
             }
 
             setCreator(creator);
-            setVisiblePopup(false);
+            setVisibleExhibitPopup(false);
           }}
         />
       </Popup>
@@ -224,32 +260,49 @@ export const Mypage = () => {
 
 interface ProductCellProps {
   data: Product;
+  onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
   sortableProps: SortableProps;
 }
 
 const ProductCell = (props: ProductCellProps) => {
-  const { data, onDelete, sortableProps } = props;
+  const { data, onEdit, onDelete, sortableProps } = props;
 
   return (
     <div className="relative min-w-fit">
-      <img
-        className="h-28 p-2 md:h-40"
-        key={data.id}
-        src={data.tmpImageData || data.imageUrl}
-        {...sortableProps}
-      />
-      <IconButton
-        size="sm"
-        variant="soft"
-        color="neutral"
-        sx={{ borderRadius: 9999 }}
-        className="absolute right-0 top-0"
-        onClick={() => {
-          onDelete(data);
-        }}>
-        <FaTimes />
-      </IconButton>
+      <div className="relative">
+        <img
+          className="h-28 p-2 md:h-40"
+          key={data.id}
+          src={data.tmpImageData || data.imageUrl}
+          {...sortableProps}
+        />
+        <p className="absolute bottom-0 w-fit bg-black bg-opacity-50 px-2 text-white">
+          {data.title}
+        </p>
+      </div>
+      <div className="absolute right-0 top-0 flex flex-col gap-2">
+        <IconButton
+          size="sm"
+          variant="soft"
+          color="neutral"
+          sx={{ borderRadius: 9999 }}
+          onClick={() => {
+            onEdit(data);
+          }}>
+          <FaPen />
+        </IconButton>
+        <IconButton
+          size="sm"
+          variant="soft"
+          color="neutral"
+          sx={{ borderRadius: 9999 }}
+          onClick={() => {
+            onDelete(data);
+          }}>
+          <FaTimes />
+        </IconButton>
+      </div>
     </div>
   );
 };
@@ -303,6 +356,73 @@ const ExhibitRow = (props: ExhibitRowProps) => {
         </div>
       </td>
     </tr>
+  );
+};
+
+interface ProductPopupProps {
+  visible: boolean;
+  setVisible: Dispatch<SetStateAction<boolean>>;
+  product: Product;
+  onSubmit: (newValue: Product) => void;
+}
+
+const ProductPopup = (props: ProductPopupProps) => {
+  const { visible, setVisible, product, onSubmit } = props;
+  const { register, handleSubmit, reset } = useForm({
+    defaultValues: product,
+  });
+
+  useEffect(() => {
+    reset(product);
+  }, [product, reset]);
+
+  const onValid: SubmitHandler<Product> = data => {
+    const submitData: Product = {
+      ...product,
+      title: data.title,
+      detail: data.detail,
+    };
+
+    onSubmit(submitData);
+  };
+
+  return (
+    <Popup visible={visible} setVisible={setVisible}>
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          void handleSubmit(onValid)(e);
+        }}>
+        <h2 className="w-fit">作品情報編集</h2>
+
+        <div className="mb-4 mt-2 flex max-w-2xl flex-col gap-4 md:flex-row">
+          <div className="flex max-w-max basis-1/2 flex-col">
+            <img
+              className="w-full max-w-xs"
+              src={product.tmpImageData || product.imageUrl}
+            />
+          </div>
+          <div className="flex basis-1/2 flex-col gap-2 md:w-max">
+            <Textbox label="作品名" {...register('title')} />
+            <div>
+              <p>詳細</p>
+              <Textarea
+                sx={{ border: 1, borderColor: 'black', marginY: '0.25rem' }}
+                minRows={3}
+                {...register('detail')}
+              />
+            </div>
+          </div>
+        </div>
+
+        <SubmitButton
+          className="w-fit rounded-md border border-black bg-white text-black"
+          variant="outlined"
+          startDecorator={<FaCheck />}>
+          変更
+        </SubmitButton>
+      </form>
+    </Popup>
   );
 };
 
