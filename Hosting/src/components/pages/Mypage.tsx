@@ -9,6 +9,7 @@ import {
 } from '@mui/joy';
 import { Autocomplete } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
+import { RiDraggable } from 'react-icons/ri';
 import { useAuthContext } from 'components/AuthContext';
 import { Button, FileInput, SubmitButton, Textbox } from 'components/ui/Input';
 import { Popup } from 'components/ui/Popup';
@@ -270,12 +271,14 @@ const ProductCell = (props: ProductCellProps) => {
 
   return (
     <div className="relative min-w-fit">
-      <div className="relative">
+      <div className="flex">
+        <div className="max-w-min content-center" {...sortableProps}>
+          <RiDraggable />
+        </div>
         <img
           className="h-28 p-2 md:h-40"
           key={data.id}
           src={data.tmpImageData || data.imageUrl}
-          {...sortableProps}
         />
         <p className="absolute bottom-0 w-fit bg-black bg-opacity-50 px-2 text-white">
           {data.title}
