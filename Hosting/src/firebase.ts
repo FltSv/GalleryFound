@@ -94,6 +94,8 @@ export interface Creator {
 /** firestore Product */
 export interface Product {
   id: string;
+  title?: string;
+  detail?: string;
   image: string;
 }
 
