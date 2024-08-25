@@ -1,3 +1,4 @@
+import 'package:mobile/models/book.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/models/product.dart';
@@ -89,5 +90,43 @@ class FakeRepo implements DataRepoBase {
     const domain =
         "firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com";
     return "https://$domain/o/creators%2F$userId%2F$image";
+  }
+
+  static Future<List<Book>> fetchBooks() {
+    return Future.value([
+      Book(
+          id: '1',
+          title: 'ひまわり',
+          image:
+              'https://media.mstdn.jp/accounts/avatars/110/989/102/133/377/139/original/ef63d785a819a2f2.png',
+          urls: ['https://mstdn.jp/@himarori']),
+      Book(
+          id: '2',
+          title: '砂ちゃん',
+          image:
+              'https://media.mstdn.jp/accounts/avatars/000/113/775/original/4a94c289c389d678.jpg',
+          urls: ['https://mstdn.jp/@fltsv', 'https://mstdn.jp/@himarori']),
+      Book(
+          id: '3',
+          title: 'よるねこ',
+          image:
+              'https://media.mstdn.jp/accounts/avatars/000/155/200/original/2e948193ee954e55428290ad6ecada7f.png',
+          urls: [
+            'https://mstdn.jp/@NightCat',
+            'https://mstdn.jp/@himarori',
+            'https://mstdn.jp/@fltsv'
+          ]),
+      Book(
+          id: '4',
+          title: 'もやちゃ',
+          image:
+              'https://media.mstdn.jp/accounts/avatars/109/719/600/512/825/943/original/898331de566f6f5e.png',
+          urls: [
+            'https://mstdn.jp/@kisskamakiri',
+            'https://mstdn.jp/@fltsv',
+            'https://mstdn.jp/@NightCat',
+            'https://mstdn.jp/@himarori'
+          ])
+    ]);
   }
 }
