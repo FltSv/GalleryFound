@@ -46,6 +46,8 @@ export async function getCreatorData(user: User) {
   const creatorUrl = getCreatorStorageUrl(userId);
   const creator: Creator = {
     name: '',
+    profile: '',
+    links: [],
     products: [],
     exhibits: [],
   };
@@ -67,6 +69,8 @@ export async function getCreatorData(user: User) {
   console.debug('docSnap.data:', data);
 
   creator.name = data.name ?? '';
+  creator.profile = data.profile ?? '';
+  creator.links = data.links ?? [];
 
   // 発表作品
   const fbProducts = data.products ?? [];
@@ -114,6 +118,8 @@ export async function setCreatorData(user: User, data: Creator) {
   );
   await setDoc(docRef, {
     name: data.name,
+    profile: data.profile,
+    links: data.links,
     products: data.products.map(x => ({
       id: x.id,
       title: x.title,
@@ -313,6 +319,12 @@ export function getDatePeriodString(start: Date, end: Date) {
 export interface Creator {
   /** 表示名 */
   name: string;
+
+  /** プロフィール */
+  profile: string;
+
+  /** SNSリンク */
+  links: string[];
 
   /** 発表作品一覧 */
   products: Product[];
