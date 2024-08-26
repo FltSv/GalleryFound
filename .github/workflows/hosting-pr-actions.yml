@@ -1,9 +1,8 @@
 name: hosting-pr-actions
 on:
   pull_request:
-  push:
-    branches:
-      - master
+    branches-ignore:
+      - "master"
 
 defaults:
   run:

@@ -21,12 +21,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final product = widget.product;
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(product.title),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Image.network(product.imageUrl),
           const Gap(8),
+          Text(product.detail),
         ].intersperse(const Gap(8)).toList(),
       ),
     );

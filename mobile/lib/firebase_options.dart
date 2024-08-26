@@ -55,7 +55,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '985501114281',
     projectId: 'gallery-found',
     storageBucket: 'gallery-found.appspot.com',
-    iosBundleId: 'com.galleryfound',
+    iosBundleId: 'jp.galleryfound',
   );
-
 }

@@ -46,6 +46,8 @@ export async function getCreatorData(user: User) {
   const creatorUrl = getCreatorStorageUrl(userId);
   const creator: Creator = {
     name: '',
+    profile: '',
+    links: [],
     products: [],
     exhibits: [],
   };
@@ -67,11 +69,15 @@ export async function getCreatorData(user: User) {
   console.debug('docSnap.data:', data);
 
   creator.name = data.name ?? '';
+  creator.profile = data.profile ?? '';
+  creator.links = data.links ?? [];
 
   // 発表作品
   const fbProducts = data.products ?? [];
   creator.products = fbProducts.map(x => ({
     id: x.id,
+    title: x.title ?? '',
+    detail: x.detail ?? '',
     srcImage: x.image,
     imageUrl: creatorUrl + x.image,
     tmpImageData: '',
@@ -112,7 +118,14 @@ export async function setCreatorData(user: User, data: Creator) {
   );
   await setDoc(docRef, {
     name: data.name,
-    products: data.products.map(x => ({ id: x.id, image: x.srcImage })),
+    profile: data.profile,
+    links: data.links,
+    products: data.products.map(x => ({
+      id: x.id,
+      title: x.title,
+      detail: x.detail,
+      image: x.srcImage,
+    })),
     exhibits: data.exhibits.map(x => ({
       id: x.id,
       title: x.title,
@@ -307,6 +320,12 @@ export interface Creator {
   /** 表示名 */
   name: string;
 
+  /** プロフィール */
+  profile: string;
+
+  /** SNSリンク */
+  links: string[];
+
   /** 発表作品一覧 */
   products: Product[];
 
@@ -317,6 +336,12 @@ export interface Creator {
 /** 発表作品 */
 export interface Product extends ImageStatus {
   id: string;
+
+  /** 作品名 */
+  title: string;
+
+  /** 作品説明、他 */
+  detail: string;
 }
 
 /** 展示 */
