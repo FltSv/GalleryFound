@@ -17,6 +17,8 @@ class FirebaseRepo implements DataRepoBase {
     return querySnap.docs
         .where((docSnap) => kDebugMode || !ignoreIds.contains(docSnap.id))
         .map((docSnap) {
+      final data = docSnap.data();
+
       final exhibits = (docSnap.get("exhibits") as List<dynamic>)
           .cast<Map<String, dynamic>>();
       final products = (docSnap.get("products") as List<dynamic>)
@@ -24,7 +26,9 @@ class FirebaseRepo implements DataRepoBase {
 
       return Creator(
         id: docSnap.id,
-        name: docSnap.get("name"),
+        name: data["name"],
+        profile: data["profile"] ?? "",
+        links: ((data["links"] ?? []) as List<dynamic>).cast<String>(),
         products: products
             .map((product) => Product(
                   id: product["id"],

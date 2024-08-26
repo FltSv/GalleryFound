@@ -31,26 +31,28 @@ export const Mypage = () => {
   const { user } = useAuthContext();
   const [creator, setCreator] = useState<Creator>();
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addLink, setAddLink] = useState('');
+  const [addLinkError, setAddLinkError] = useState(false);
   const [visibleProductPopup, setVisibleProductPopup] = useState(false);
   const [visibleExhibitPopup, setVisibleExhibitPopup] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [editExhibit, setEditExhibit] = useState<Exhibit>();
   const [editProduct, setEditProduct] = useState<Product>();
 
   useEffect(() => {
-    // データの取得
     if (user === null) {
       return;
     }
 
-    getCreatorData(user)
-      .then(x => {
-        setCreator(x);
-        setLoading(false);
-      })
-      .catch((x: unknown) => {
-        console.error('failed fetch data: ', x);
-      });
+    void (async () => {
+      // データの取得
+      const creator = await getCreatorData(user);
+      setCreator(creator);
+
+      setLoading(false);
+    })().catch((e: unknown) => {
+      console.error('failed fetch data: ', e);
+    });
   }, [user]);
 
   const {
@@ -64,8 +66,29 @@ export const Mypage = () => {
     return <p>Now loading...</p>;
   }
 
+  const isValidUrl = (url: string) => {
+    if (!url) return true;
+
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const onAddLink = () => {
+    if (creator === undefined) return;
+    if (addLinkError) return;
+
+    const links = [...creator.links, addLink];
+    setCreator({ ...creator, links });
+    setAddLink('');
+  };
+
   const onValid: SubmitHandler<Creator> = async data => {
     // 一時データの結合
+    data.links = creator?.links ?? [];
     data.products = creator?.products ?? [];
     data.exhibits = creator?.exhibits ?? [];
 
@@ -97,6 +120,81 @@ export const Mypage = () => {
           fieldError={errors.name}
           {...register('name', { required: '1文字以上の入力が必要です。' })}
         />
+
+        <div>
+          <p>プロフィール</p>
+          <Textarea
+            defaultValue={creator?.profile}
+            sx={{
+              borderColor: 'black',
+              marginY: '0.25rem',
+              backgroundColor: 'transparent',
+            }}
+            minRows={3}
+            {...register('profile')}
+          />
+        </div>
+
+        <div>
+          <p>SNSリンク</p>
+          {creator?.links.map(link => (
+            <div key={link} className="flex items-center gap-2">
+              <img
+                className="h-4 w-4"
+                src={`http://www.google.com/s2/favicons?domain=${link}`}
+              />
+              <a
+                href={link}
+                className="text-blue-600 underline"
+                target="_blank"
+                rel="noreferrer">
+                {link}
+              </a>
+              <MuiJoyButton
+                size="sm"
+                variant="plain"
+                color="neutral"
+                onClick={() => {
+                  const links = creator.links.filter(x => x !== link);
+                  setCreator({ ...creator, links });
+                }}>
+                <FaTimes />
+                <label className="hidden md:inline md:pl-2">削除</label>
+              </MuiJoyButton>
+            </div>
+          ))}
+          <Input
+            color={addLinkError ? 'danger' : 'neutral'}
+            placeholder="https://..."
+            value={addLink}
+            onChange={e => {
+              const input = e.target.value;
+              setAddLink(input);
+              setAddLinkError(!isValidUrl(input));
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                onAddLink();
+              }
+            }}
+            endDecorator={
+              <MuiJoyButton
+                size="sm"
+                variant="plain"
+                color="neutral"
+                disabled={addLinkError}
+                onClick={onAddLink}>
+                <FaPlus />
+                <label className="hidden md:inline md:pl-2">追加</label>
+              </MuiJoyButton>
+            }
+            sx={{
+              borderColor: 'black',
+              backgroundColor: 'transparent',
+            }}
+          />
+        </div>
 
         <div>
           <div className="mb-2 flex gap-2">

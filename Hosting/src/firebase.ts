@@ -87,6 +87,8 @@ export const fbGalleryConverter: FirestoreDataConverter<Gallery> = {
 /** firestore Creator */
 export interface Creator {
   name?: string;
+  profile?: string;
+  links?: string[];
   products?: Product[];
   exhibits?: Exhibit[];
 }

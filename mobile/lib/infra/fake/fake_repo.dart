@@ -11,6 +11,8 @@ class FakeRepo implements DataRepoBase {
       Creator(
         id: "nkRObVdYriU5AolyNxJy5pIDKEs2",
         name: "suna",
+        profile: "すなプロフィール",
+        links: ["https://mstdn.jp/@fltsv", "https://mstdn.jp/@himarori"],
         products: [
           Product(
             id: "10043286-3072-49b8-a04a-83b9b1f790f5",
@@ -53,6 +55,12 @@ class FakeRepo implements DataRepoBase {
       Creator(
         id: "cWp162TEn9MrXVUqifEmRJ22nyx1",
         name: "ノゾミ",
+        profile: "ふぁぴ\n\n\n\nhttps://lit.link/choco78",
+        links: [
+          "https://x.com/mi_oilacrylart",
+          "https://x.com/utsukikuroko",
+          "https://misskey.m544.net/@choco"
+        ],
         products: [
           Product(
             id: "43a0e71b-9761-4800-9e88-1a57a3a4ed53",

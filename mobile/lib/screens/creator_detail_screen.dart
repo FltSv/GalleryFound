@@ -8,6 +8,8 @@ import 'package:mobile/screens/exhibit_detail_screen.dart';
 import 'package:mobile/screens/product_detail_screen.dart';
 import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
+import 'package:mobile/widgets/link_text.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CreatorDetailScreen extends StatefulWidget {
   const CreatorDetailScreen({super.key, required this.creator});
@@ -31,6 +33,33 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (creator.profile.isNotEmpty) Text(creator.profile),
+          if (creator.links.isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: creator.links
+                  .map<Widget>((link) => Row(
+                        children: [
+                          Image.network(
+                            "http://www.google.com/s2/favicons?domain=$link",
+                            width: theme.textTheme.bodyMedium?.fontSize ?? 16,
+                            height: theme.textTheme.bodyMedium?.fontSize ?? 16,
+                          ),
+                          const Gap(4),
+                          LinkText(
+                              text: link,
+                              onTap: () async {
+                                final url = Uri.parse(link);
+                                await launchUrl(url,
+                                    mode: LaunchMode.externalApplication);
+                              }),
+                        ],
+                      ))
+                  .intersperse(const Gap(8))
+                  .toList(),
+            ),
+          if (creator.profile.isNotEmpty || creator.links.isNotEmpty)
+            const Gap(8),
           Text(
             '展示歴',
             style: theme.textTheme.headlineMedium,
