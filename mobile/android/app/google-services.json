@@ -7,14 +7,14 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:985501114281:android:fc253b6b47125039826eb8",
+        "mobilesdk_app_id": "1:985501114281:android:481a5fb931582e16826eb8",
         "android_client_info": {
-          "package_name": "com.galleryfound"
+          "package_name": "jp.galleryfound"
         }
       },
       "oauth_client": [
         {
-          "client_id": "985501114281-7qtka3vudf9lsbgjs47ipq7u945mvf8s.apps.googleusercontent.com",
+          "client_id": "985501114281-4h122vrg9sntbrcip3i51v4s84uvt8n9.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,7 +27,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "985501114281-7qtka3vudf9lsbgjs47ipq7u945mvf8s.apps.googleusercontent.com",
+              "client_id": "985501114281-4h122vrg9sntbrcip3i51v4s84uvt8n9.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
