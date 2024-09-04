@@ -15,7 +15,6 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
-		A47850532C88472100BAA908 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = A47850522C88472100BAA908 /* FirebaseAppCheck */; };
 		F2EADCB42539C364CFE1786D /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC38289594A6B33F8F6A6BA9 /* Pods_RunnerTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -62,7 +61,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A47850532C88472100BAA908 /* FirebaseAppCheck in Frameworks */,
 				2C311EF98F3ECE299E1753E4 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -198,7 +196,6 @@
 			);
 			name = Runner;
 			packageProductDependencies = (
-				A47850522C88472100BAA908 /* FirebaseAppCheck */,
 			);
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
@@ -768,14 +765,6 @@
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		A47850522C88472100BAA908 /* FirebaseAppCheck */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A47850512C8846ED00BAA908 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAppCheck;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 97C146E61CF9000F007C117D /* Project object */;
 }
