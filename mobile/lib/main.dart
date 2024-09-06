@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -41,6 +42,11 @@ void main() {
     // スプラッシュ画面を解除
     FlutterNativeSplash.remove();
     runApp(const MyApp());
+  }).catchError((error, stackTrace) {
+    // エラーが発生した場合、エラーダイアログを表示
+    FlutterNativeSplash.remove();
+    runApp(MaterialApp(home: ErrorDialog(error: error)));
+    return Future.value(null);
   });
 }
 
@@ -72,5 +78,30 @@ class MyApp extends StatelessWidget {
         return const TopScreen();
       }),
     );
+  }
+}
+
+class ErrorDialog extends StatelessWidget {
+  final Object error;
+  const ErrorDialog({super.key, required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('エラー'),
+          content: Text(
+            '''アプリ起動時にエラーが発生しました。
+下記の情報を support@gallery-found.jp へ送信してください。
+
+$error''',
+          ),
+        ),
+      );
+    });
+
+    return const Scaffold();
   }
 }
