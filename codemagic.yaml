@@ -77,7 +77,7 @@ workflows:
     instance_type: mac_mini_m1
     max_build_duration: 20
     integrations:
-      app_store_connect: $APP_STORE_CONNECT_KEY_IDENTIFIER
+      app_store_connect: GalleryFound Codemagic
     environment:
       <<: *env_versions
       ios_signing:
@@ -85,6 +85,8 @@ workflows:
           - galleryfound_certificate
         provisioning_profiles:
           - galleryfound_profile
+      groups:
+        - appstore_credentials
     cache:
       <<: *cache
     scripts:
