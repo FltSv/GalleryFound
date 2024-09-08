@@ -1,0 +1,117 @@
+scripts:
+  - &get_flutter_packages
+    name: Get Flutter packages
+    working_directory: mobile
+    script: |
+      flutter packages pub get
+
+definitions:
+  workflow_trigger: &workflow_trigger
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+        - pattern: master
+        - pattern: develop
+    when:
+      changeset:
+        includes:
+          - "mobile/"
+
+  env_versions: &env_versions
+    flutter: stable
+    xcode: latest
+    cocoapods: default
+
+  cache: &cache
+    cache_paths:
+      - $FLUTTER_ROOT/.pub-cache
+      - $HOME/.gradle/caches
+      - $HOME/Library/Caches/CocoaPods
+
+  publishing_email: &publishing_email
+    email:
+      recipients:
+        - support@gallery-found.jp
+      notify:
+        success: false
+        failure: true
+
+workflows:
+  android-workflow: #todo
+    name: Android Workflow
+    instance_type: mac_mini_m1
+    max_build_duration: 20
+    environment:
+      <<: *env_versions
+      android_signing:
+        - keystore_reference
+      groups:
+        - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS)
+      vars:
+        PACKAGE_NAME: "io.codemagic.flutteryaml" # <-- Put your package name here
+        GOOGLE_PLAY_TRACK: "alpha"
+    scripts:
+      - name: Set up local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+      - *get_flutter_packages
+      - name: Build AAB with Flutter
+        script: |
+          BUILD_NUMBER=$(($(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK") + 1))      
+          flutter build appbundle --release \
+            --build-name=1.0.$BUILD_NUMBER \
+            --build-number=$BUILD_NUMBER
+    artifacts:
+      - build/**/outputs/**/*.aab
+      - build/**/outputs/**/mapping.txt
+      - flutter_drive.log
+    publishing:
+      <<: *publishing_email
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: $GOOGLE_PLAY_TRACK
+        submit_as_draft: true
+
+  ios-workflow:
+    name: iOS Workflow
+    <<: *workflow_trigger
+    instance_type: mac_mini_m1
+    max_build_duration: 20
+    integrations:
+      app_store_connect: $APP_STORE_CONNECT_KEY_IDENTIFIER
+    environment:
+      <<: *env_versions
+      ios_signing:
+        certificates:
+          - galleryfound_certificate
+        provisioning_profiles:
+          - galleryfound_profile
+    cache:
+      <<: *cache
+    scripts:
+      - name: Set up code signing settings on Xcode project
+        working_directory: mobile/ios
+        script: |
+          xcode-project use-profiles
+      - *get_flutter_packages
+      - name: Install pods
+        working_directory: mobile/ios
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Flutter build ipa
+        working_directory: mobile
+        script: |
+          flutter build ipa --release \
+            --build-number=$PROJECT_BUILD_NUMBER \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    publishing:
+      <<: *publishing_email
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
