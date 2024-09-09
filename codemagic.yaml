@@ -53,17 +53,19 @@ workflows:
         GOOGLE_PLAY_TRACK: "intenal"
     scripts:
       - name: Set up local.properties
+        working_directory: mobile
         script: |
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
       - *get_flutter_packages
       - name: Build AAB with Flutter
+        working_directory: mobile
         script: |
           flutter build appbundle --release \
             --build-number=$PROJECT_BUILD_NUMBER \
     artifacts:
-      - build/**/outputs/**/*.aab
-      - build/**/outputs/**/mapping.txt
-      - flutter_drive.log
+      - mobile/build/**/outputs/**/*.aab
+      - mobile/build/**/outputs/**/mapping.txt
+      - mobile/flutter_drive.log
     publishing:
       <<: *publishing_email
       google_play:
@@ -106,9 +108,9 @@ workflows:
             --build-number=$PROJECT_BUILD_NUMBER \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
-      - build/ios/ipa/*.ipa
+      - mobile/build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
-      - flutter_drive.log
+      - mobile/flutter_drive.log
     publishing:
       <<: *publishing_email
       app_store_connect:
