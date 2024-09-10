@@ -41,6 +41,7 @@ definitions:
 workflows:
   android-workflow:
     name: Android Workflow
+    <<: *workflow_trigger
     instance_type: mac_mini_m1
     max_build_duration: 20
     environment:
@@ -51,6 +52,8 @@ workflows:
         - google_credentials
       vars:
         GOOGLE_PLAY_TRACK: internal
+    cache:
+      <<: *cache
     scripts:
       - name: Set up local.properties
         working_directory: mobile
