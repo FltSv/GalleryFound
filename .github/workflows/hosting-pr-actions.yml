@@ -3,6 +3,8 @@ on:
   pull_request:
     branches-ignore:
       - "master"
+    paths:
+      - "Hosting/**"
 
 defaults:
   run:
