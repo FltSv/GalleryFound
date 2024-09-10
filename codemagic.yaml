@@ -39,7 +39,7 @@ definitions:
         failure: true
 
 workflows:
-  android-workflow: #todo
+  android-workflow:
     name: Android Workflow
     instance_type: mac_mini_m1
     max_build_duration: 20
@@ -50,7 +50,7 @@ workflows:
       groups:
         - google_credentials
       vars:
-        GOOGLE_PLAY_TRACK: "intenal"
+        GOOGLE_PLAY_TRACK: internal
     scripts:
       - name: Set up local.properties
         working_directory: mobile
