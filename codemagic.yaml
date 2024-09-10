@@ -55,7 +55,7 @@ workflows:
       - name: Set up local.properties
         working_directory: mobile
         script: |
-          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/mobile/android/local.properties"
       - *get_flutter_packages
       - name: Build AAB with Flutter
         working_directory: mobile
