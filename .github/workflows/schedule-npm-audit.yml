@@ -1,0 +1,17 @@
+on:
+  schedule:
+    - cron: "0 0 * * *" # 毎日日本時間9時実行
+  pull_request:
+    paths:
+      - "Hosting/**"
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run npm audit
+        run: npm audit --audit-level=high --omit=dev
