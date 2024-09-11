@@ -1,0 +1,13 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "Checked out to a new branch or revision"
+echo "Checking if Hosting/package.json has changed..."
+
+# git diffでpackage.jsonの差分があるか確認する
+if git diff --name-only HEAD@{1} HEAD | grep -q "Hosting/package.json"; then
+  echo "package.json has changed. Running npm install..."
+  cd Hosting && npm i  # 依存関係をインストール
+else
+  echo "No changes in package.json."
+fi

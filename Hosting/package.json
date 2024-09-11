@@ -9,7 +9,7 @@
     "start:firebase": "firebase emulators:start",
     "format": "prettier -w src",
     "lint": "npm run format && eslint --fix src",
-    "prepare": "cd .. && husky install hosting/.husky"
+    "prepare": "cd .. && husky hosting/.husky"
   },
   "author": "suna",
   "license": "ISC",
