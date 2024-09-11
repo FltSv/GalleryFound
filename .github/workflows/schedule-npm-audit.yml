@@ -8,6 +8,9 @@ on:
 jobs:
   npm-audit:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Hosting
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
