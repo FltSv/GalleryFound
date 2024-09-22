@@ -7,6 +7,7 @@ import { APIProvider } from '@vis.gl/react-google-maps';
 import { Map } from './components/pages/Map';
 
 // components
+// eslint-disable-next-line no-unused-vars
 import React from 'react';
 import App from './App';
 
