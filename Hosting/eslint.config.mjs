@@ -6,6 +6,7 @@ import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import globals from 'globals';
+import functional from 'eslint-plugin-functional';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import reactPlugin from 'eslint-plugin-react';
 
@@ -36,6 +37,13 @@ export default tseslint.config(
     name: 'eslint additional rules',
     rules: {
       'no-implicit-coercion': 'error', // JavaScriptでの演算子による暗黙的な型変換を禁止
+      'no-restricted-globals': [
+        'error', // 一部のグローバル変数の使用を禁止
+        'eval',
+        'Boolean',
+        'Function',
+        'globalThis',
+      ],
     },
   },
 
@@ -100,7 +108,48 @@ export default tseslint.config(
     },
   },
 
-  // react
+  // 関数型プログラミングスタイルを推奨するためのルール
+  {
+    name: 'functional',
+    files: ['**/*.{ts,tsx}'],
+    plugins: {
+      functional,
+    },
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        projectService: true,
+      },
+    },
+    rules: {
+      'functional/no-return-void': 'off', // void型の返り値を許可
+      'functional/no-let': [
+        'warn', // letの使用を警告
+        {
+          allowInForLoopInit: true, // for文の初期化式でのletの使用を許可
+          allowInFunctions: false, // 関数内でのletの使用を禁止
+          ignoreIdentifierPattern: ['^[_#]?mut_'], // mut_, _mut_, #mut_ で始まる変数は許可
+        },
+      ],
+      'functional/immutable-data': [
+        'warn', // オブジェクトの変更を警告
+        {
+          ignoreImmediateMutation: true, // 変数に代入する前の即時変更を許可
+          ignoreClasses: true, // クラスの変更を許可
+          ignoreIdentifierPattern: [
+            '^[_#]?mut_', // mut_, _mut_, #mut_ で始まる変数は許可
+            'window.location.href',
+          ],
+          ignoreAccessorPattern: [
+            '**.current.**', // React.useRefのcurrentプロパティへの変更を許可
+            '**.displayName', // React componentのdisplayNameプロパティへの変更を許可
+            '**.scrollTop', // スクロール位置の変更を許可
+          ],
+        },
+      ],
+    },
+  },
+
   {
     name: 'react',
     plugins: {
