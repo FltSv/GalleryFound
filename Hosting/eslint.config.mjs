@@ -26,7 +26,17 @@ export default tseslint.config(
   },
 
   // eslintの推奨ルールを使用
-  eslint.configs.recommended, // 従来設定における"eslint:recommended"に相当。
+  {
+    name: 'eslint recommended',
+    ...eslint.configs.recommended, // 従来設定における"eslint:recommended"に相当。
+  },
+
+  {
+    name: 'eslint additional rules',
+    rules: {
+      'no-implicit-coercion': 'error', // JavaScriptでの演算子による暗黙的な型変換を禁止
+    },
+  },
 
   // グローバル変数の設定
   {
@@ -60,6 +70,17 @@ export default tseslint.config(
     rules: {
       ...tseslint.plugin.configs?.recommended.rules,
       '@typescript-eslint/strict-boolean-expressions': 'error', // booleanへの型強制を禁止
+      '@typescript-eslint/restrict-plus-operands': [
+        'error', // TypeScriptでの演算子による暗黙的な型変換を禁止
+        {
+          allowAny: false,
+          allowBoolean: false,
+          allowNullish: false,
+          allowNumberAndString: false,
+          allowRegExp: false,
+          skipCompoundAssignments: true,
+        },
+      ],
     },
   },
 
