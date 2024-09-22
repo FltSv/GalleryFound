@@ -33,7 +33,7 @@ function isLoginState(value: unknown): value is LoginState {
 
 export const Login = () => {
   const { user, loading } = useAuthContext();
-  const [loginErrorMsg, setLoginErrorMsg] = useState<string>();
+  const [loginErrorMsg, setLoginErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -49,8 +49,8 @@ export const Login = () => {
     return <p>Now loading...</p>;
   }
 
-  // 既にログインしている場合、mypageに移動
-  if (user?.emailVerified) {
+  // 既にログインした上でメール認証済の場合、mypageに移動
+  if (user?.emailVerified ?? false) {
     return <Navigate replace to={'/mypage'} />;
   }
 
@@ -142,7 +142,9 @@ export const Login = () => {
           loading={isSubmitting}>
           {actionText}
         </SubmitButton>
-        {loginErrorMsg && <p className="text-red-600">{loginErrorMsg}</p>}
+        {loginErrorMsg.length > 0 && (
+          <p className="text-red-600">{loginErrorMsg}</p>
+        )}
       </div>
 
       {/* ソーシャルログイン */}

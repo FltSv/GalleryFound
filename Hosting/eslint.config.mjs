@@ -59,6 +59,7 @@ export default tseslint.config(
     },
     rules: {
       ...tseslint.plugin.configs?.recommended.rules,
+      '@typescript-eslint/strict-boolean-expressions': 'error', // booleanへの型強制を禁止
     },
   },
 

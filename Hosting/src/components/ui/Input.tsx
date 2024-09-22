@@ -49,7 +49,7 @@ export const Button: FC<ButtonProps> = props => {
       {...props}
       className={`rounded-full font-normal transition hover:opacity-80 ${props.className ?? ''}`}
       sx={{
-        opacity: props.disabled ? 0.4 : 1,
+        opacity: props.disabled ?? false ? 0.4 : 1,
       }}>
       {props.children}
     </MuiJoyButton>
@@ -57,7 +57,8 @@ export const Button: FC<ButtonProps> = props => {
 };
 
 export const SubmitButton: FC<ButtonProps> = props => {
-  const disabled = props.loading || props.disabled;
+  const isLoading = props.loading ?? false;
+  const disabled = isLoading || (props.disabled ?? false);
 
   return (
     <MuiJoyButton
@@ -69,7 +70,7 @@ export const SubmitButton: FC<ButtonProps> = props => {
       startDecorator={props.startDecorator}
       loadingPosition="start"
       disabled={disabled}>
-      {props.loading ? 'Loading...' : props.children}
+      {isLoading ? 'Loading...' : props.children}
     </MuiJoyButton>
   );
 };
