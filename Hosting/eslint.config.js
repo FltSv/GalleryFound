@@ -93,6 +93,10 @@ export default tseslint.config(
       // 列挙型に対するswitch文で全ケースの網羅を強制（case列挙漏れの防止）
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/method-signature-style': 'error', // 双変であるメソッド記法の禁止
+      '@typescript-eslint/require-array-sort-compare': [
+        'error', // Array.prototype.sortデフォルトの文字列比較によるソートを防止
+        { ignoreStringArrays: true },
+      ],
     },
   },
 
