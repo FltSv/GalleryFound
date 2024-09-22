@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import globals from 'globals';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import reactPlugin from 'eslint-plugin-react';
@@ -81,6 +82,21 @@ export default tseslint.config(
           skipCompoundAssignments: true,
         },
       ],
+      // 列挙型に対するswitch文で全ケースの網羅を強制（case列挙漏れの防止）
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
+    },
+  },
+
+  {
+    name: 'unicorn',
+    plugins: {
+      unicorn: eslintPluginUnicorn,
+    },
+    languageOptions: {
+      globals: globals.builtin,
+    },
+    rules: {
+      'unicorn/prefer-switch': 'error', // 複数else-ifを禁止し、switch文の利用を強制
     },
   },
 

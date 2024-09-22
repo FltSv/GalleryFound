@@ -48,6 +48,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.36.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc-f2df5694-20240916",
+    "eslint-plugin-unicorn": "^55.0.0",
     "favicons": "^7.2.0",
     "favicons-webpack-plugin": "^6.0.1",
     "firebase-tools": "^13.8.3",
