@@ -2,16 +2,16 @@
 import { createRoot } from 'react-dom/client';
 import './index.tailwind.css';
 
-import { AuthProvider } from './components/AuthContext';
+import { AuthProvider } from './components/AuthContext.tsx';
 import { APIProvider } from '@vis.gl/react-google-maps';
-import { Map } from './components/pages/Map';
+import { Map } from './components/pages/Map.tsx';
 
 // components
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
-import App from './App';
+import App from './App.tsx';
 
-import { Env } from './Env';
+import { Env } from './Env.ts';
 
 // イベント
 document.addEventListener('DOMContentLoaded', () => {
