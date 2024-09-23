@@ -44,6 +44,9 @@ export default tseslint.config(
         'Function',
         'globalThis',
       ],
+      // 関数の記述方法を関数式（アロー関数を含む）に統一
+      'func-style': ['warn', 'expression', { allowArrowFunctions: true }],
+      'arrow-body-style': ['error', 'as-needed'], // アロー関数の本体の記述方法を制限
     },
   },
 
@@ -173,6 +176,7 @@ export default tseslint.config(
       ...reactPlugin.configs.recommended.rules,
       ...reactPlugin.configs['jsx-runtime'].rules,
       'react/prop-types': 'off',
+      'react/jsx-no-bind': 'warn', // JSX内での関数記述を禁止し、renderごとの関数生成を防止
     },
     settings: {
       react: {

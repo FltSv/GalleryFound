@@ -43,18 +43,16 @@ export const Textbox = forwardRef<HTMLInputElement, TextboxProps>(
   },
 );
 
-export const Button: FC<ButtonProps> = props => {
-  return (
-    <MuiJoyButton
-      {...props}
-      className={`rounded-full font-normal transition hover:opacity-80 ${props.className ?? ''}`}
-      sx={{
-        opacity: props.disabled ?? false ? 0.4 : 1,
-      }}>
-      {props.children}
-    </MuiJoyButton>
-  );
-};
+export const Button: FC<ButtonProps> = props => (
+  <MuiJoyButton
+    {...props}
+    className={`rounded-full font-normal transition hover:opacity-80 ${props.className ?? ''}`}
+    sx={{
+      opacity: props.disabled ?? false ? 0.4 : 1,
+    }}>
+    {props.children}
+  </MuiJoyButton>
+);
 
 export const SubmitButton: FC<ButtonProps> = props => {
   const isLoading = props.loading ?? false;
