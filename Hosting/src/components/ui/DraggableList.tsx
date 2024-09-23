@@ -52,14 +52,14 @@ export function DraggableList<T extends { id: string }>(
 
   return (
     <DndContext
-      sensors={sensors}
       collisionDetection={closestCenter}
+      onDragEnd={onDragEnd}
       onDragStart={onDragStart}
-      onDragEnd={onDragEnd}>
+      sensors={sensors}>
       <SortableContext items={items} strategy={rectSortingStrategy}>
         <div className="flex flex-wrap gap-2">
           {items.map(item => (
-            <SortableItem key={item.id} item={item} renderItem={renderItem} />
+            <SortableItem item={item} key={item.id} renderItem={renderItem} />
           ))}
         </div>
       </SortableContext>
@@ -91,8 +91,8 @@ function SortableItem<T extends { id: string }>(props: SortableItemProps<T>) {
 
   return (
     <div
-      ref={setNodeRef}
       className="rounded-md bg-white bg-opacity-50 p-1 shadow-md"
+      ref={setNodeRef}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,

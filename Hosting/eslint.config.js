@@ -181,7 +181,7 @@ export default tseslint.config(
       'react/jsx-boolean-value': 'error', // boolean型のPropsの渡し方を統一
       'react/jsx-curly-brace-presence': 'error', // 不要な中括弧を禁止
       'react/jsx-no-useless-fragment': 'error', // 不要なReact Fragmentの使用を禁止
-      'react/jsx-sort-props': 'warn', // Propsの並び順をアルファベット順に強制
+      'react/jsx-sort-props': 'error', // Propsの並び順をアルファベット順に強制
       'react/jsx-pascal-case': 'error', // コンポーネント名をパスカルケースに強制
       'react/no-danger': 'error', // dangerouslySetInnerHTMLを許可しない
       'react/self-closing-comp': 'error', // 子要素がない場合は自己終了タグを強制

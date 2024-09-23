@@ -28,14 +28,14 @@ export const Textbox = forwardRef<HTMLInputElement, TextboxProps>(
         <p className="font-ibmflex">{props.label}</p>
         <Input
           {...others}
-          ref={ref}
-          type={others.type ?? 'text'}
           autoComplete={others.autoComplete ?? 'off'}
           className={`my-1 border bg-transparent ${others.className ?? ''}`}
           defaultValue={defaultDate ?? others.defaultValue}
+          ref={ref}
           sx={{
             borderColor: 'black', //isError ? 'red' : 'black',
           }}
+          type={others.type ?? 'text'}
         />
         <p className="text-xs text-red-600">{fieldError?.message}</p>
       </FormControl>
@@ -61,13 +61,13 @@ export const SubmitButton: FC<ButtonProps> = props => {
   return (
     <MuiJoyButton
       {...props}
-      type="submit"
       className={`rounded-full font-normal transition
         ${disabled ? '' : 'hover:opacity-80'} ${props.className ?? ''}`}
-      sx={{ opacity: disabled ? 0.4 : 1 }}
-      startDecorator={props.startDecorator}
+      disabled={disabled}
       loadingPosition="start"
-      disabled={disabled}>
+      startDecorator={props.startDecorator}
+      sx={{ opacity: disabled ? 0.4 : 1 }}
+      type="submit">
       {isLoading ? 'Loading...' : props.children}
     </MuiJoyButton>
   );
@@ -94,12 +94,12 @@ export const FileInput = forwardRef<HTMLInputElement, FileInputProps>(
   (props, ref) => (
     <Button
       className="min-w-fit bg-white"
-      component="label"
-      variant="outlined"
       color="neutral"
-      startDecorator={<FaCloudUploadAlt />}>
+      component="label"
+      startDecorator={<FaCloudUploadAlt />}
+      variant="outlined">
       ファイルを選択
-      <VisuallyHiddenInput {...props} type="file" ref={ref} size={undefined} />
+      <VisuallyHiddenInput {...props} ref={ref} size={undefined} type="file" />
     </Button>
   ),
 );

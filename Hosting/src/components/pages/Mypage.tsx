@@ -114,10 +114,10 @@ export const Mypage = () => {
         onSubmit={e => void handleSubmit(onValid)(e)}>
         <h2>My Page</h2>
         <Textbox
-          label="表示作家名"
-          defaultValue={creator?.name}
           className="w-1/2"
+          defaultValue={creator?.name}
           fieldError={errors.name}
+          label="表示作家名"
           {...register('name', { required: '1文字以上の入力が必要です。' })}
         />
 
@@ -125,12 +125,12 @@ export const Mypage = () => {
           <p>プロフィール</p>
           <Textarea
             defaultValue={creator?.profile}
+            minRows={3}
             sx={{
               borderColor: 'black',
               marginY: '0.25rem',
               backgroundColor: 'transparent',
             }}
-            minRows={3}
             {...register('profile')}
           />
         </div>
@@ -138,26 +138,26 @@ export const Mypage = () => {
         <div>
           <p>SNSリンク</p>
           {creator?.links.map(link => (
-            <div key={link} className="flex items-center gap-2">
+            <div className="flex items-center gap-2" key={link}>
               <img
                 className="h-4 w-4"
                 src={`http://www.google.com/s2/favicons?domain=${link}`}
               />
               <a
-                href={link}
                 className="text-blue-600 underline"
-                target="_blank"
-                rel="noreferrer">
+                href={link}
+                rel="noreferrer"
+                target="_blank">
                 {link}
               </a>
               <MuiJoyButton
-                size="sm"
-                variant="plain"
                 color="neutral"
                 onClick={() => {
                   const links = creator.links.filter(x => x !== link);
                   setCreator({ ...creator, links });
-                }}>
+                }}
+                size="sm"
+                variant="plain">
                 <FaTimes />
                 <label className="hidden md:inline md:pl-2">削除</label>
               </MuiJoyButton>
@@ -165,8 +165,17 @@ export const Mypage = () => {
           ))}
           <Input
             color={addLinkError ? 'danger' : 'neutral'}
-            placeholder="https://..."
-            value={addLink}
+            endDecorator={
+              <MuiJoyButton
+                color="neutral"
+                disabled={addLinkError}
+                onClick={onAddLink}
+                size="sm"
+                variant="plain">
+                <FaPlus />
+                <label className="hidden md:inline md:pl-2">追加</label>
+              </MuiJoyButton>
+            }
             onChange={e => {
               const input = e.target.value;
               setAddLink(input);
@@ -178,21 +187,12 @@ export const Mypage = () => {
                 onAddLink();
               }
             }}
-            endDecorator={
-              <MuiJoyButton
-                size="sm"
-                variant="plain"
-                color="neutral"
-                disabled={addLinkError}
-                onClick={onAddLink}>
-                <FaPlus />
-                <label className="hidden md:inline md:pl-2">追加</label>
-              </MuiJoyButton>
-            }
+            placeholder="https://..."
             sx={{
               borderColor: 'black',
               backgroundColor: 'transparent',
             }}
+            value={addLink}
           />
         </div>
 
@@ -200,9 +200,9 @@ export const Mypage = () => {
           <div className="mb-2 flex gap-2">
             <p className="mt-auto w-full">発表作品</p>
             <FileInput
-              multiple
               accept="image/*"
               className="min-w-fit"
+              multiple
               onChange={e => {
                 if (creator === undefined) return;
 
@@ -231,6 +231,24 @@ export const Mypage = () => {
           {creator && (
             <DraggableList
               items={creator.products}
+              renderItem={(product, props) => (
+                <ProductCell
+                  data={product}
+                  key={product.id}
+                  onDelete={() => {
+                    const newProducts = creator.products.filter(
+                      x => x.id !== product.id,
+                    );
+
+                    setCreator({ ...creator, products: newProducts });
+                  }}
+                  onEdit={() => {
+                    setEditProduct(product);
+                    setVisibleProductPopup(true);
+                  }}
+                  sortableProps={props}
+                />
+              )}
               setItems={items => {
                 const newProducts = items
                   .map(item =>
@@ -240,24 +258,6 @@ export const Mypage = () => {
 
                 setCreator({ ...creator, products: newProducts });
               }}
-              renderItem={(product, props) => (
-                <ProductCell
-                  key={product.id}
-                  data={product}
-                  onEdit={() => {
-                    setEditProduct(product);
-                    setVisibleProductPopup(true);
-                  }}
-                  onDelete={() => {
-                    const newProducts = creator.products.filter(
-                      x => x.id !== product.id,
-                    );
-
-                    setCreator({ ...creator, products: newProducts });
-                  }}
-                  sortableProps={props}
-                />
-              )}
             />
           )}
         </div>
@@ -267,11 +267,11 @@ export const Mypage = () => {
             <p className="mt-auto w-full">展示登録</p>
             <Button
               className="min-w-fit rounded-md bg-white text-black"
-              startDecorator={<FaPlus />}
               onClick={() => {
                 setEditExhibit(undefined);
                 setVisibleExhibitPopup(true);
-              }}>
+              }}
+              startDecorator={<FaPlus />}>
               展示追加
             </Button>
           </div>
@@ -279,18 +279,18 @@ export const Mypage = () => {
             <tbody>
               {creator?.exhibits.map(exhibit => (
                 <ExhibitRow
-                  key={exhibit.id}
                   data={exhibit}
-                  onEdit={() => {
-                    setEditExhibit(exhibit);
-                    setVisibleExhibitPopup(true);
-                  }}
+                  key={exhibit.id}
                   onDelete={() => {
                     const newExhibits = creator.exhibits.filter(
                       x => x.id !== exhibit.id,
                     );
 
                     setCreator({ ...creator, exhibits: newExhibits });
+                  }}
+                  onEdit={() => {
+                    setEditExhibit(exhibit);
+                    setVisibleExhibitPopup(true);
                   }}
                 />
               ))}
@@ -300,8 +300,8 @@ export const Mypage = () => {
 
         <SubmitButton
           className="w-fit rounded-md border bg-white text-black"
-          startDecorator={<FaCheck />}
-          loading={isSubmitting}>
+          loading={isSubmitting}
+          startDecorator={<FaCheck />}>
           確定
         </SubmitButton>
       </form>
@@ -309,9 +309,6 @@ export const Mypage = () => {
       {/* 発表作品 */}
       {editProduct && (
         <ProductPopup
-          visible={visibleProductPopup}
-          setVisible={setVisibleProductPopup}
-          product={editProduct}
           onSubmit={newValue => {
             if (creator === undefined) {
               return;
@@ -325,11 +322,14 @@ export const Mypage = () => {
             setCreator(creator);
             setVisibleProductPopup(false);
           }}
+          product={editProduct}
+          setVisible={setVisibleProductPopup}
+          visible={visibleProductPopup}
         />
       )}
 
       {/* 展示登録 */}
-      <Popup visible={visibleExhibitPopup} setVisible={setVisibleExhibitPopup}>
+      <Popup setVisible={setVisibleExhibitPopup} visible={visibleExhibitPopup}>
         <ExhibitForm
           exhibit={editExhibit}
           onSubmit={newValue => {
@@ -384,23 +384,23 @@ const ProductCell = (props: ProductCellProps) => {
       </div>
       <div className="absolute right-0 top-0 flex flex-col gap-2">
         <IconButton
-          size="sm"
-          variant="soft"
           color="neutral"
-          sx={{ borderRadius: 9999 }}
           onClick={() => {
             onEdit(data);
-          }}>
+          }}
+          size="sm"
+          sx={{ borderRadius: 9999 }}
+          variant="soft">
           <FaPen />
         </IconButton>
         <IconButton
-          size="sm"
-          variant="soft"
           color="neutral"
-          sx={{ borderRadius: 9999 }}
           onClick={() => {
             onDelete(data);
-          }}>
+          }}
+          size="sm"
+          sx={{ borderRadius: 9999 }}
+          variant="soft">
           <FaTimes />
         </IconButton>
       </div>
@@ -422,9 +422,9 @@ const ExhibitRow = (props: ExhibitRowProps) => {
       <td className="flex gap-4 p-2">
         {/* 画像 */}
         <img
+          alt={data.title}
           className="max-w-32 md:max-w-40"
           src={data.tmpImageData || data.imageUrl}
-          alt={data.title}
         />
         {/* 内容 */}
         <div className="flex w-full flex-col gap-1 align-top">
@@ -435,22 +435,22 @@ const ExhibitRow = (props: ExhibitRowProps) => {
         {/* 編集/削除ボタン */}
         <div className="flex min-w-max flex-col gap-1 align-top">
           <MuiJoyButton
-            size="sm"
-            variant="plain"
             color="neutral"
             onClick={() => {
               onEdit(data);
-            }}>
+            }}
+            size="sm"
+            variant="plain">
             <FaPen />
             <label className="hidden md:inline md:pl-2">編集</label>
           </MuiJoyButton>
           <MuiJoyButton
-            size="sm"
-            variant="plain"
             color="neutral"
             onClick={() => {
               onDelete(data);
-            }}>
+            }}
+            size="sm"
+            variant="plain">
             <FaTimes />
             <label className="hidden md:inline md:pl-2">削除</label>
           </MuiJoyButton>
@@ -488,7 +488,7 @@ const ProductPopup = (props: ProductPopupProps) => {
   };
 
   return (
-    <Popup visible={visible} setVisible={setVisible}>
+    <Popup setVisible={setVisible} visible={visible}>
       <form
         onSubmit={e => {
           e.preventDefault();
@@ -508,8 +508,8 @@ const ProductPopup = (props: ProductPopupProps) => {
             <div>
               <p>詳細</p>
               <Textarea
-                sx={{ border: 1, borderColor: 'black', marginY: '0.25rem' }}
                 minRows={3}
+                sx={{ border: 1, borderColor: 'black', marginY: '0.25rem' }}
                 {...register('detail')}
               />
             </div>
@@ -518,8 +518,8 @@ const ProductPopup = (props: ProductPopupProps) => {
 
         <SubmitButton
           className="w-fit rounded-md border border-black bg-white text-black"
-          variant="outlined"
-          startDecorator={<FaCheck />}>
+          startDecorator={<FaCheck />}
+          variant="outlined">
           変更
         </SubmitButton>
       </form>
@@ -639,15 +639,13 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             <Controller
               control={control}
               name="location"
-              rules={{ required: requireMsg }}
               render={({ field }) => (
                 <Autocomplete
                   freeSolo
-                  options={galleries?.map(x => x.name) ?? []}
                   onChange={(e, value) => {
                     field.onChange(value);
                   }}
-                  value={field.value || null}
+                  options={galleries?.map(x => x.name) ?? []}
                   renderInput={params => (
                     <Input
                       slotProps={{
@@ -663,8 +661,10 @@ const ExhibitForm = (props: ExhibitFormProps) => {
                       sx={{ borderColor: 'black' }}
                     />
                   )}
+                  value={field.value || null}
                 />
               )}
+              rules={{ required: requireMsg }}
             />
             <p className="text-xs text-red-600">{errors.location?.message}</p>
             {location !== '' && isMatchGallery ? (
@@ -685,19 +685,19 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             )}
           </div>
           <Textbox
-            label="開始日時"
-            type="date"
             defaultDateValue={exhibit?.startDate}
             fieldError={errors.startDateString}
+            label="開始日時"
+            type="date"
             {...register('startDateString', {
               validate: v => !isNaN(new Date(v).getDate()) || invalidDateMsg,
             })}
           />
           <Textbox
-            label="終了日時"
-            type="date"
             defaultDateValue={exhibit?.endDate}
             fieldError={errors.endDateString}
+            label="終了日時"
+            type="date"
             {...register('endDateString', {
               validate: v => {
                 const endDate = new Date(v);
@@ -774,16 +774,16 @@ const NoGalleryInfo = (props: NoGalleryProps) => {
           fieldError={errors.name || errors.location}
         />
         <MuiJoyButton
-          size="sm"
-          variant="soft"
-          color="neutral"
-          startDecorator={<FaPlus />}
           className="w-fit"
+          color="neutral"
           loading={isSubmitting}
           onClick={e => {
             clearErrors('name');
             void handleSubmit(onValid)(e);
-          }}>
+          }}
+          size="sm"
+          startDecorator={<FaPlus />}
+          variant="soft">
           追加
         </MuiJoyButton>
       </div>

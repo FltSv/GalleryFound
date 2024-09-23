@@ -71,8 +71,8 @@ export const ReSent = () => (
 
 const ReSendLink = (props: { setter: () => void }) => (
   <a
-    href="#"
     className="my-8 text-blue-600"
+    href="#"
     onClick={() =>
       void (async () => {
         // 確認メールを再送信
