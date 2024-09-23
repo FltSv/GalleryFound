@@ -24,7 +24,7 @@ const AuthRouting = (props: { page: ReactNode }) => {
 
   // 未ログインの場合
   if (user === null) {
-    return <Navigate replace to={'/login'} />;
+    return <Navigate replace to="/login" />;
   }
 
   // メール認証がまだ
@@ -40,16 +40,16 @@ const App = () => (
     <Header />
     <div className="mx-4 pb-8 md:mx-10">
       <Routes>
-        <Route path="/" element={<Top />} />
-        <Route path="login" element={<Login />} />
-        <Route path="sendverify" element={<SendVerify />} />
-        <Route path="mypage" element={<AuthRouting page={<Mypage />} />} />
+        <Route element={<Top />} path="/" />
+        <Route element={<Login />} path="login" />
+        <Route element={<SendVerify />} path="sendverify" />
+        <Route element={<AuthRouting page={<Mypage />} />} path="mypage" />
         <Route
-          path="galleries"
           element={<AuthRouting page={<Galleries />} />}
+          path="galleries"
         />
-        <Route path="policy" element={<Policy />} />
-        <Route path="*" element={<NotFound />} />
+        <Route element={<Policy />} path="policy" />
+        <Route element={<NotFound />} path="*" />
       </Routes>
     </div>
   </BrowserRouter>

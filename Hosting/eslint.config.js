@@ -176,7 +176,15 @@ export default tseslint.config(
       ...reactPlugin.configs.recommended.rules,
       ...reactPlugin.configs['jsx-runtime'].rules,
       'react/prop-types': 'off',
+      'react/hook-use-state': 'error', // useStateの返り値の命名を統一
       'react/jsx-no-bind': 'warn', // JSX内での関数記述を禁止し、renderごとの関数生成を防止
+      'react/jsx-boolean-value': 'error', // boolean型のPropsの渡し方を統一
+      'react/jsx-curly-brace-presence': 'error', // 不要な中括弧を禁止
+      'react/jsx-no-useless-fragment': 'error', // 不要なReact Fragmentの使用を禁止
+      'react/jsx-sort-props': 'warn', // Propsの並び順をアルファベット順に強制
+      'react/jsx-pascal-case': 'error', // コンポーネント名をパスカルケースに強制
+      'react/no-danger': 'error', // dangerouslySetInnerHTMLを許可しない
+      'react/self-closing-comp': 'error', // 子要素がない場合は自己終了タグを強制
     },
     settings: {
       react: {
@@ -191,3 +199,9 @@ export default tseslint.config(
   // 配列末尾への配置が推奨されている
   eslintConfigPrettier,
 );
+
+/**
+ * 参考リンク
+ * - ESLint を使い倒す（おすすめルール紹介） https://zenn.dev/noshiro_piko/articles/take-full-advantage-of-typescript-eslint
+ * - チームで同じような React コンポーネントを書く https://zenn.dev/kazukix/articles/create-similar-react-components
+ */

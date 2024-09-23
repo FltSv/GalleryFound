@@ -30,19 +30,17 @@ const Header = () => {
           <Link to="/">Gallery Found</Link>
         </h1>
       </div>
-      {loading ? (
-        <></>
-      ) : (
+      {loading ? null : (
         <div className="inline-block">
           {/* アイコンメニュー */}
           <div className="md:hidden">
             <Dropdown>
               {visibleMenu && (
                 <MenuButton
-                  slots={{ root: IconButton }}
                   slotProps={{
                     root: { variant: 'outlined', color: 'transparent' },
-                  }}>
+                  }}
+                  slots={{ root: IconButton }}>
                   <FaBars />
                 </MenuButton>
               )}
@@ -77,17 +75,17 @@ const Header = () => {
           {/* ボタンメニュー */}
           <div className="hidden gap-4 md:flex">
             {visibleLogin && (
-              <Link to="login" className={styles}>
+              <Link className={styles} to="login">
                 Creator Login
               </Link>
             )}
             {visibleMypage && (
-              <Link to="/mypage" className={styles}>
+              <Link className={styles} to="/mypage">
                 MyPage
               </Link>
             )}
             {visibleLogout && (
-              <Link onClick={onSignOut} to="/" className={styles}>
+              <Link className={styles} onClick={onSignOut} to="/">
                 Logout
               </Link>
             )}

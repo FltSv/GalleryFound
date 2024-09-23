@@ -51,7 +51,7 @@ export const Login = () => {
 
   // 既にログインした上でメール認証済の場合、mypageに移動
   if (user?.emailVerified ?? false) {
-    return <Navigate replace to={'/mypage'} />;
+    return <Navigate replace to="/mypage" />;
   }
 
   const isRegister = isLoginState(location.state) && location.state.isRegister;
@@ -88,8 +88,8 @@ export const Login = () => {
       onSubmit={e => void handleSubmit(onValid)(e)}>
       <div className="flex w-full max-w-xs flex-col gap-4">
         <Textbox
-          className="rounded-full"
           autoComplete="username"
+          className="rounded-full"
           label="メールアドレス"
           {...register('mail', {
             required: reqMessage,
@@ -101,10 +101,10 @@ export const Login = () => {
           fieldError={errors.mail}
         />
         <Textbox
-          type={visiblePwd ? 'text' : 'password'}
-          className="rounded-full"
           autoComplete="current-password"
+          className="rounded-full"
           label="パスワード"
+          type={visiblePwd ? 'text' : 'password'}
           {...register('password', {
             required: reqMessage,
             minLength: { value: 6, message: '6文字以上で入力してください。' },
@@ -113,10 +113,10 @@ export const Login = () => {
         />
         {isRegister && (
           <Textbox
-            type={visiblePwd ? 'text' : 'password'}
-            className="rounded-full"
             autoComplete="new-password"
+            className="rounded-full"
             label="パスワード（確認）"
+            type={visiblePwd ? 'text' : 'password'}
             {...register('passCheck', {
               required: reqMessage,
               validate: value =>
@@ -126,9 +126,9 @@ export const Login = () => {
           />
         )}
         <Checkbox
+          color="neutral"
           label="パスワードを表示する"
           variant="outlined"
-          color="neutral"
           {...register('visiblePwd')}
           sx={{
             '& span, span:hover': {
@@ -151,16 +151,16 @@ export const Login = () => {
       <Divider className="text-base">or</Divider>
       <div className="flex gap-4">
         <Button
-          startDecorator={<FcGoogle />}
           className="w-fit bg-white text-black"
-          onClick={() => void loginWith('google')}>
+          onClick={() => void loginWith('google')}
+          startDecorator={<FcGoogle />}>
           Continue with Google
         </Button>
         {/* 法人化が必要そうなので非表示 */}
         <Button
-          startDecorator={<FaFacebook color="#1877F2" />}
           className="hidden w-fit bg-white text-black"
-          onClick={() => void loginWith('facebook')}>
+          onClick={() => void loginWith('facebook')}
+          startDecorator={<FaFacebook color="#1877F2" />}>
           Continue with Facebook
         </Button>
       </div>
@@ -170,9 +170,9 @@ export const Login = () => {
         <p>
           新規登録は
           <Link
-            to="/login"
             className="text-blue-800 underline"
-            state={{ isRegister: true } as LoginState}>
+            state={{ isRegister: true } as LoginState}
+            to="/login">
             こちら
           </Link>
         </p>
