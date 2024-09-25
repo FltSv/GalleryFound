@@ -26,9 +26,9 @@ const TODAY = new Date();
 export const Map = () => (
   <div className="h-svh w-svw bg-white">
     <GeolocationWrapper
+      renderErrorView={error => <MapView error={error} />}
       renderProcessView={() => <p>現在位置取得中…</p>}
       renderSuccessView={coords => <MapView coords={coords} />}
-      renderErrorView={error => <MapView error={error} />}
     />
   </div>
 );
@@ -71,16 +71,16 @@ const MapView = ({ coords, error }: MapViewProps) => {
         </p>
       )}
       <GoogleMap
-        mapId="f63e2cf30554f3f8"
         defaultCenter={centerPos}
-        defaultZoom={12}>
+        defaultZoom={12}
+        mapId="f63e2cf30554f3f8">
         {currPos !== undefined && (
           <AdvancedMarker position={currPos}>
             <FaLocationCrosshairs className="text-3xl text-cyan-400" />
           </AdvancedMarker>
         )}
         {galleries.map(x => (
-          <GalleryMarker key={x.gallery.id} item={x} />
+          <GalleryMarker item={x} key={x.gallery.id} />
         ))}
       </GoogleMap>
     </APIProvider>
@@ -103,27 +103,23 @@ const GalleryMarker = (props: { item: GalleryExhibits }) => {
 
   return (
     <AdvancedMarker
-      ref={markerRef}
       key={gallery.id}
+      onClick={onMarkerClick}
       position={gallery.latLng}
-      onClick={onMarkerClick}>
-      <Pin
-        background={'#ef4444'}
-        glyphColor={'#7f1d1d'}
-        borderColor={'#7f1d1d'}
-      />
+      ref={markerRef}>
+      <Pin background="#ef4444" borderColor="#7f1d1d" glyphColor="#7f1d1d" />
       {showInfo && (
         <InfoWindow
+          anchor={marker}
           headerContent={
             <div>
               <p className="text-base">{gallery.name}</p>
               <p className="max-w-60">{gallery.location}</p>
             </div>
           }
-          anchor={marker}
           onClose={onClose}>
           {exhibits.map(x => (
-            <div key={x.id} className="flex gap-2 py-1">
+            <div className="flex gap-2 py-1" key={x.id}>
               <img className="inline w-16" src={x.imageUrl} />
               <div>
                 <p className="text-base font-bold">{x.title}</p>

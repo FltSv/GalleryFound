@@ -13,10 +13,10 @@ export const Popup = (props: PopupProps) => {
 
   return (
     <Modal
-      open={visible}
       onClose={() => {
         setVisible(false);
       }}
+      open={visible}
       sx={{
         display: 'flex',
         justifyContent: 'center',

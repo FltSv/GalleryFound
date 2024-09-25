@@ -69,21 +69,19 @@ export const ReSent = () => (
   </div>
 );
 
-const ReSendLink = (props: { setter: () => void }) => {
-  return (
-    <a
-      href="#"
-      className="my-8 text-blue-600"
-      onClick={() =>
-        void (async () => {
-          // 確認メールを再送信
-          await sendVerifyEmail();
+const ReSendLink = (props: { setter: () => void }) => (
+  <a
+    className="my-8 text-blue-600"
+    href="#"
+    onClick={() =>
+      void (async () => {
+        // 確認メールを再送信
+        await sendVerifyEmail();
 
-          // ReSentページに遷移
-          props.setter();
-        })()
-      }>
-      確認メールを再送信する
-    </a>
-  );
-};
+        // ReSentページに遷移
+        props.setter();
+      })()
+    }>
+    確認メールを再送信する
+  </a>
+);

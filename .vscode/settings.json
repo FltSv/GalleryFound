@@ -6,7 +6,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
   // eslint
-  "eslint.experimental.useFlatConfig": true,
+  "eslint.useFlatConfig": true,
   "eslint.workingDirectories": ["./Hosting"],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
@@ -15,5 +15,6 @@
   // TailwindCSS
   "files.associations": {
     "*.css": "tailwindcss"
-  }
+  },
+  "yaml.schemaStore.enable": false
 }
