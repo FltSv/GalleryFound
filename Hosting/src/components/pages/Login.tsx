@@ -20,7 +20,7 @@ interface LoginState {
   isRegister: boolean;
 }
 
-function isLoginState(value: unknown): value is LoginState {
+const isLoginState = (value: unknown): value is LoginState => {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
@@ -29,7 +29,7 @@ function isLoginState(value: unknown): value is LoginState {
     isRegister: false,
   };
   return typeof record.isRegister === typeof loginState.isRegister;
-}
+};
 
 export const Login = () => {
   const { user, loading } = useAuthContext();

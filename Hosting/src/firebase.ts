@@ -38,14 +38,14 @@ const config = getRemoteConfig(app);
 config.settings.minimumFetchIntervalMillis =
   process.env.NODE_ENV === 'development' ? 60000 : 3600000;
 
-export async function getConfig(): Promise<Config> {
+export const getConfig = async (): Promise<Config> => {
   await fetchAndActivate(config);
   return {
     debugUserIds: JSON.parse(
       getValue(config, 'debug_user_ids').asString(),
     ) as string[],
   };
-}
+};
 
 export const fbCreatorConverter: FirestoreDataConverter<Creator> = {
   toFirestore: modelObject => modelObject,

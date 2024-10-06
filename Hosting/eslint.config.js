@@ -45,7 +45,7 @@ export default tseslint.config(
         'globalThis',
       ],
       // 関数の記述方法を関数式（アロー関数を含む）に統一
-      'func-style': ['warn', 'expression', { allowArrowFunctions: true }],
+      'func-style': ['error', 'expression', { allowArrowFunctions: true }],
       'arrow-body-style': ['error', 'as-needed'], // アロー関数の本体の記述方法を制限
     },
   },

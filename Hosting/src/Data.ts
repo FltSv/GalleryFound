@@ -37,11 +37,10 @@ const imageCompOptions: Options = {
   maxWidthOrHeight: 1000,
 };
 
-function getCreatorStorageUrl(userId: string) {
-  return `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${userId}%2F`;
-}
+const getCreatorStorageUrl = (userId: string) =>
+  `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${userId}%2F`;
 
-export async function getCreatorData(user: User) {
+export const getCreatorData = async (user: User) => {
   const userId = user.uid;
   const creatorUrl = getCreatorStorageUrl(userId);
   const creator: Creator = {
@@ -100,12 +99,12 @@ export async function getCreatorData(user: User) {
 
   console.debug('creator:', creator);
   return creator;
-}
+};
 
 /**
  *  値の確定、DBへデータを送信する
  */
-export async function setCreatorData(user: User, data: Creator) {
+export const setCreatorData = async (user: User, data: Creator) => {
   const userId = user.uid;
 
   // 画像のアップロード
@@ -165,12 +164,12 @@ export async function setCreatorData(user: User, data: Creator) {
 
   // 処理完了
   console.debug('complete setCreatorData');
-}
+};
 
 /**
  * tmpImageDataの画像をアップロード、URLを格納
  */
-async function uploadImageData(user: User, images: ImageStatus[]) {
+const uploadImageData = async (user: User, images: ImageStatus[]) => {
   const uploadImage = async (image: ImageStatus) => {
     // イメージの更新が無ければスキップ
     if (image.tmpImageData === '') {
@@ -198,10 +197,10 @@ async function uploadImageData(user: User, images: ImageStatus[]) {
 
   const tasks = images.map(exhibit => uploadImage(exhibit));
   await Promise.all(tasks);
-}
+};
 
 /** すべての展示情報の取得 */
-export async function getAllExhibits() {
+export const getAllExhibits = async () => {
   const creatorsSnap = await getDocs(
     collection(db, collectionNames.creators).withConverter(fbCreatorConverter),
   );
@@ -231,7 +230,7 @@ export async function getAllExhibits() {
 
   const resolvedExhibits = await Promise.all(exhibitsPromises);
   return resolvedExhibits.flat();
-}
+};
 
 export interface GalleryExhibits {
   gallery: Gallery;
@@ -239,7 +238,7 @@ export interface GalleryExhibits {
 }
 
 /** ギャラリー情報と関連する展示の配列を取得 */
-export async function getGalleryExhibits() {
+export const getGalleryExhibits = async () => {
   const galleries = await getGalleries();
   const exhibits = await getAllExhibits();
 
@@ -256,10 +255,10 @@ export async function getGalleryExhibits() {
   });
 
   return array;
-}
+};
 
 /** ギャラリー情報の一覧を取得 */
-export async function getGalleries() {
+export const getGalleries = async () => {
   const colRef = collection(db, collectionNames.galleries);
   const querySnap = await getDocs(colRef.withConverter(fbGalleryConverter));
 
@@ -268,20 +267,20 @@ export async function getGalleries() {
     const { latitude, longitude } = data.latLng.toJSON();
     return { ...data, id: doc.id, latLng: { lat: latitude, lng: longitude } };
   });
-}
+};
 
 /** ギャラリー情報を追加 */
-export async function addGallery(data: Gallery) {
+export const addGallery = async (data: Gallery) => {
   const { lat, lng } = await getLatLngFromAddress(data.location);
   const { id, ...firebaseData } = { ...data, latLng: new GeoPoint(lat, lng) };
   void id;
 
   const docRef = doc(db, collectionNames.galleries, getUlid());
   await setDoc(docRef.withConverter(fbGalleryConverter), firebaseData);
-}
+};
 
 /** 住所から緯度経度を取得する */
-async function getLatLngFromAddress(address: string) {
+const getLatLngFromAddress = async (address: string) => {
   const geocoder = new google.maps.Geocoder();
   const geocodingTask = new Promise<google.maps.GeocoderResult[]>(
     (resolve, reject) =>
@@ -306,14 +305,14 @@ async function getLatLngFromAddress(address: string) {
   );
 
   return results[0].geometry.location.toJSON();
-}
+};
 
 /** 日付の期間の表示値を返す */
-export function getDatePeriodString(start: Date, end: Date) {
+export const getDatePeriodString = (start: Date, end: Date) => {
   const startString = start.toLocaleDateString();
   const endString = end.toLocaleDateString();
   return `${startString} ～ ${endString}`;
-}
+};
 
 /** 作家 */
 export interface Creator {

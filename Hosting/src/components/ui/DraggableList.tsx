@@ -27,9 +27,9 @@ interface DraggableListProps<T> {
   renderItem: RenderItem<T>;
 }
 
-export function DraggableList<T extends { id: string }>(
+export const DraggableList = <T extends { id: string }>(
   props: DraggableListProps<T>,
-) {
+) => {
   const { items, setItems, renderItem } = props;
 
   const [activeId, setActiveId] = useState<UniqueIdentifier>();
@@ -70,14 +70,16 @@ export function DraggableList<T extends { id: string }>(
       )}
     </DndContext>
   );
-}
+};
 
 interface SortableItemProps<T> {
   item: T;
   renderItem: RenderItem<T>;
 }
 
-function SortableItem<T extends { id: string }>(props: SortableItemProps<T>) {
+const SortableItem = <T extends { id: string }>(
+  props: SortableItemProps<T>,
+) => {
   const { item, renderItem } = props;
 
   const {
@@ -106,7 +108,7 @@ function SortableItem<T extends { id: string }>(props: SortableItemProps<T>) {
       })}
     </div>
   );
-}
+};
 
 type RenderItem<T> = (item: T, sortableProps: SortableProps) => ReactNode;
 

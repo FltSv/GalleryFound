@@ -15,16 +15,16 @@ type providerTypes = 'google' | 'facebook' | 'email';
  * @param email メールアドレス
  * @param pass パスワード
  */
-export async function loginWithEmail(email: string, pass: string) {
+export const loginWithEmail = async (email: string, pass: string) => {
   const auth = getAuth();
   return await signInWithEmailAndPassword(auth, email, pass);
-}
+};
 
 /**
  * メール・パスワードによる新規登録
  * @returns
  */
-export async function signupWithEmail(email: string, pass: string) {
+export const signupWithEmail = async (email: string, pass: string) => {
   const auth = getAuth();
   const userCredential = await createUserWithEmailAndPassword(
     auth,
@@ -35,10 +35,10 @@ export async function signupWithEmail(email: string, pass: string) {
   // メールアドレス確認メールを送信する
   await sendEmailVerification(userCredential.user);
   return userCredential;
-}
+};
 
 /** Googleログイン・新規登録 */
-export async function loginWith(providerType: providerTypes) {
+export const loginWith = async (providerType: providerTypes) => {
   let provider;
   switch (providerType) {
     case 'google':
@@ -57,21 +57,21 @@ export async function loginWith(providerType: providerTypes) {
   return await signInWithPopup(getAuth(), provider).catch((error: unknown) => {
     console.error(error);
   });
-}
+};
 
 /**
  * ログアウト
  */
-export async function signOut() {
+export const signout = async () => {
   await getAuth().signOut();
-}
+};
 
 /**
  * メールアドレス確認メールを再送信する
  */
-export async function sendVerifyEmail() {
+export const sendVerifyEmail = async () => {
   const user = getAuth().currentUser;
   if (user) {
     await sendEmailVerification(user);
   }
-}
+};
