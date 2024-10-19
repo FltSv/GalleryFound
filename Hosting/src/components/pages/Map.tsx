@@ -23,15 +23,29 @@ const TOKYO_POS = {
 
 const TODAY = new Date();
 
-export const Map = () => (
-  <div className="h-svh w-svw bg-white">
-    <GeolocationWrapper
-      renderErrorView={error => <MapView error={error} />}
-      renderProcessView={() => <p>現在位置取得中…</p>}
-      renderSuccessView={coords => <MapView coords={coords} />}
-    />
-  </div>
-);
+export const Map = () => {
+  const renderErrorView = useCallback(
+    (error: GeolocationPositionError) => <MapView error={error} />,
+    [],
+  );
+
+  const renderProcessView = useCallback(() => <p>現在位置取得中…</p>, []);
+
+  const renderSuccessView = useCallback(
+    (coords: GeolocationCoordinates) => <MapView coords={coords} />,
+    [],
+  );
+
+  return (
+    <div className="h-svh w-svw bg-white">
+      <GeolocationWrapper
+        renderErrorView={renderErrorView}
+        renderProcessView={renderProcessView}
+        renderSuccessView={renderSuccessView}
+      />
+    </div>
+  );
+};
 
 interface MapViewProps {
   coords?: GeolocationCoordinates;

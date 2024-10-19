@@ -177,7 +177,7 @@ export default tseslint.config(
       ...reactPlugin.configs['jsx-runtime'].rules,
       'react/prop-types': 'off',
       'react/hook-use-state': 'error', // useStateの返り値の命名を統一
-      'react/jsx-no-bind': 'warn', // JSX内での関数記述を禁止し、renderごとの関数生成を防止
+      'react/jsx-no-bind': 'error', // JSX内での関数記述を禁止し、renderごとの関数生成を防止
       'react/jsx-boolean-value': 'error', // boolean型のPropsの渡し方を統一
       'react/jsx-curly-brace-presence': 'error', // 不要な中括弧を禁止
       'react/jsx-no-useless-fragment': 'error', // 不要なReact Fragmentの使用を禁止

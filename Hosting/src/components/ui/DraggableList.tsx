@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -35,18 +35,24 @@ export const DraggableList = <T extends { id: string }>(
   const [activeId, setActiveId] = useState<UniqueIdentifier>();
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
-  const onDragStart = ({ active }: DragStartEvent) => {
-    setActiveId(active.id);
-  };
+  const onDragStart = useCallback(
+    ({ active }: DragStartEvent) => {
+      setActiveId(active.id);
+    },
+    [setActiveId],
+  );
 
-  const onDragEnd = ({ active, over }: DragEndEvent) => {
-    if (active.id !== over?.id) {
-      const oldIndex = items.findIndex(item => item.id === active.id);
-      const newIndex = items.findIndex(item => item.id === over?.id);
+  const onDragEnd = useCallback(
+    ({ active, over }: DragEndEvent) => {
+      if (active.id !== over?.id) {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over?.id);
 
-      setItems(arrayMove(items, oldIndex, newIndex));
-    }
-  };
+        setItems(arrayMove(items, oldIndex, newIndex));
+      }
+    },
+    [items, setItems],
+  );
 
   const overlayItem = items.find(item => item.id === activeId);
 

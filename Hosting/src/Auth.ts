@@ -62,7 +62,7 @@ export const loginWith = async (providerType: providerTypes) => {
 /**
  * ログアウト
  */
-export const signout = async () => {
+export const signOut = async () => {
   await getAuth().signOut();
 };
 

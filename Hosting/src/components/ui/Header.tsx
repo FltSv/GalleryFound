@@ -3,6 +3,7 @@ import { Menu, MenuButton, MenuItem, Dropdown, IconButton } from '@mui/joy';
 import { FaBars } from 'react-icons/fa';
 import { signOut } from '../../Auth';
 import { useAuthContext } from '../AuthContext';
+import { useCallback } from 'react';
 
 const Header = () => {
   const styles =
@@ -19,9 +20,9 @@ const Header = () => {
 
   const visibleMenu = visibleLogin || visibleMypage || visibleLogout;
 
-  const onSignOut = () => {
+  const onSignOut = useCallback(() => {
     void signOut();
-  };
+  }, []);
 
   return (
     <header className="mb-4 flex gap-4 p-4">

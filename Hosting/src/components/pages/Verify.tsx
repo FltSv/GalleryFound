@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { sendVerifyEmail } from 'src/Auth';
 
 const divStyle = 'mx-auto flex w-full max-w-xl flex-col items-center';
@@ -6,6 +6,10 @@ const h1Style = 'my-2 md:my-6 text-2xl md:text-3xl font-bold text-black';
 
 export const SendVerify = () => {
   const [isResent, setIsResent] = useState(false);
+
+  const onResend = useCallback(() => {
+    setIsResent(true);
+  }, [setIsResent]);
 
   return isResent ? (
     <ReSent />
@@ -24,17 +28,18 @@ export const SendVerify = () => {
       <p className="text-gray-800">
         受信フォルダ内に確認メールが見当たらない場合は、迷惑メールフォルダもご確認ください。
       </p>
-      <ReSendLink
-        setter={() => {
-          setIsResent(true);
-        }}
-      />
+
+      <ReSendLink setter={onResend} />
     </div>
   );
 };
 
 export const NoVerify = () => {
   const [isResent, setIsResent] = useState(false);
+
+  const onResend = useCallback(() => {
+    setIsResent(true);
+  }, [setIsResent]);
 
   return isResent ? (
     <ReSent />
@@ -47,11 +52,7 @@ export const NoVerify = () => {
       <p className="text-gray-800">
         受信フォルダ内に確認メールが見当たらない場合は、迷惑メールフォルダもご確認ください。
       </p>
-      <ReSendLink
-        setter={() => {
-          setIsResent(true);
-        }}
-      />
+      <ReSendLink setter={onResend} />
     </div>
   );
 };
@@ -69,19 +70,20 @@ export const ReSent = () => (
   </div>
 );
 
-const ReSendLink = (props: { setter: () => void }) => (
-  <a
-    className="my-8 text-blue-600"
-    href="#"
-    onClick={() =>
-      void (async () => {
-        // 確認メールを再送信
-        await sendVerifyEmail();
+const ReSendLink = (props: { setter: () => void }) => {
+  const onClick = useCallback(() => {
+    (async () => {
+      // 確認メールを再送信
+      await sendVerifyEmail();
 
-        // ReSentページに遷移
-        props.setter();
-      })()
-    }>
-    確認メールを再送信する
-  </a>
-);
+      // ReSentページに遷移
+      props.setter();
+    })();
+  }, [props]);
+
+  return (
+    <a className="my-8 text-blue-600" href="#" onClick={onClick}>
+      確認メールを再送信する
+    </a>
+  );
+};

@@ -1,4 +1,4 @@
-import { ReactNode, Dispatch, SetStateAction } from 'react';
+import { ReactNode, Dispatch, SetStateAction, useCallback } from 'react';
 import { Modal, ModalDialog, ModalOverflow } from '@mui/joy';
 import { FaXmark } from 'react-icons/fa6';
 
@@ -11,11 +11,13 @@ interface PopupProps {
 export const Popup = (props: PopupProps) => {
   const { visible, setVisible, children } = props;
 
+  const onClose = useCallback(() => {
+    setVisible(false);
+  }, [setVisible]);
+
   return (
     <Modal
-      onClose={() => {
-        setVisible(false);
-      }}
+      onClose={onClose}
       open={visible}
       sx={{
         display: 'flex',
@@ -26,9 +28,7 @@ export const Popup = (props: PopupProps) => {
         <ModalDialog layout="center">
           <label
             className="absolute right-4 top-4 cursor-pointer"
-            onClick={() => {
-              setVisible(false);
-            }}>
+            onClick={onClose}>
             <FaXmark />
           </label>
           {children}
