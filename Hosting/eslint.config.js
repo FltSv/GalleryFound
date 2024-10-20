@@ -140,7 +140,7 @@ export default tseslint.config(
         },
       ],
       'functional/immutable-data': [
-        'warn', // オブジェクトの変更を警告
+        'error', // オブジェクトの変更を警告
         {
           ignoreImmediateMutation: true, // 変数に代入する前の即時変更を許可
           ignoreClasses: true, // クラスの変更を許可
@@ -149,6 +149,7 @@ export default tseslint.config(
             'window.location.href',
           ],
           ignoreAccessorPattern: [
+            'window.**', // windowオブジェクトの変更を許可
             '**.current.**', // React.useRefのcurrentプロパティへの変更を許可
             '**.displayName', // React componentのdisplayNameプロパティへの変更を許可
             '**.scrollTop', // スクロール位置の変更を許可

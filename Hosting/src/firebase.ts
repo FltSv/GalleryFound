@@ -34,15 +34,15 @@ export const db = getFirestore(app);
 
 // Remote Config
 // 最小フェッチ時間: dev1分、prod1時間
-const config = getRemoteConfig(app);
-config.settings.minimumFetchIntervalMillis =
+const mut_config = getRemoteConfig(app);
+mut_config.settings.minimumFetchIntervalMillis =
   process.env.NODE_ENV === 'development' ? 60000 : 3600000;
 
 export const getConfig = async (): Promise<Config> => {
-  await fetchAndActivate(config);
+  await fetchAndActivate(mut_config);
   return {
     debugUserIds: JSON.parse(
-      getValue(config, 'debug_user_ids').asString(),
+      getValue(mut_config, 'debug_user_ids').asString(),
     ) as string[],
   };
 };

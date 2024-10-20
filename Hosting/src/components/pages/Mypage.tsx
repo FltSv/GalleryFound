@@ -144,20 +144,19 @@ export const Mypage = () => {
       if (files === null) return;
       if (files.length === 0) return;
 
-      for (const file of Array.from(files)) {
-        const url = URL.createObjectURL(file);
-        const product: Product = {
-          id: getUlid(),
-          title: '',
-          detail: '',
-          tmpImageData: url,
-          srcImage: '',
-          imageUrl: '',
-        };
-        creator.products.push(product);
-      }
+      const newProducts: Product[] = Array.from(files).map(file => ({
+        id: getUlid(),
+        title: '',
+        detail: '',
+        tmpImageData: URL.createObjectURL(file),
+        srcImage: '',
+        imageUrl: '',
+      }));
 
-      setCreator({ ...creator, products: creator.products });
+      setCreator({
+        ...creator,
+        products: [...creator.products, ...newProducts],
+      });
     },
     [creator],
   );
@@ -278,21 +277,23 @@ export const Mypage = () => {
 
   const onValid: SubmitHandler<Creator> = useCallback(
     async data => {
-      // 一時データの結合
-      data.links = creator?.links ?? [];
-      data.products = creator?.products ?? [];
-      data.exhibits = creator?.exhibits ?? [];
+      if (user === null) return;
+      if (creator === undefined) return;
 
-      if (user === null) {
-        return;
-      }
+      // 一時データの結合
+      const submitData = {
+        ...data,
+        links: creator.links,
+        products: creator.products,
+        exhibits: creator.exhibits,
+      };
 
       // ローディングの表示
       setIsSubmitting(true);
 
       // 情報の送信
-      console.debug('submit: ', data);
-      await setCreatorData(user, data);
+      console.debug('submit: ', submitData);
+      await setCreatorData(user, submitData);
 
       // リロード
       window.location.reload();

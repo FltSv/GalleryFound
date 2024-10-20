@@ -39,19 +39,18 @@ export const signupWithEmail = async (email: string, pass: string) => {
 
 /** Googleログイン・新規登録 */
 export const loginWith = async (providerType: providerTypes) => {
-  let provider;
-  switch (providerType) {
-    case 'google':
-      provider = new GoogleAuthProvider();
-      break;
+  const provider = (() => {
+    switch (providerType) {
+      case 'google':
+        return new GoogleAuthProvider();
 
-    case 'facebook':
-      provider = new FacebookAuthProvider();
-      break;
+      case 'facebook':
+        return new FacebookAuthProvider();
 
-    default:
-      throw new Error('Invalid provider type');
-  }
+      default:
+        throw new Error('Invalid provider type');
+    }
+  })();
 
   // ポップアップでログイン
   return await signInWithPopup(getAuth(), provider).catch((error: unknown) => {
