@@ -45,7 +45,7 @@ export default tseslint.config(
         'globalThis',
       ],
       // 関数の記述方法を関数式（アロー関数を含む）に統一
-      'func-style': ['warn', 'expression', { allowArrowFunctions: true }],
+      'func-style': ['error', 'expression', { allowArrowFunctions: true }],
       'arrow-body-style': ['error', 'as-needed'], // アロー関数の本体の記述方法を制限
     },
   },
@@ -140,7 +140,7 @@ export default tseslint.config(
         },
       ],
       'functional/immutable-data': [
-        'warn', // オブジェクトの変更を警告
+        'error', // オブジェクトの変更を警告
         {
           ignoreImmediateMutation: true, // 変数に代入する前の即時変更を許可
           ignoreClasses: true, // クラスの変更を許可
@@ -149,6 +149,7 @@ export default tseslint.config(
             'window.location.href',
           ],
           ignoreAccessorPattern: [
+            'window.**', // windowオブジェクトの変更を許可
             '**.current.**', // React.useRefのcurrentプロパティへの変更を許可
             '**.displayName', // React componentのdisplayNameプロパティへの変更を許可
             '**.scrollTop', // スクロール位置の変更を許可
@@ -177,7 +178,7 @@ export default tseslint.config(
       ...reactPlugin.configs['jsx-runtime'].rules,
       'react/prop-types': 'off',
       'react/hook-use-state': 'error', // useStateの返り値の命名を統一
-      'react/jsx-no-bind': 'warn', // JSX内での関数記述を禁止し、renderごとの関数生成を防止
+      'react/jsx-no-bind': 'error', // JSX内での関数記述を禁止し、renderごとの関数生成を防止
       'react/jsx-boolean-value': 'error', // boolean型のPropsの渡し方を統一
       'react/jsx-curly-brace-presence': 'error', // 不要な中括弧を禁止
       'react/jsx-no-useless-fragment': 'error', // 不要なReact Fragmentの使用を禁止

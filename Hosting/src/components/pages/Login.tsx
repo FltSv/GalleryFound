@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FormEvent, useCallback, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useNavigate, useLocation, Navigate, Link } from 'react-router-dom';
 import { Divider, Checkbox } from '@mui/joy';
@@ -20,7 +20,7 @@ interface LoginState {
   isRegister: boolean;
 }
 
-function isLoginState(value: unknown): value is LoginState {
+const isLoginState = (value: unknown): value is LoginState => {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
@@ -29,7 +29,7 @@ function isLoginState(value: unknown): value is LoginState {
     isRegister: false,
   };
   return typeof record.isRegister === typeof loginState.isRegister;
-}
+};
 
 export const Login = () => {
   const { user, loading } = useAuthContext();
@@ -45,6 +45,47 @@ export const Login = () => {
     formState: { errors },
   } = useForm<Inputs>();
 
+  const isRegister = isLoginState(location.state) && location.state.isRegister;
+
+  const onValid: SubmitHandler<Inputs> = useCallback(
+    async data => {
+      setIsSubmitting(true);
+      try {
+        if (isRegister) {
+          // 新規登録
+          await signupWithEmail(data.mail, data.password);
+          navigate('/sendverify');
+        } else {
+          // ログイン
+          await loginWithEmail(data.mail, data.password);
+          navigate('/mypage');
+        }
+      } catch (error) {
+        console.error(error);
+        if (error instanceof FirebaseError) {
+          setLoginErrorMsg(error.message);
+        }
+        setIsSubmitting(false);
+      }
+    },
+    [isRegister, navigate],
+  );
+
+  const onSubmit = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      handleSubmit(onValid)(e);
+    },
+    [handleSubmit, onValid],
+  );
+
+  const loginWithGoogle = useCallback(() => {
+    loginWith('google');
+  }, []);
+
+  const loginWithFacebook = useCallback(() => {
+    loginWith('facebook');
+  }, []);
+
   if (loading) {
     return <p>Now loading...</p>;
   }
@@ -54,38 +95,16 @@ export const Login = () => {
     return <Navigate replace to="/mypage" />;
   }
 
-  const isRegister = isLoginState(location.state) && location.state.isRegister;
   const actionText = isRegister ? 'sign up' : 'rogin';
 
   const visiblePwd = watch('visiblePwd', false);
-
-  const onValid: SubmitHandler<Inputs> = async data => {
-    setIsSubmitting(true);
-    try {
-      if (isRegister) {
-        // 新規登録
-        await signupWithEmail(data.mail, data.password);
-        navigate('/sendverify');
-      } else {
-        // ログイン
-        await loginWithEmail(data.mail, data.password);
-        navigate('/mypage');
-      }
-    } catch (error) {
-      console.error(error);
-      if (error instanceof FirebaseError) {
-        setLoginErrorMsg(error.message);
-      }
-      setIsSubmitting(false);
-    }
-  };
 
   const reqMessage = 'このフィールドは入力必須です。';
 
   return (
     <form
       className="mx-auto flex flex-col items-center gap-8"
-      onSubmit={e => void handleSubmit(onValid)(e)}>
+      onSubmit={onSubmit}>
       <div className="flex w-full max-w-xs flex-col gap-4">
         <Textbox
           autoComplete="username"
@@ -152,14 +171,14 @@ export const Login = () => {
       <div className="flex gap-4">
         <Button
           className="w-fit bg-white text-black"
-          onClick={() => void loginWith('google')}
+          onClick={loginWithGoogle}
           startDecorator={<FcGoogle />}>
           Continue with Google
         </Button>
         {/* 法人化が必要そうなので非表示 */}
         <Button
           className="hidden w-fit bg-white text-black"
-          onClick={() => void loginWith('facebook')}
+          onClick={loginWithFacebook}
           startDecorator={<FaFacebook color="#1877F2" />}>
           Continue with Facebook
         </Button>

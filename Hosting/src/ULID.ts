@@ -1,10 +1,8 @@
 import { ulid, decodeTime } from 'ulidx';
 
-export function getUlid() {
-  return ulid();
-}
+export const getUlid = () => ulid();
 
-export function toDate(ulid: string) {
+export const toDate = (ulid: string) => {
   const unixTime = decodeTime(ulid);
   return new Date(unixTime);
-}
+};
