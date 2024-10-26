@@ -13,14 +13,19 @@ class LinkText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        text: text,
-        style: const TextStyle(
-          color: Colors.blue,
-          decoration: TextDecoration.underline,
+    return Expanded(
+      child: RichText(
+        overflow: TextOverflow.fade,
+        maxLines: 1,
+        softWrap: false,
+        text: TextSpan(
+          text: text,
+          style: const TextStyle(
+            color: Colors.blue,
+            decoration: TextDecoration.underline,
+          ),
+          recognizer: TapGestureRecognizer()..onTap = onTap,
         ),
-        recognizer: TapGestureRecognizer()..onTap = onTap,
       ),
     );
   }
