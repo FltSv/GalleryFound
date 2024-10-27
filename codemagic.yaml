@@ -103,6 +103,7 @@ workflows:
       - name: Install pods
         working_directory: mobile/ios
         script: |
+          pod repo update
           find . -name "Podfile" -execdir pod install \;
       - name: Flutter build ipa
         working_directory: mobile
