@@ -7,6 +7,7 @@ class Creator {
     required this.name,
     required this.profile,
     required this.links,
+    required this.highlightProduct,
     required this.products,
     required this.exhibits,
   }) {
@@ -28,6 +29,9 @@ class Creator {
 
   /// SNSリンク
   final List<String> links;
+
+  /// 代表作品
+  final Product? highlightProduct;
 
   /// 作品一覧
   final List<Product> products;

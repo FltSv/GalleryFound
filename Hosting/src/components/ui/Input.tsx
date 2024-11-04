@@ -1,6 +1,13 @@
 /* eslint react/display-name: 0 */
-import { FC, forwardRef } from 'react';
-import { FieldError } from 'react-hook-form';
+import { ChangeEvent, FC, forwardRef, useCallback } from 'react';
+import {
+  Control,
+  Controller,
+  ControllerRenderProps,
+  FieldError,
+  FieldPath,
+  FieldValues,
+} from 'react-hook-form';
 import {
   Button as MuiJoyButton,
   ButtonProps,
@@ -8,6 +15,8 @@ import {
   InputProps,
   FormControl,
   styled,
+  Switch as MuiJoySwitch,
+  SwitchProps as MuiJoySwitchProps,
 } from '@mui/joy';
 import { FaCloudUploadAlt } from 'react-icons/fa';
 
@@ -103,3 +112,40 @@ export const FileInput = forwardRef<HTMLInputElement, FileInputProps>(
     </Button>
   ),
 );
+
+interface SwitchProps<TFieldValues extends FieldValues>
+  extends MuiJoySwitchProps {
+  control: Control<TFieldValues>;
+  name: FieldPath<TFieldValues>;
+}
+
+export const Switch = <TFieldValues extends FieldValues>(
+  props: SwitchProps<TFieldValues>,
+) => {
+  const { name, control, ...switchProps } = props;
+
+  const render = useCallback(
+    <TFieldValues extends FieldValues, TName extends FieldPath<TFieldValues>>({
+      field,
+    }: {
+      field: ControllerRenderProps<TFieldValues, TName>;
+    }) => {
+      const handleChange =
+        (field: ControllerRenderProps<TFieldValues, TName>) =>
+        (event: ChangeEvent<HTMLInputElement>) =>
+          field.onChange(event.target.checked);
+      const onChange = handleChange(field);
+
+      return (
+        <MuiJoySwitch
+          checked={field.value}
+          onChange={onChange}
+          {...switchProps}
+        />
+      );
+    },
+    [switchProps],
+  );
+
+  return <Controller control={control} name={name} render={render} />;
+};

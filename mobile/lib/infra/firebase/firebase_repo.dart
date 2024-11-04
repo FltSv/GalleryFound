@@ -21,22 +21,32 @@ class FirebaseRepo implements DataRepoBase {
 
       final exhibits = (docSnap.get("exhibits") as List<dynamic>)
           .cast<Map<String, dynamic>>();
-      final products = (docSnap.get("products") as List<dynamic>)
+
+      final productMaps = (docSnap.get("products") as List<dynamic>)
           .cast<Map<String, dynamic>>();
+      final products = productMaps
+          .map((product) => Product(
+                id: product["id"],
+                title: product["title"] ?? "",
+                detail: product["detail"] ?? "",
+                image: product["image"],
+              ))
+          .toList();
+
+      final highlightProduct = products.isNotEmpty
+          ? products.firstWhere(
+              (product) => product.id == data["highlightProductId"],
+              orElse: () => products.first,
+            )
+          : null;
 
       return Creator(
         id: docSnap.id,
         name: data["name"],
         profile: data["profile"] ?? "",
         links: ((data["links"] ?? []) as List<dynamic>).cast<String>(),
-        products: products
-            .map((product) => Product(
-                  id: product["id"],
-                  title: product["title"] ?? "",
-                  detail: product["detail"] ?? "",
-                  image: product["image"],
-                ))
-            .toList(),
+        highlightProduct: highlightProduct,
+        products: products,
         exhibits: exhibits
             .map((exhibit) => Exhibit(
                   id: exhibit["id"],

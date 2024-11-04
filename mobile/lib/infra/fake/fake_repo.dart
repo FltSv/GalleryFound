@@ -13,6 +13,13 @@ class FakeRepo implements DataRepoBase {
         name: "suna",
         profile: "すなプロフィール",
         links: ["https://mstdn.jp/@fltsv", "https://mstdn.jp/@himarori"],
+        highlightProduct: Product(
+          id: "10043286-3072-49b8-a04a-83b9b1f790f5",
+          title: "ねこ",
+          detail: "ねこ説明",
+          image:
+              "9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f",
+        ),
         products: [
           Product(
             id: "10043286-3072-49b8-a04a-83b9b1f790f5",
@@ -61,6 +68,13 @@ class FakeRepo implements DataRepoBase {
           "https://x.com/utsukikuroko",
           "https://misskey.m544.net/@choco"
         ],
+        highlightProduct: Product(
+          id: "43a0e71b-9761-4800-9e88-1a57a3a4ed53",
+          title: "",
+          detail: "",
+          image:
+              "46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.png?alt=media&token=f2f8f802-c85b-464e-8de8-8a29468c74c8",
+        ),
         products: [
           Product(
             id: "43a0e71b-9761-4800-9e88-1a57a3a4ed53",
