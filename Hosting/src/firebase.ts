@@ -89,6 +89,7 @@ export interface Creator {
   name?: string;
   profile?: string;
   links?: string[];
+  highlightProductId?: string;
   products?: Product[];
   exhibits?: Exhibit[];
 }

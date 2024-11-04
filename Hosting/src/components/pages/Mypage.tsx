@@ -27,7 +27,13 @@ import { Autocomplete, AutocompleteRenderInputParams } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { RiDraggable } from 'react-icons/ri';
 import { useAuthContext } from 'components/AuthContext';
-import { Button, FileInput, SubmitButton, Textbox } from 'components/ui/Input';
+import {
+  Button,
+  FileInput,
+  Switch,
+  SubmitButton,
+  Textbox,
+} from 'components/ui/Input';
 import { Popup } from 'components/ui/Popup';
 import {
   getCreatorData,
@@ -147,6 +153,7 @@ export const Mypage = () => {
       const newProducts: Product[] = Array.from(files).map(file => ({
         id: getUlid(),
         title: '',
+        isHighlight: false,
         detail: '',
         tmpImageData: URL.createObjectURL(file),
         srcImage: '',
@@ -241,9 +248,17 @@ export const Mypage = () => {
       if (creator === undefined) return;
       if (editProduct === undefined) return;
 
-      const newProducts = creator.products.map(product =>
-        product.id === editProduct.id ? newValue : product,
-      );
+      // Productsの中でisHighlightがtrueの要素は1つのみにする処理
+      // editProductのisHighlightがtrueに変化した場合、他のisHighlightをfalseにする
+      const newProducts = creator.products.map(product => {
+        if (product.id === editProduct.id) {
+          return newValue;
+        }
+        if (newValue.isHighlight && product.isHighlight) {
+          return { ...product, isHighlight: false };
+        }
+        return product;
+      });
 
       setCreator({ ...creator, products: newProducts });
       setVisibleProductPopup(false);
@@ -482,8 +497,11 @@ const ProductCell = (props: ProductCellProps) => {
     onDelete(data);
   }, [data, onDelete]);
 
+  // 代表作品として設定されていれば、背景を黄色にする
+  const bgHighlight = data.isHighlight ? 'bg-yellow-100' : '';
+
   return (
-    <div className="relative min-w-fit">
+    <div className={`relative min-w-fit ${bgHighlight}`}>
       <div className="flex">
         <div className="max-w-min content-center" {...sortableProps}>
           <RiDraggable />
@@ -584,7 +602,7 @@ interface ProductPopupProps {
 
 const ProductPopup = (props: ProductPopupProps) => {
   const { visible, setVisible, product, onSubmit } = props;
-  const { register, handleSubmit, reset } = useForm({
+  const { control, register, handleSubmit, reset } = useForm({
     defaultValues: product,
   });
 
@@ -597,6 +615,7 @@ const ProductPopup = (props: ProductPopupProps) => {
       const submitData: Product = {
         ...product,
         title: data.title,
+        isHighlight: data.isHighlight,
         detail: data.detail,
       };
 
@@ -627,6 +646,13 @@ const ProductPopup = (props: ProductPopupProps) => {
           </div>
           <div className="flex basis-1/2 flex-col gap-2 md:w-max">
             <Textbox label="作品名" {...register('title')} />
+            <div>
+              <Switch
+                control={control}
+                name="isHighlight"
+                startDecorator={<p>これを代表作品として表示する</p>}
+              />
+            </div>
             <div>
               <p>詳細</p>
               <Textarea

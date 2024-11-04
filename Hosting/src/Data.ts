@@ -71,12 +71,14 @@ export const getCreatorData = async (user: User) => {
   const name = data.name ?? '';
   const profile = data.profile ?? '';
   const links = data.links ?? [];
+  const highlightProductId = data.highlightProductId ?? '';
 
   // 発表作品
   const fbProducts = data.products ?? [];
   const products = fbProducts.map(x => ({
     id: x.id,
     title: x.title ?? '',
+    isHighlight: x.id === highlightProductId,
     detail: x.detail ?? '',
     srcImage: x.image,
     imageUrl: creatorUrl + x.image,
@@ -128,6 +130,7 @@ export const setCreatorData = async (user: User, data: Creator) => {
     name: data.name,
     profile: data.profile,
     links: data.links,
+    highlightProductId: data.products.find(x => x.isHighlight)?.id,
     products: products.map(x => ({
       id: x.id,
       title: x.title,
@@ -353,6 +356,9 @@ export interface Product extends ImageStatus {
 
   /** 作品名 */
   title: string;
+
+  /** 代表作品か */
+  isHighlight: boolean;
 
   /** 作品説明、他 */
   detail: string;
