@@ -39,7 +39,7 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
               horizontal: 24,
             ),
             child: TextField(
-              decoration: const InputDecoration(hintText: '検索'),
+              decoration: const InputDecoration(hintText: '作家を検索'),
               onChanged: (String value) {
                 setState(() => searchText = value);
               },
