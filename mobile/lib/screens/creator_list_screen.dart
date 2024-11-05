@@ -136,7 +136,10 @@ class CreatorItem extends StatelessWidget {
               left: 10.0,
               child: Text(
                 creator.name,
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(color: Colors.white),
               ),
             ),
           ],
