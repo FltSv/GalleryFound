@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/exhibit.dart';
+import 'package:mobile/models/gallery.dart';
 import 'package:mobile/models/product.dart';
 import 'package:mobile/providers/config_provider.dart';
 import 'package:mobile/repos/data_repo_base.dart';
@@ -58,6 +59,22 @@ class FirebaseRepo implements DataRepoBase {
                   endDate: exhibit["endDate"].toDate(),
                 ))
             .toList(),
+      );
+    }).toList();
+  }
+
+  @override
+  Future<List<Gallery>> fetchGalleries() async {
+    final db = FirebaseFirestore.instance;
+    final querySnap = await db.collection("galleries").get();
+
+    return querySnap.docs.map((docSnap) {
+      final data = docSnap.data();
+
+      return Gallery(
+        id: docSnap.id,
+        name: data["name"],
+        location: data["location"],
       );
     }).toList();
   }

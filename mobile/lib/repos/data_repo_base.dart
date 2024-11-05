@@ -1,7 +1,10 @@
 import 'package:mobile/models/creator.dart';
+import 'package:mobile/models/gallery.dart';
 
 abstract class DataRepoBase {
   Future<List<Creator>> fetchCreators();
+
+  Future<List<Gallery>> fetchGalleries();
 
   /// 画像URLを取得する
   ///

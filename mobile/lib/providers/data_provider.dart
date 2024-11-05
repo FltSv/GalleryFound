@@ -2,6 +2,7 @@ import 'package:mobile/infra/factory.dart';
 import 'package:mobile/infra/fake/fake_repo.dart';
 import 'package:mobile/models/book.dart';
 import 'package:mobile/models/creator.dart';
+import 'package:mobile/models/gallery.dart';
 
 /// データの取得と保持を行う
 class DataProvider {
@@ -12,6 +13,9 @@ class DataProvider {
 
   late List<Creator> _creators;
   List<Creator> get creators => _creators;
+
+  late List<Gallery> _galleries;
+  List<Gallery> get galleries => _galleries;
 
   late List<Book> _books;
   List<Book> get books => _books;
@@ -26,6 +30,7 @@ class DataProvider {
 
     _getImageUrl = repo.getImageUrl;
     _creators = await repo.fetchCreators();
+    _galleries = await repo.fetchGalleries();
     _books = await FakeRepo.fetchBooks();
   }
 }
