@@ -1,6 +1,7 @@
 import 'package:mobile/models/book.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/exhibit.dart';
+import 'package:mobile/models/gallery.dart';
 import 'package:mobile/models/product.dart';
 import 'package:mobile/repos/data_repo_base.dart';
 
@@ -149,6 +150,16 @@ class FakeRepo implements DataRepoBase {
             'https://mstdn.jp/@NightCat',
             'https://mstdn.jp/@himarori'
           ])
+    ]);
+  }
+
+  @override
+  Future<List<Gallery>> fetchGalleries() {
+    return Future.value([
+      Gallery(
+          id: "nkRObVdYriU5AolyNxJy5pIDKEs3",
+          name: "皇居",
+          location: "東京都千代田区千代田1-1"),
     ]);
   }
 }

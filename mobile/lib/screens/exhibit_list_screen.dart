@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
-import 'package:mobile/models/creator.dart';
 import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/exhibit_detail_screen.dart';
@@ -16,7 +15,8 @@ class ExhibitListScreen extends StatefulWidget {
 }
 
 class _ExhibitListScreenState extends State<ExhibitListScreen> {
-  final List<Creator> creators = DataProvider().creators;
+  final creators = DataProvider().creators;
+  final galleries = DataProvider().galleries;
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +33,16 @@ class _ExhibitListScreenState extends State<ExhibitListScreen> {
 
   List<Widget> _getResults() {
     final results = creators
-        .map((creator) =>
-            creator.exhibits.map((exhibit) => ExhibitItem(exhibit: exhibit)))
+        .map((creator) => creator.exhibits.map((exhibit) {
+              final gallery = galleries
+                  .firstWhere((gallery) => gallery.id == exhibit.galleryId);
+              final galleryAddress = gallery.location;
+
+              return ExhibitItem(
+                exhibit: exhibit,
+                galleryAddress: galleryAddress,
+              );
+            }))
         .expand((element) => element)
         .where((item) => item.exhibit.endDate.isAfter(DateTime.now()))
         .map<Widget>((item) => GestureDetector(
