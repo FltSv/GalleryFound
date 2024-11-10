@@ -10,7 +10,8 @@
     "ms-vscode.live-server",
     "Gruntfuggly.todo-tree",
     "bradlc.vscode-tailwindcss",
-    "dart-code.flutter"
+    "dart-code.flutter",
+    "streetsidesoftware.code-spell-checker"
   ],
 
   // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
