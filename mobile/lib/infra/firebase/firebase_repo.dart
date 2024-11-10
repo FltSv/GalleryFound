@@ -44,6 +44,7 @@ class FirebaseRepo implements DataRepoBase {
       return Creator(
         id: docSnap.id,
         name: data["name"],
+        genre: data["genre"],
         profile: data["profile"] ?? "",
         links: ((data["links"] ?? []) as List<dynamic>).cast<String>(),
         highlightProduct: highlightProduct,

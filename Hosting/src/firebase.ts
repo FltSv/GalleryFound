@@ -44,6 +44,7 @@ export const getConfig = async (): Promise<Config> => {
     debugUserIds: JSON.parse(
       getValue(mut_config, 'debug_user_ids').asString(),
     ) as string[],
+    genres: JSON.parse(getValue(mut_config, 'genres').asString()) as string[],
   };
 };
 
@@ -87,6 +88,7 @@ export const fbGalleryConverter: FirestoreDataConverter<Gallery> = {
 /** firestore Creator */
 export interface Creator {
   name?: string;
+  genre?: string;
   profile?: string;
   links?: string[];
   highlightProductId?: string;
@@ -123,4 +125,5 @@ export interface Gallery {
 /** Remote Config */
 interface Config {
   debugUserIds: string[];
+  genres: string[];
 }

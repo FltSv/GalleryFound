@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:mobile/models/creator.dart';
+import 'package:mobile/providers/config_provider.dart';
 import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/screens/creator_detail_screen.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -13,16 +15,23 @@ class CreatorListScreen extends StatefulWidget {
 
 class _CreatorListScreenState extends State<CreatorListScreen> {
   final List<Creator> creators = DataProvider().creators;
+  final List<String> genres = ConfigProvider().config.genres;
 
   String searchText = '';
+  String? selectedGenre;
+
   List<Creator> get results {
-    if (searchText.isEmpty) {
+    if (selectedGenre == null && searchText.isEmpty) {
       return creators;
     }
 
-    return creators
-        .where((creator) => creator.name.contains(searchText))
-        .toList();
+    return creators.where((creator) {
+      final matchesGenre =
+          selectedGenre == null || creator.genre == selectedGenre;
+      final matchesSearch =
+          searchText.isEmpty || creator.name.contains(searchText);
+      return matchesGenre && matchesSearch;
+    }).toList();
   }
 
   @override
@@ -34,10 +43,27 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 12,
-              horizontal: 24,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Wrap(
+                spacing: 8.0,
+                children: genres
+                    .map((genre) => ChoiceChip(
+                          label: Text(genre),
+                          selected: genre == selectedGenre,
+                          onSelected: (selected) {
+                            setState(() {
+                              selectedGenre = selected ? genre : null;
+                            });
+                          },
+                        ))
+                    .toList(),
+              ),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: TextField(
               decoration: const InputDecoration(hintText: '作家を検索'),
               onChanged: (String value) {
@@ -45,6 +71,7 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
               },
             ),
           ),
+          Gap(8),
           Expanded(
             child: MasonryGridView.builder(
               gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(

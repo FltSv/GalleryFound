@@ -55,6 +55,7 @@ export const getCreatorData = async (user: User) => {
     // 存在しない場合、情報は空のままで登録を促す
     const empty: Creator = {
       name: '',
+      genre: '',
       profile: '',
       links: [],
       products: [],
@@ -69,6 +70,7 @@ export const getCreatorData = async (user: User) => {
   console.debug('docSnap.data:', data);
 
   const name = data.name ?? '';
+  const genre = data.genre ?? '';
   const profile = data.profile ?? '';
   const links = data.links ?? [];
   const highlightProductId = data.highlightProductId ?? '';
@@ -102,6 +104,7 @@ export const getCreatorData = async (user: User) => {
 
   const creator: Creator = {
     name: name,
+    genre: genre,
     profile: profile,
     links: links,
     products: products,
@@ -128,6 +131,7 @@ export const setCreatorData = async (user: User, data: Creator) => {
   );
   await setDoc(docRef, {
     name: data.name,
+    genre: data.genre,
     profile: data.profile,
     links: data.links,
     highlightProductId: data.products.find(x => x.isHighlight)?.id,
@@ -336,6 +340,9 @@ export const getDatePeriodString = (start: Date, end: Date) => {
 export interface Creator {
   /** 表示名 */
   name: string;
+
+  /** ジャンル */
+  genre: string;
 
   /** プロフィール */
   profile: string;

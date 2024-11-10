@@ -48,6 +48,7 @@ import {
 } from 'src/Data';
 import { getUlid } from 'src/ULID';
 import { DraggableList, SortableProps } from 'components/ui/DraggableList';
+import { getConfig } from 'src/firebase';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -60,6 +61,7 @@ export const Mypage = () => {
   const [visibleExhibitPopup, setVisibleExhibitPopup] = useState(false);
   const [editExhibit, setEditExhibit] = useState<Exhibit>();
   const [editProduct, setEditProduct] = useState<Product>();
+  const [genres, setGenres] = useState<string[]>([]);
 
   useEffect(() => {
     if (user === null) {
@@ -70,6 +72,9 @@ export const Mypage = () => {
       // データの取得
       const creator = await getCreatorData(user);
       setCreator(creator);
+
+      const genres = (await getConfig()).genres;
+      setGenres(genres);
 
       setLoading(false);
     })().catch((e: unknown) => {
@@ -341,6 +346,23 @@ export const Mypage = () => {
           label="表示作家名"
           {...register('name', { required: '1文字以上の入力が必要です。' })}
         />
+
+        <div>
+          <p>作品ジャンル</p>
+          <select
+            className="
+              my-1 block w-fit rounded-md 
+              border border-black bg-transparent px-2 py-2 
+              focus:border-2 focus:border-blue-600 focus:outline-none"
+            defaultValue={creator?.genre}
+            {...register('genre')}>
+            {genres.map(genre => (
+              <option key={genre} value={genre}>
+                {genre}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div>
           <p>プロフィール</p>
