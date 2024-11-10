@@ -5,6 +5,7 @@ class Creator {
   Creator({
     required this.id,
     required this.name,
+    required this.genre,
     required this.profile,
     required this.links,
     required this.highlightProduct,
@@ -23,6 +24,9 @@ class Creator {
 
   /// 作家名
   final String name;
+
+  /// ジャンル
+  final String? genre;
 
   /// プロフィール
   final String profile;
