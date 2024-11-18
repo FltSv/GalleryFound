@@ -13,7 +13,8 @@ class LinkText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return Flexible(
+      fit: FlexFit.loose,
       child: RichText(
         overflow: TextOverflow.fade,
         maxLines: 1,
