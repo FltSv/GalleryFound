@@ -3,6 +3,8 @@ on:
   pull_request:
     branches-ignore:
       - "master"
+    paths:
+      - "Hosting/**"
 
 defaults:
   run:
@@ -69,6 +71,7 @@ jobs:
           reporter: github-pr-review
           workdir: Hosting
           eslint_flags: "src/**/*.{js,jsx,ts,tsx}"
+          reviewdog_flags: -fail-level=error # エラーは指摘するが、警告は指摘しない
           fail_on_error: true # 指摘が発生したらjobを失敗扱いにする
 
   deploy:

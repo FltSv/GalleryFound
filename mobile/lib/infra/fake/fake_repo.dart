@@ -1,6 +1,7 @@
 import 'package:mobile/models/book.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/exhibit.dart';
+import 'package:mobile/models/gallery.dart';
 import 'package:mobile/models/product.dart';
 import 'package:mobile/repos/data_repo_base.dart';
 
@@ -11,8 +12,16 @@ class FakeRepo implements DataRepoBase {
       Creator(
         id: "nkRObVdYriU5AolyNxJy5pIDKEs2",
         name: "suna",
+        genre: "デジタル",
         profile: "すなプロフィール",
         links: ["https://mstdn.jp/@fltsv", "https://mstdn.jp/@himarori"],
+        highlightProduct: Product(
+          id: "10043286-3072-49b8-a04a-83b9b1f790f5",
+          title: "ねこ",
+          detail: "ねこ説明",
+          image:
+              "9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f",
+        ),
         products: [
           Product(
             id: "10043286-3072-49b8-a04a-83b9b1f790f5",
@@ -55,12 +64,20 @@ class FakeRepo implements DataRepoBase {
       Creator(
         id: "cWp162TEn9MrXVUqifEmRJ22nyx1",
         name: "ノゾミ",
+        genre: null,
         profile: "ふぁぴ\n\n\n\nhttps://lit.link/choco78",
         links: [
           "https://x.com/mi_oilacrylart",
           "https://x.com/utsukikuroko",
           "https://misskey.m544.net/@choco"
         ],
+        highlightProduct: Product(
+          id: "43a0e71b-9761-4800-9e88-1a57a3a4ed53",
+          title: "",
+          detail: "",
+          image:
+              "46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.png?alt=media&token=f2f8f802-c85b-464e-8de8-8a29468c74c8",
+        ),
         products: [
           Product(
             id: "43a0e71b-9761-4800-9e88-1a57a3a4ed53",
@@ -135,6 +152,16 @@ class FakeRepo implements DataRepoBase {
             'https://mstdn.jp/@NightCat',
             'https://mstdn.jp/@himarori'
           ])
+    ]);
+  }
+
+  @override
+  Future<List<Gallery>> fetchGalleries() {
+    return Future.value([
+      Gallery(
+          id: "nkRObVdYriU5AolyNxJy5pIDKEs3",
+          name: "皇居",
+          location: "東京都千代田区千代田1-1"),
     ]);
   }
 }

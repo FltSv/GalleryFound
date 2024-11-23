@@ -51,10 +51,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBItEROQfbYVNucKvZxjAxZS3BO4thnmyU',
-    appId: '1:985501114281:ios:9be2fae25d13dba2826eb8',
+    appId: '1:985501114281:ios:b802d389dea42d4b826eb8',
     messagingSenderId: '985501114281',
     projectId: 'gallery-found',
     storageBucket: 'gallery-found.appspot.com',
     iosBundleId: 'jp.galleryfound',
+    iosClientId:
+        '985501114281-dfjl22ipnsk8a6iu11pds5f6ob2ue7ht.apps.googleusercontent.com',
   );
 }

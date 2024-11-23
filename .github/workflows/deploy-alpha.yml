@@ -6,6 +6,9 @@ on:
   push:
     branches:
       - develop
+    paths:
+      - "Hosting/**"
+
 jobs:
   build_and_deploy:
     environment: production

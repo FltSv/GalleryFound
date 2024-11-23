@@ -1,0 +1,121 @@
+scripts:
+  - &get_flutter_packages
+    name: Get Flutter packages
+    working_directory: mobile
+    script: |
+      flutter packages pub get
+
+definitions:
+  workflow_trigger: &workflow_trigger
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+        - pattern: master
+        - pattern: develop
+    when:
+      changeset:
+        includes:
+          - "mobile/"
+
+  env_versions: &env_versions
+    flutter: stable
+    xcode: latest
+    cocoapods: default
+
+  cache: &cache
+    cache_paths:
+      - $FLUTTER_ROOT/.pub-cache
+      - $HOME/.gradle/caches
+      - $HOME/Library/Caches/CocoaPods
+
+  publishing_email: &publishing_email
+    email:
+      recipients:
+        - support@gallery-found.jp
+      notify:
+        success: false
+        failure: true
+
+workflows:
+  android-workflow:
+    name: Android Workflow
+    <<: *workflow_trigger
+    instance_type: mac_mini_m1
+    max_build_duration: 20
+    environment:
+      <<: *env_versions
+      android_signing:
+        - keystore_reference
+      groups:
+        - google_credentials
+      vars:
+        GOOGLE_PLAY_TRACK: internal
+    cache:
+      <<: *cache
+    scripts:
+      - name: Set up local.properties
+        working_directory: mobile
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/mobile/android/local.properties"
+      - *get_flutter_packages
+      - name: Build AAB with Flutter
+        working_directory: mobile
+        script: |
+          flutter build appbundle --release \
+            --build-number=$PROJECT_BUILD_NUMBER \
+    artifacts:
+      - mobile/build/**/outputs/**/*.aab
+      - mobile/build/**/outputs/**/mapping.txt
+      - mobile/flutter_drive.log
+    publishing:
+      <<: *publishing_email
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: $GOOGLE_PLAY_TRACK
+        submit_as_draft: true
+
+  ios-workflow:
+    name: iOS Workflow
+    <<: *workflow_trigger
+    instance_type: mac_mini_m1
+    max_build_duration: 20
+    integrations:
+      app_store_connect: GalleryFound Codemagic
+    environment:
+      <<: *env_versions
+      ios_signing:
+        certificates:
+          - galleryfound_certificate
+        provisioning_profiles:
+          - galleryfound_profile
+      groups:
+        - appstore_credentials
+    cache:
+      <<: *cache
+    scripts:
+      - name: Set up code signing settings on Xcode project
+        working_directory: mobile/ios
+        script: |
+          xcode-project use-profiles
+      - *get_flutter_packages
+      - name: Install pods
+        working_directory: mobile/ios
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Flutter build ipa
+        working_directory: mobile
+        script: |
+          flutter build ipa --release \
+            --build-number=$PROJECT_BUILD_NUMBER \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - mobile/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - mobile/flutter_drive.log
+    publishing:
+      <<: *publishing_email
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true

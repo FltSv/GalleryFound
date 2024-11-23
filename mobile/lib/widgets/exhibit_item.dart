@@ -7,9 +7,11 @@ class ExhibitItem extends StatelessWidget {
   const ExhibitItem({
     super.key,
     required this.exhibit,
+    this.galleryAddress,
   });
 
   final Exhibit exhibit;
+  final String? galleryAddress;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,15 @@ class ExhibitItem extends StatelessWidget {
                 ),
                 const Gap(0),
                 Text(exhibit.location),
-                Text(exhibit.displayDate),
+                if (galleryAddress != null)
+                  Text(
+                    galleryAddress!,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                Text(
+                  exhibit.displayDate,
+                  style: theme.textTheme.bodySmall,
+                ),
               ].intersperse(const Gap(4)).toList(),
             ),
           ),

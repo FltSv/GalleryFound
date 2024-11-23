@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FormEvent, useCallback, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useNavigate, useLocation, Navigate, Link } from 'react-router-dom';
 import { Divider, Checkbox } from '@mui/joy';
@@ -20,7 +20,7 @@ interface LoginState {
   isRegister: boolean;
 }
 
-function isLoginState(value: unknown): value is LoginState {
+const isLoginState = (value: unknown): value is LoginState => {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
@@ -29,11 +29,11 @@ function isLoginState(value: unknown): value is LoginState {
     isRegister: false,
   };
   return typeof record.isRegister === typeof loginState.isRegister;
-}
+};
 
 export const Login = () => {
   const { user, loading } = useAuthContext();
-  const [loginErrorMsg, setLoginErrorMsg] = useState<string>();
+  const [loginErrorMsg, setLoginErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -45,51 +45,70 @@ export const Login = () => {
     formState: { errors },
   } = useForm<Inputs>();
 
+  const isRegister = isLoginState(location.state) && location.state.isRegister;
+
+  const onValid: SubmitHandler<Inputs> = useCallback(
+    async data => {
+      setIsSubmitting(true);
+      try {
+        if (isRegister) {
+          // 新規登録
+          await signupWithEmail(data.mail, data.password);
+          navigate('/sendverify');
+        } else {
+          // ログイン
+          await loginWithEmail(data.mail, data.password);
+          navigate('/mypage');
+        }
+      } catch (error) {
+        console.error(error);
+        if (error instanceof FirebaseError) {
+          setLoginErrorMsg(error.message);
+        }
+        setIsSubmitting(false);
+      }
+    },
+    [isRegister, navigate],
+  );
+
+  const onSubmit = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      handleSubmit(onValid)(e);
+    },
+    [handleSubmit, onValid],
+  );
+
+  const loginWithGoogle = useCallback(() => {
+    loginWith('google');
+  }, []);
+
+  const loginWithFacebook = useCallback(() => {
+    loginWith('facebook');
+  }, []);
+
   if (loading) {
     return <p>Now loading...</p>;
   }
 
-  // 既にログインしている場合、mypageに移動
-  if (user?.emailVerified) {
-    return <Navigate replace to={'/mypage'} />;
+  // 既にログインした上でメール認証済の場合、mypageに移動
+  if (user?.emailVerified ?? false) {
+    return <Navigate replace to="/mypage" />;
   }
 
-  const isRegister = isLoginState(location.state) && location.state.isRegister;
   const actionText = isRegister ? 'sign up' : 'rogin';
 
   const visiblePwd = watch('visiblePwd', false);
-
-  const onValid: SubmitHandler<Inputs> = async data => {
-    setIsSubmitting(true);
-    try {
-      if (isRegister) {
-        // 新規登録
-        await signupWithEmail(data.mail, data.password);
-        navigate('/sendverify');
-      } else {
-        // ログイン
-        await loginWithEmail(data.mail, data.password);
-        navigate('/mypage');
-      }
-    } catch (error) {
-      console.error(error);
-      if (error instanceof FirebaseError) {
-        setLoginErrorMsg(error.message);
-      }
-      setIsSubmitting(false);
-    }
-  };
 
   const reqMessage = 'このフィールドは入力必須です。';
 
   return (
     <form
       className="mx-auto flex flex-col items-center gap-8"
-      onSubmit={e => void handleSubmit(onValid)(e)}>
+      onSubmit={onSubmit}>
       <div className="flex w-full max-w-xs flex-col gap-4">
         <Textbox
-          className="rounded-full"
           autoComplete="username"
+          className="rounded-full"
           label="メールアドレス"
           {...register('mail', {
             required: reqMessage,
@@ -101,10 +120,10 @@ export const Login = () => {
           fieldError={errors.mail}
         />
         <Textbox
-          type={visiblePwd ? 'text' : 'password'}
-          className="rounded-full"
           autoComplete="current-password"
+          className="rounded-full"
           label="パスワード"
+          type={visiblePwd ? 'text' : 'password'}
           {...register('password', {
             required: reqMessage,
             minLength: { value: 6, message: '6文字以上で入力してください。' },
@@ -113,10 +132,10 @@ export const Login = () => {
         />
         {isRegister && (
           <Textbox
-            type={visiblePwd ? 'text' : 'password'}
-            className="rounded-full"
             autoComplete="new-password"
+            className="rounded-full"
             label="パスワード（確認）"
+            type={visiblePwd ? 'text' : 'password'}
             {...register('passCheck', {
               required: reqMessage,
               validate: value =>
@@ -126,9 +145,9 @@ export const Login = () => {
           />
         )}
         <Checkbox
+          color="neutral"
           label="パスワードを表示する"
           variant="outlined"
-          color="neutral"
           {...register('visiblePwd')}
           sx={{
             '& span, span:hover': {
@@ -142,23 +161,25 @@ export const Login = () => {
           loading={isSubmitting}>
           {actionText}
         </SubmitButton>
-        {loginErrorMsg && <p className="text-red-600">{loginErrorMsg}</p>}
+        {loginErrorMsg.length > 0 && (
+          <p className="text-red-600">{loginErrorMsg}</p>
+        )}
       </div>
 
       {/* ソーシャルログイン */}
       <Divider className="text-base">or</Divider>
       <div className="flex gap-4">
         <Button
-          startDecorator={<FcGoogle />}
           className="w-fit bg-white text-black"
-          onClick={() => void loginWith('google')}>
+          onClick={loginWithGoogle}
+          startDecorator={<FcGoogle />}>
           Continue with Google
         </Button>
         {/* 法人化が必要そうなので非表示 */}
         <Button
-          startDecorator={<FaFacebook color="#1877F2" />}
           className="hidden w-fit bg-white text-black"
-          onClick={() => void loginWith('facebook')}>
+          onClick={loginWithFacebook}
+          startDecorator={<FaFacebook color="#1877F2" />}>
           Continue with Facebook
         </Button>
       </div>
@@ -168,9 +189,9 @@ export const Login = () => {
         <p>
           新規登録は
           <Link
-            to="/login"
             className="text-blue-800 underline"
-            state={{ isRegister: true } as LoginState}>
+            state={{ isRegister: true } as LoginState}
+            to="/login">
             こちら
           </Link>
         </p>

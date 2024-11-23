@@ -1,8 +1,13 @@
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
+import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
+import Dotenv from 'dotenv-webpack';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /** @type import('webpack').Configuration */
-module.exports = {
+export default {
   entry: './src/index.js', // 変換元のエントリーポイントファイルを指定します。
   module: {
     rules: [

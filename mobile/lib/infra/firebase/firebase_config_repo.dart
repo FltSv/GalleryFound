@@ -14,6 +14,7 @@ class FirebaseConfigRepo implements ConfigRepoBase {
       mapUrl: config.getString("map_url"),
       debugUserIds: _getJsonAsList<String>(config, "debug_user_ids"),
       requiredAppVersion: config.getString("required_app_version"),
+      genres: _getJsonAsList(config, "genres"),
     );
   }
 

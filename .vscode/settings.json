@@ -6,7 +6,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
   // eslint
-  "eslint.experimental.useFlatConfig": true,
+  "eslint.useFlatConfig": true,
   "eslint.workingDirectories": ["./Hosting"],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
@@ -15,5 +15,14 @@
   // TailwindCSS
   "files.associations": {
     "*.css": "tailwindcss"
-  }
+  },
+  "yaml.schemaStore.enable": false,
+
+  // スペルチェック除外リスト
+  "cSpell.words": ["appcheck", "firestore", "Mypage"],
+  "cSpell.ignoreRegExpList": [
+    "\\..*", // プロパティ名などを無視
+    "/.*", // パス名などを無視
+    "key.*" // APIKeyなど、keyをSuffixとした変数以降の値を無視
+  ]
 }

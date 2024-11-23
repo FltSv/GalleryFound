@@ -1,5 +1,21 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useForm, SubmitHandler, Controller } from 'react-hook-form';
+import {
+  ChangeEvent,
+  Dispatch,
+  FormEvent,
+  KeyboardEvent,
+  MouseEventHandler,
+  SetStateAction,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+import {
+  useForm,
+  SubmitHandler,
+  Controller,
+  ControllerRenderProps,
+} from 'react-hook-form';
 import {
   Button as MuiJoyButton,
   IconButton,
@@ -7,11 +23,17 @@ import {
   Input,
   Textarea,
 } from '@mui/joy';
-import { Autocomplete } from '@mui/material';
+import { Autocomplete, AutocompleteRenderInputParams } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { RiDraggable } from 'react-icons/ri';
 import { useAuthContext } from 'components/AuthContext';
-import { Button, FileInput, SubmitButton, Textbox } from 'components/ui/Input';
+import {
+  Button,
+  FileInput,
+  Switch,
+  SubmitButton,
+  Textbox,
+} from 'components/ui/Input';
 import { Popup } from 'components/ui/Popup';
 import {
   getCreatorData,
@@ -26,6 +48,7 @@ import {
 } from 'src/Data';
 import { getUlid } from 'src/ULID';
 import { DraggableList, SortableProps } from 'components/ui/DraggableList';
+import { getConfig } from 'src/firebase';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -38,6 +61,7 @@ export const Mypage = () => {
   const [visibleExhibitPopup, setVisibleExhibitPopup] = useState(false);
   const [editExhibit, setEditExhibit] = useState<Exhibit>();
   const [editProduct, setEditProduct] = useState<Product>();
+  const [genres, setGenres] = useState<string[]>([]);
 
   useEffect(() => {
     if (user === null) {
@@ -48,6 +72,9 @@ export const Mypage = () => {
       // データの取得
       const creator = await getCreatorData(user);
       setCreator(creator);
+
+      const genres = (await getConfig()).genres;
+      setGenres(genres);
 
       setLoading(false);
     })().catch((e: unknown) => {
@@ -61,10 +88,8 @@ export const Mypage = () => {
     formState: { errors },
   } = useForm<Creator>();
 
-  if (loading) {
-    //todo ローディングコンポーネントに置き換え
-    return <p>Now loading...</p>;
-  }
+  // - - - - - - - -
+  // SNSリンク関係の処理
 
   const isValidUrl = (url: string) => {
     if (!url) return true;
@@ -77,122 +102,332 @@ export const Mypage = () => {
     }
   };
 
-  const onAddLink = () => {
+  /** Linkが検証されていれば、Linkを追加 */
+  const onAddLink = useCallback(() => {
     if (creator === undefined) return;
     if (addLinkError) return;
 
     const links = [...creator.links, addLink];
     setCreator({ ...creator, links });
     setAddLink('');
-  };
+  }, [creator, addLink, addLinkError]);
 
-  const onValid: SubmitHandler<Creator> = async data => {
-    // 一時データの結合
-    data.links = creator?.links ?? [];
-    data.products = creator?.products ?? [];
-    data.exhibits = creator?.exhibits ?? [];
+  /** Linkの削除 */
+  const handleRemoveLink = useCallback(
+    (link: string) => () => {
+      if (creator === undefined) return;
 
-    if (user === null) {
-      return;
-    }
+      const links = creator.links.filter(x => x !== link);
+      setCreator({ ...creator, links });
+    },
+    [creator],
+  );
 
-    // ローディングの表示
-    setIsSubmitting(true);
+  /** Linkの入力値変更時に、入力値の更新と検証を行う */
+  const onChangeLinkInput = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    setAddLink(input);
+    setAddLinkError(!isValidUrl(input));
+  }, []);
 
-    // 情報の送信
-    console.debug('submit: ', data);
-    await setCreatorData(user, data);
+  const onKeyDownLinkInput = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        onAddLink();
+      }
+    },
+    [onAddLink],
+  );
 
-    // リロード
-    window.location.reload();
-  };
+  // - - - - - - - -
+  // 発表作品
+
+  /**
+   * 選択された各ファイルに対して `Product` オブジェクトを作成し、
+   * `creator.Products` を更新
+   */
+  const onChangeProductFileInput = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      if (creator === undefined) return;
+
+      const files = e.currentTarget.files;
+      if (files === null) return;
+      if (files.length === 0) return;
+
+      const newProducts: Product[] = Array.from(files).map(file => ({
+        id: getUlid(),
+        title: '',
+        isHighlight: false,
+        detail: '',
+        tmpImageData: URL.createObjectURL(file),
+        srcImage: '',
+        imageUrl: '',
+      }));
+
+      setCreator({
+        ...creator,
+        products: [...creator.products, ...newProducts],
+      });
+    },
+    [creator],
+  );
+
+  /**
+   * `DraggableList` で並び替え後のアイテムを設定するコールバック関数
+   */
+  const setDraggableProducts = useCallback(
+    (items: Product[]) => {
+      if (creator === undefined) return;
+
+      const newProducts = items
+        .map(item => creator.products.find(product => product.id === item.id))
+        .filter(x => x !== undefined);
+
+      setCreator({ ...creator, products: newProducts });
+    },
+    [creator],
+  );
+
+  /** 作品の削除 */
+  const onDeleteRenderProduct = useCallback(
+    (product: Product) => {
+      if (creator === undefined) return;
+
+      const newProducts = creator.products.filter(x => x.id !== product.id);
+      setCreator({ ...creator, products: newProducts });
+    },
+    [creator],
+  );
+
+  /** 作品の編集画面の表示 */
+  const onEditRenderProduct = useCallback((product: Product) => {
+    setEditProduct(product);
+    setVisibleProductPopup(true);
+  }, []);
+
+  const renderProductItem = useCallback(
+    (product: Product, props: SortableProps) => (
+      <ProductCell
+        data={product}
+        key={product.id}
+        onDelete={onDeleteRenderProduct}
+        onEdit={onEditRenderProduct}
+        sortableProps={props}
+      />
+    ),
+    [onDeleteRenderProduct, onEditRenderProduct],
+  );
+
+  // - - - - - - - -
+  // 展示
+
+  /** 展示追加 */
+  const onClickAddExhibit = useCallback(() => {
+    setEditExhibit(undefined);
+    setVisibleExhibitPopup(true);
+  }, []);
+
+  /** 展示削除 */
+  const onDeleteExhibit = useCallback(
+    (exhibit: Exhibit) => {
+      if (creator === undefined) return;
+
+      const newExhibits = creator.exhibits.filter(x => x.id !== exhibit.id);
+      setCreator({ ...creator, exhibits: newExhibits });
+    },
+    [creator],
+  );
+
+  /** 展示編集画面の表示 */
+  const onEditExhibit = useCallback((exhibit: Exhibit) => {
+    setEditExhibit(exhibit);
+    setVisibleExhibitPopup(true);
+  }, []);
+
+  // - - - - - - - -
+  // Popup関連
+
+  const onSubmitProductPopup = useCallback(
+    (newValue: Product) => {
+      if (creator === undefined) return;
+      if (editProduct === undefined) return;
+
+      // Productsの中でisHighlightがtrueの要素は1つのみにする処理
+      // editProductのisHighlightがtrueに変化した場合、他のisHighlightをfalseにする
+      const newProducts = creator.products.map(product => {
+        if (product.id === editProduct.id) {
+          return newValue;
+        }
+        if (newValue.isHighlight && product.isHighlight) {
+          return { ...product, isHighlight: false };
+        }
+        return product;
+      });
+
+      setCreator({ ...creator, products: newProducts });
+      setVisibleProductPopup(false);
+    },
+    [creator, editProduct],
+  );
+
+  const onSubmitExhibitPopup = useCallback(
+    (newValue: Exhibit) => {
+      if (creator === undefined) return;
+
+      if (editExhibit === undefined) {
+        // 追加
+        const newExhibits = [...creator.exhibits, newValue];
+        setCreator({ ...creator, exhibits: newExhibits });
+      } else {
+        // 編集
+        const newExhibits = creator.exhibits.map(exhibit =>
+          exhibit.id === editExhibit.id ? newValue : exhibit,
+        );
+        setCreator({ ...creator, exhibits: newExhibits });
+      }
+
+      setVisibleExhibitPopup(false);
+    },
+    [creator, editExhibit],
+  );
+
+  // - - - - - - - -
+  // フォーム全体の検証、送信
+
+  const onValid: SubmitHandler<Creator> = useCallback(
+    async data => {
+      if (user === null) return;
+      if (creator === undefined) return;
+
+      // 一時データの結合
+      const submitData = {
+        ...data,
+        links: creator.links,
+        products: creator.products,
+        exhibits: creator.exhibits,
+      };
+
+      // ローディングの表示
+      setIsSubmitting(true);
+
+      // 情報の送信
+      console.debug('submit: ', submitData);
+      await setCreatorData(user, submitData);
+
+      // リロード
+      window.location.reload();
+    },
+    [creator, user],
+  );
+
+  const onSubmit = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      handleSubmit(onValid)(e);
+    },
+    [handleSubmit, onValid],
+  );
+
+  if (loading) {
+    //todo ローディングコンポーネントに置き換え
+    return <p>Now loading...</p>;
+  }
 
   return (
     <>
       <form
         className="mx-auto flex w-full max-w-xl flex-col gap-4"
-        onSubmit={e => void handleSubmit(onValid)(e)}>
+        onSubmit={onSubmit}>
         <h2>My Page</h2>
         <Textbox
-          label="表示作家名"
-          defaultValue={creator?.name}
           className="w-1/2"
+          defaultValue={creator?.name}
           fieldError={errors.name}
+          label="表示作家名"
           {...register('name', { required: '1文字以上の入力が必要です。' })}
         />
+
+        <div>
+          <p>作品ジャンル</p>
+          <select
+            className="
+              my-1 block w-fit rounded-md 
+              border border-black bg-transparent px-2 py-2 
+              focus:border-2 focus:border-blue-600 focus:outline-none"
+            defaultValue={creator?.genre}
+            {...register('genre')}>
+            {genres.map(genre => (
+              <option key={genre} value={genre}>
+                {genre}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div>
           <p>プロフィール</p>
           <Textarea
             defaultValue={creator?.profile}
+            minRows={3}
             sx={{
               borderColor: 'black',
               marginY: '0.25rem',
               backgroundColor: 'transparent',
             }}
-            minRows={3}
             {...register('profile')}
           />
         </div>
 
         <div>
           <p>SNSリンク</p>
-          {creator?.links.map(link => (
-            <div key={link} className="flex items-center gap-2">
-              <img
-                className="h-4 w-4"
-                src={`http://www.google.com/s2/favicons?domain=${link}`}
-              />
-              <a
-                href={link}
-                className="text-blue-600 underline"
-                target="_blank"
-                rel="noreferrer">
-                {link}
-              </a>
-              <MuiJoyButton
-                size="sm"
-                variant="plain"
-                color="neutral"
-                onClick={() => {
-                  const links = creator.links.filter(x => x !== link);
-                  setCreator({ ...creator, links });
-                }}>
-                <FaTimes />
-                <label className="hidden md:inline md:pl-2">削除</label>
-              </MuiJoyButton>
-            </div>
-          ))}
+          {creator?.links.map(link => {
+            const removeLink = handleRemoveLink(link);
+
+            return (
+              <div className="flex items-center gap-2" key={link}>
+                <img
+                  className="h-4 w-4"
+                  src={`http://www.google.com/s2/favicons?domain=${link}`}
+                />
+                <a
+                  className="text-blue-600 underline"
+                  href={link}
+                  rel="noreferrer"
+                  target="_blank">
+                  {link}
+                </a>
+                <MuiJoyButton
+                  color="neutral"
+                  onClick={removeLink}
+                  size="sm"
+                  variant="plain">
+                  <FaTimes />
+                  <label className="hidden md:inline md:pl-2">削除</label>
+                </MuiJoyButton>
+              </div>
+            );
+          })}
           <Input
             color={addLinkError ? 'danger' : 'neutral'}
-            placeholder="https://..."
-            value={addLink}
-            onChange={e => {
-              const input = e.target.value;
-              setAddLink(input);
-              setAddLinkError(!isValidUrl(input));
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                onAddLink();
-              }
-            }}
             endDecorator={
               <MuiJoyButton
-                size="sm"
-                variant="plain"
                 color="neutral"
                 disabled={addLinkError}
-                onClick={onAddLink}>
+                onClick={onAddLink}
+                size="sm"
+                variant="plain">
                 <FaPlus />
                 <label className="hidden md:inline md:pl-2">追加</label>
               </MuiJoyButton>
             }
+            onChange={onChangeLinkInput}
+            onKeyDown={onKeyDownLinkInput}
+            placeholder="https://..."
             sx={{
               borderColor: 'black',
               backgroundColor: 'transparent',
             }}
+            value={addLink}
           />
         </div>
 
@@ -200,64 +435,18 @@ export const Mypage = () => {
           <div className="mb-2 flex gap-2">
             <p className="mt-auto w-full">発表作品</p>
             <FileInput
-              multiple
               accept="image/*"
               className="min-w-fit"
-              onChange={e => {
-                if (creator === undefined) return;
-
-                const files = e.currentTarget.files;
-                if (files === null) return;
-                if (files.length === 0) return;
-
-                for (const file of Array.from(files)) {
-                  const url = URL.createObjectURL(file);
-                  const product: Product = {
-                    id: getUlid(),
-                    title: '',
-                    detail: '',
-                    tmpImageData: url,
-                    srcImage: '',
-                    imageUrl: '',
-                  };
-                  creator.products.push(product);
-                }
-
-                setCreator({ ...creator, products: creator.products });
-              }}
+              multiple
+              onChange={onChangeProductFileInput}
             />
           </div>
 
           {creator && (
             <DraggableList
               items={creator.products}
-              setItems={items => {
-                const newProducts = items
-                  .map(item =>
-                    creator.products.find(product => product.id === item.id),
-                  )
-                  .filter(x => x !== undefined);
-
-                setCreator({ ...creator, products: newProducts });
-              }}
-              renderItem={(product, props) => (
-                <ProductCell
-                  key={product.id}
-                  data={product}
-                  onEdit={() => {
-                    setEditProduct(product);
-                    setVisibleProductPopup(true);
-                  }}
-                  onDelete={() => {
-                    const newProducts = creator.products.filter(
-                      x => x.id !== product.id,
-                    );
-
-                    setCreator({ ...creator, products: newProducts });
-                  }}
-                  sortableProps={props}
-                />
-              )}
+              renderItem={renderProductItem}
+              setItems={setDraggableProducts}
             />
           )}
         </div>
@@ -267,11 +456,8 @@ export const Mypage = () => {
             <p className="mt-auto w-full">展示登録</p>
             <Button
               className="min-w-fit rounded-md bg-white text-black"
-              startDecorator={<FaPlus />}
-              onClick={() => {
-                setEditExhibit(undefined);
-                setVisibleExhibitPopup(true);
-              }}>
+              onClick={onClickAddExhibit}
+              startDecorator={<FaPlus />}>
               展示追加
             </Button>
           </div>
@@ -279,19 +465,10 @@ export const Mypage = () => {
             <tbody>
               {creator?.exhibits.map(exhibit => (
                 <ExhibitRow
-                  key={exhibit.id}
                   data={exhibit}
-                  onEdit={() => {
-                    setEditExhibit(exhibit);
-                    setVisibleExhibitPopup(true);
-                  }}
-                  onDelete={() => {
-                    const newExhibits = creator.exhibits.filter(
-                      x => x.id !== exhibit.id,
-                    );
-
-                    setCreator({ ...creator, exhibits: newExhibits });
-                  }}
+                  key={exhibit.id}
+                  onDelete={onDeleteExhibit}
+                  onEdit={onEditExhibit}
                 />
               ))}
             </tbody>
@@ -300,8 +477,8 @@ export const Mypage = () => {
 
         <SubmitButton
           className="w-fit rounded-md border bg-white text-black"
-          startDecorator={<FaCheck />}
-          loading={isSubmitting}>
+          loading={isSubmitting}
+          startDecorator={<FaCheck />}>
           確定
         </SubmitButton>
       </form>
@@ -309,49 +486,16 @@ export const Mypage = () => {
       {/* 発表作品 */}
       {editProduct && (
         <ProductPopup
-          visible={visibleProductPopup}
-          setVisible={setVisibleProductPopup}
+          onSubmit={onSubmitProductPopup}
           product={editProduct}
-          onSubmit={newValue => {
-            if (creator === undefined) {
-              return;
-            }
-
-            const editIndex = creator.products.indexOf(editProduct);
-            if (editIndex !== -1) {
-              creator.products[editIndex] = newValue;
-            }
-
-            setCreator(creator);
-            setVisibleProductPopup(false);
-          }}
+          setVisible={setVisibleProductPopup}
+          visible={visibleProductPopup}
         />
       )}
 
       {/* 展示登録 */}
-      <Popup visible={visibleExhibitPopup} setVisible={setVisibleExhibitPopup}>
-        <ExhibitForm
-          exhibit={editExhibit}
-          onSubmit={newValue => {
-            if (creator === undefined) {
-              return;
-            }
-
-            if (editExhibit === undefined) {
-              // 追加
-              creator.exhibits.push(newValue);
-            } else {
-              // 編集
-              const editIndex = creator.exhibits.indexOf(editExhibit);
-              if (editIndex !== -1) {
-                creator.exhibits[editIndex] = newValue;
-              }
-            }
-
-            setCreator(creator);
-            setVisibleExhibitPopup(false);
-          }}
-        />
+      <Popup setVisible={setVisibleExhibitPopup} visible={visibleExhibitPopup}>
+        <ExhibitForm exhibit={editExhibit} onSubmit={onSubmitExhibitPopup} />
       </Popup>
     </>
   );
@@ -367,8 +511,19 @@ interface ProductCellProps {
 const ProductCell = (props: ProductCellProps) => {
   const { data, onEdit, onDelete, sortableProps } = props;
 
+  const onEditClick = useCallback(() => {
+    onEdit(data);
+  }, [data, onEdit]);
+
+  const onDeleteClick = useCallback(() => {
+    onDelete(data);
+  }, [data, onDelete]);
+
+  // 代表作品として設定されていれば、背景を黄色にする
+  const bgHighlight = data.isHighlight ? 'bg-yellow-100' : '';
+
   return (
-    <div className="relative min-w-fit">
+    <div className={`relative min-w-fit ${bgHighlight}`}>
       <div className="flex">
         <div className="max-w-min content-center" {...sortableProps}>
           <RiDraggable />
@@ -384,23 +539,19 @@ const ProductCell = (props: ProductCellProps) => {
       </div>
       <div className="absolute right-0 top-0 flex flex-col gap-2">
         <IconButton
-          size="sm"
-          variant="soft"
           color="neutral"
+          onClick={onEditClick}
+          size="sm"
           sx={{ borderRadius: 9999 }}
-          onClick={() => {
-            onEdit(data);
-          }}>
+          variant="soft">
           <FaPen />
         </IconButton>
         <IconButton
-          size="sm"
-          variant="soft"
           color="neutral"
+          onClick={onDeleteClick}
+          size="sm"
           sx={{ borderRadius: 9999 }}
-          onClick={() => {
-            onDelete(data);
-          }}>
+          variant="soft">
           <FaTimes />
         </IconButton>
       </div>
@@ -417,14 +568,22 @@ interface ExhibitRowProps {
 const ExhibitRow = (props: ExhibitRowProps) => {
   const { data, onEdit, onDelete } = props;
 
+  const onEditClick = useCallback(() => {
+    onEdit(data);
+  }, [data, onEdit]);
+
+  const onDeleteClick = useCallback(() => {
+    onDelete(data);
+  }, [data, onDelete]);
+
   return (
     <tr className="odd:bg-neutral-200 even:bg-neutral-50">
       <td className="flex gap-4 p-2">
         {/* 画像 */}
         <img
+          alt={data.title}
           className="max-w-32 md:max-w-40"
           src={data.tmpImageData || data.imageUrl}
-          alt={data.title}
         />
         {/* 内容 */}
         <div className="flex w-full flex-col gap-1 align-top">
@@ -435,22 +594,18 @@ const ExhibitRow = (props: ExhibitRowProps) => {
         {/* 編集/削除ボタン */}
         <div className="flex min-w-max flex-col gap-1 align-top">
           <MuiJoyButton
-            size="sm"
-            variant="plain"
             color="neutral"
-            onClick={() => {
-              onEdit(data);
-            }}>
+            onClick={onEditClick}
+            size="sm"
+            variant="plain">
             <FaPen />
             <label className="hidden md:inline md:pl-2">編集</label>
           </MuiJoyButton>
           <MuiJoyButton
-            size="sm"
-            variant="plain"
             color="neutral"
-            onClick={() => {
-              onDelete(data);
-            }}>
+            onClick={onDeleteClick}
+            size="sm"
+            variant="plain">
             <FaTimes />
             <label className="hidden md:inline md:pl-2">削除</label>
           </MuiJoyButton>
@@ -469,7 +624,7 @@ interface ProductPopupProps {
 
 const ProductPopup = (props: ProductPopupProps) => {
   const { visible, setVisible, product, onSubmit } = props;
-  const { register, handleSubmit, reset } = useForm({
+  const { control, register, handleSubmit, reset } = useForm({
     defaultValues: product,
   });
 
@@ -477,23 +632,31 @@ const ProductPopup = (props: ProductPopupProps) => {
     reset(product);
   }, [product, reset]);
 
-  const onValid: SubmitHandler<Product> = data => {
-    const submitData: Product = {
-      ...product,
-      title: data.title,
-      detail: data.detail,
-    };
+  const onValid: SubmitHandler<Product> = useCallback(
+    data => {
+      const submitData: Product = {
+        ...product,
+        title: data.title,
+        isHighlight: data.isHighlight,
+        detail: data.detail,
+      };
 
-    onSubmit(submitData);
-  };
+      onSubmit(submitData);
+    },
+    [onSubmit, product],
+  );
+
+  const onSubmitForm = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      handleSubmit(onValid)(e);
+    },
+    [handleSubmit, onValid],
+  );
 
   return (
-    <Popup visible={visible} setVisible={setVisible}>
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          void handleSubmit(onValid)(e);
-        }}>
+    <Popup setVisible={setVisible} visible={visible}>
+      <form onSubmit={onSubmitForm}>
         <h2 className="w-fit">作品情報編集</h2>
 
         <div className="mb-4 mt-2 flex max-w-2xl flex-col gap-4 md:flex-row">
@@ -506,10 +669,17 @@ const ProductPopup = (props: ProductPopupProps) => {
           <div className="flex basis-1/2 flex-col gap-2 md:w-max">
             <Textbox label="作品名" {...register('title')} />
             <div>
+              <Switch
+                control={control}
+                name="isHighlight"
+                startDecorator={<p>これを代表作品として表示する</p>}
+              />
+            </div>
+            <div>
               <p>詳細</p>
               <Textarea
-                sx={{ border: 1, borderColor: 'black', marginY: '0.25rem' }}
                 minRows={3}
+                sx={{ border: 1, borderColor: 'black', marginY: '0.25rem' }}
                 {...register('detail')}
               />
             </div>
@@ -518,8 +688,8 @@ const ProductPopup = (props: ProductPopupProps) => {
 
         <SubmitButton
           className="w-fit rounded-md border border-black bg-white text-black"
-          variant="outlined"
-          startDecorator={<FaCheck />}>
+          startDecorator={<FaCheck />}
+          variant="outlined">
           変更
         </SubmitButton>
       </form>
@@ -551,13 +721,16 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     formState: { errors },
   } = useForm<ExhibitFormValues>({ defaultValues: exhibit });
 
-  const fetchGalleries = () =>
-    void (async () => {
-      const galleries = await getGalleries();
-      setGalleries(galleries);
-    })();
+  const fetchGalleries = useCallback(
+    () =>
+      void (async () => {
+        const galleries = await getGalleries();
+        setGalleries(galleries);
+      })(),
+    [],
+  );
 
-  useEffect(fetchGalleries, []);
+  useEffect(fetchGalleries, [fetchGalleries]);
 
   const requireMsg = '1文字以上の入力が必要です。';
   const invalidDateMsg = '有効な日付を入力してください。';
@@ -573,35 +746,105 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const matchGallery = galleries?.find(x => x.name === location);
   const isMatchGallery = matchGallery !== undefined;
 
-  const onValid: SubmitHandler<ExhibitFormValues> = data => {
-    if (!isMatchGallery) {
-      setError('location', {
-        message: 'ギャラリー情報の指定または入力が必要です。',
-      });
-      return;
-    }
+  type LocationFieldProps = ControllerRenderProps<
+    ExhibitFormValues,
+    'location'
+  >;
 
-    const submitData: Exhibit = {
-      id: exhibit?.id ?? getUlid(),
-      title: data.title,
-      location: data.location,
-      galleryId: matchGallery.id,
-      startDate: new Date(data.startDateString + 'T00:00:00'),
-      endDate: new Date(data.endDateString + 'T23:59:59'),
-      srcImage: data.srcImage,
-      tmpImageData: tmpImage,
-      imageUrl: exhibit?.imageUrl ?? '',
-    };
+  const handleLocationChange = useCallback(
+    (field: LocationFieldProps) =>
+      (event: SyntheticEvent, value: string | null) => {
+        field.onChange(value);
+      },
+    [],
+  );
 
-    onSubmit(submitData);
-  };
+  const handleRenderInput = useCallback((field: LocationFieldProps) => {
+    const renderAutocompleteInput = (params: AutocompleteRenderInputParams) => (
+      <Input
+        slotProps={{
+          root: { ref: params.InputProps.ref },
+          input: {
+            ...params.inputProps,
+            onChange: e => {
+              field.onChange(e);
+              params.inputProps.onChange?.(e);
+            },
+          },
+        }}
+        sx={{ borderColor: 'black' }}
+      />
+    );
+    return renderAutocompleteInput;
+  }, []);
+
+  const renderLocation = useCallback(
+    ({ field }: { field: LocationFieldProps }) => {
+      const onChange = handleLocationChange(field);
+      const renderInput = handleRenderInput(field);
+
+      return (
+        <Autocomplete
+          freeSolo
+          onChange={onChange}
+          options={galleries?.map(x => x.name) ?? []}
+          renderInput={renderInput}
+          value={field.value || null}
+        />
+      );
+    },
+    [galleries, handleLocationChange, handleRenderInput],
+  );
+
+  const onChangeLocation = useCallback(() => {
+    fetchGalleries();
+    setError('location', {});
+  }, [setError, fetchGalleries]);
+
+  const onValid: SubmitHandler<ExhibitFormValues> = useCallback(
+    data => {
+      if (!isMatchGallery) {
+        setError('location', {
+          message: 'ギャラリー情報の指定または入力が必要です。',
+        });
+        return;
+      }
+
+      const submitData: Exhibit = {
+        id: exhibit?.id ?? getUlid(),
+        title: data.title,
+        location: data.location,
+        galleryId: matchGallery.id,
+        startDate: new Date(data.startDateString + 'T00:00:00'),
+        endDate: new Date(data.endDateString + 'T23:59:59'),
+        srcImage: data.srcImage,
+        tmpImageData: tmpImage,
+        imageUrl: exhibit?.imageUrl ?? '',
+      };
+
+      onSubmit(submitData);
+    },
+    [
+      exhibit?.id,
+      exhibit?.imageUrl,
+      isMatchGallery,
+      matchGallery?.id,
+      onSubmit,
+      setError,
+      tmpImage,
+    ],
+  );
+
+  const onSubmitForm = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      handleSubmit(onValid)(e);
+    },
+    [handleSubmit, onValid],
+  );
 
   return (
-    <form
-      onSubmit={e => {
-        e.preventDefault();
-        void handleSubmit(onValid)(e);
-      }}>
+    <form onSubmit={onSubmitForm}>
       <h2 className="w-fit">{isAdd ? '展示登録' : '展示修正'}</h2>
 
       <div className="my-2 flex max-w-2xl flex-col md:flex-row">
@@ -639,32 +882,8 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             <Controller
               control={control}
               name="location"
+              render={renderLocation}
               rules={{ required: requireMsg }}
-              render={({ field }) => (
-                <Autocomplete
-                  freeSolo
-                  options={galleries?.map(x => x.name) ?? []}
-                  onChange={(e, value) => {
-                    field.onChange(value);
-                  }}
-                  value={field.value || null}
-                  renderInput={params => (
-                    <Input
-                      slotProps={{
-                        root: { ref: params.InputProps.ref },
-                        input: {
-                          ...params.inputProps,
-                          onChange: e => {
-                            field.onChange(e);
-                            params.inputProps.onChange?.(e);
-                          },
-                        },
-                      }}
-                      sx={{ borderColor: 'black' }}
-                    />
-                  )}
-                />
-              )}
             />
             <p className="text-xs text-red-600">{errors.location?.message}</p>
             {location !== '' && isMatchGallery ? (
@@ -675,29 +894,23 @@ const ExhibitForm = (props: ExhibitFormProps) => {
                 </div>
               </Card>
             ) : (
-              <NoGalleryInfo
-                newName={location}
-                onChange={() => {
-                  fetchGalleries();
-                  setError('location', {});
-                }}
-              />
+              <NoGalleryInfo newName={location} onChange={onChangeLocation} />
             )}
           </div>
           <Textbox
-            label="開始日時"
-            type="date"
             defaultDateValue={exhibit?.startDate}
             fieldError={errors.startDateString}
+            label="開始日時"
+            type="date"
             {...register('startDateString', {
               validate: v => !isNaN(new Date(v).getDate()) || invalidDateMsg,
             })}
           />
           <Textbox
-            label="終了日時"
-            type="date"
             defaultDateValue={exhibit?.endDate}
             fieldError={errors.endDateString}
+            label="終了日時"
+            type="date"
             {...register('endDateString', {
               validate: v => {
                 const endDate = new Date(v);
@@ -740,22 +953,33 @@ const NoGalleryInfo = (props: NoGalleryProps) => {
     formState: { errors, isSubmitting },
   } = useForm<Gallery>({ defaultValues: { name: props.newName } as Gallery });
 
-  const onValid: SubmitHandler<Gallery> = async data => {
-    if (!props.newName) {
-      setError('name', { message: '場所（ギャラリー名称）が未入力です。' });
-      return;
-    }
+  const onValid: SubmitHandler<Gallery> = useCallback(
+    async data => {
+      if (!props.newName) {
+        setError('name', { message: '場所（ギャラリー名称）が未入力です。' });
+        return;
+      }
 
-    try {
-      await addGallery({ ...data, name: props.newName });
-    } catch (error) {
-      console.error('error: ', error);
-      setError('name', { message: '入力された住所が見つかりませんでした。' });
-      return;
-    }
+      try {
+        await addGallery({ ...data, name: props.newName });
+      } catch (error) {
+        console.error('error: ', error);
+        setError('name', { message: '入力された住所が見つかりませんでした。' });
+        return;
+      }
 
-    props.onChange();
-  };
+      props.onChange();
+    },
+    [props, setError],
+  );
+
+  const onClick: MouseEventHandler<HTMLAnchorElement> = useCallback(
+    e => {
+      clearErrors('name');
+      void handleSubmit(onValid)(e);
+    },
+    [clearErrors, handleSubmit, onValid],
+  );
 
   return (
     <Card size="sm">
@@ -774,16 +998,13 @@ const NoGalleryInfo = (props: NoGalleryProps) => {
           fieldError={errors.name || errors.location}
         />
         <MuiJoyButton
-          size="sm"
-          variant="soft"
-          color="neutral"
-          startDecorator={<FaPlus />}
           className="w-fit"
+          color="neutral"
           loading={isSubmitting}
-          onClick={e => {
-            clearErrors('name');
-            void handleSubmit(onValid)(e);
-          }}>
+          onClick={onClick}
+          size="sm"
+          startDecorator={<FaPlus />}
+          variant="soft">
           追加
         </MuiJoyButton>
       </div>

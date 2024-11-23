@@ -29,6 +29,14 @@
             {
               "client_id": "985501114281-4h122vrg9sntbrcip3i51v4s84uvt8n9.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "985501114281-dfjl22ipnsk8a6iu11pds5f6ob2ue7ht.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "jp.galleryfound",
+                "app_store_id": "6670169822"
+              }
             }
           ]
         }

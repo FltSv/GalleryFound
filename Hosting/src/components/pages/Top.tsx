@@ -14,9 +14,9 @@ export const Top = () => (
 
     <div className="flex items-center">
       <img
+        className="w-24 md:w-40"
         src="img/exhibit-screen.png"
         style={screenshot}
-        className="w-24 md:w-40"
       />
       <div>
         <h2>ギャラリーリスト</h2>
@@ -26,9 +26,9 @@ export const Top = () => (
 
     <div className="flex flex-row-reverse items-center">
       <img
+        className="w-24 md:w-40"
         src="img/map-screen.png"
         style={screenshot}
-        className="w-24 md:w-40"
       />
       <div>
         <h2>地図機能</h2>
@@ -54,9 +54,9 @@ export const Top = () => (
 
     <div className="flex items-center">
       <img
+        className="w-24 md:w-40"
         src="img/creator-screen.png"
         style={screenshot}
-        className="w-24 md:w-40"
       />
       <div>
         <h2>作家リスト</h2>
@@ -68,12 +68,12 @@ export const Top = () => (
     <div className="mx-auto my-16 flex gap-1 md:gap-4">
       <div className="relative">
         <a
+          className="pointer-events-none cursor-default opacity-50"
           href="#"
-          target="_blank"
-          className="pointer-events-none cursor-default opacity-50">
+          target="_blank">
           <img
-            src="img/google-play-badge_JP.png"
             className="m-2 h-12 object-contain md:h-16"
+            src="img/google-play-badge_JP.png"
           />
         </a>
         <div className="absolute bottom-0 bg-black bg-opacity-50 p-1 text-white">
@@ -82,12 +82,12 @@ export const Top = () => (
       </div>
       <div className="relative">
         <a
+          className="pointer-events-none cursor-default opacity-50"
           href="#"
-          target="_blank"
-          className="pointer-events-none cursor-default opacity-50">
+          target="_blank">
           <img
-            src="img/DownloadAppStore_JP.svg"
             className="m-2 h-12 object-contain md:h-16"
+            src="img/DownloadAppStore_JP.svg"
           />
         </a>
         <div className="absolute bottom-0 bg-black bg-opacity-50 p-1 text-white">

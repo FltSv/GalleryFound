@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -27,39 +27,45 @@ interface DraggableListProps<T> {
   renderItem: RenderItem<T>;
 }
 
-export function DraggableList<T extends { id: string }>(
+export const DraggableList = <T extends { id: string }>(
   props: DraggableListProps<T>,
-) {
+) => {
   const { items, setItems, renderItem } = props;
 
   const [activeId, setActiveId] = useState<UniqueIdentifier>();
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
-  const onDragStart = ({ active }: DragStartEvent) => {
-    setActiveId(active.id);
-  };
+  const onDragStart = useCallback(
+    ({ active }: DragStartEvent) => {
+      setActiveId(active.id);
+    },
+    [setActiveId],
+  );
 
-  const onDragEnd = ({ active, over }: DragEndEvent) => {
-    if (active.id !== over?.id) {
-      const oldIndex = items.findIndex(item => item.id === active.id);
-      const newIndex = items.findIndex(item => item.id === over?.id);
+  const onDragEnd = useCallback(
+    ({ active, over }: DragEndEvent) => {
+      if (active.id !== over?.id) {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over?.id);
 
-      setItems(arrayMove(items, oldIndex, newIndex));
-    }
-  };
+        setItems(arrayMove(items, oldIndex, newIndex));
+      }
+    },
+    [items, setItems],
+  );
 
   const overlayItem = items.find(item => item.id === activeId);
 
   return (
     <DndContext
-      sensors={sensors}
       collisionDetection={closestCenter}
+      onDragEnd={onDragEnd}
       onDragStart={onDragStart}
-      onDragEnd={onDragEnd}>
+      sensors={sensors}>
       <SortableContext items={items} strategy={rectSortingStrategy}>
         <div className="flex flex-wrap gap-2">
           {items.map(item => (
-            <SortableItem key={item.id} item={item} renderItem={renderItem} />
+            <SortableItem item={item} key={item.id} renderItem={renderItem} />
           ))}
         </div>
       </SortableContext>
@@ -70,14 +76,16 @@ export function DraggableList<T extends { id: string }>(
       )}
     </DndContext>
   );
-}
+};
 
 interface SortableItemProps<T> {
   item: T;
   renderItem: RenderItem<T>;
 }
 
-function SortableItem<T extends { id: string }>(props: SortableItemProps<T>) {
+const SortableItem = <T extends { id: string }>(
+  props: SortableItemProps<T>,
+) => {
   const { item, renderItem } = props;
 
   const {
@@ -91,8 +99,8 @@ function SortableItem<T extends { id: string }>(props: SortableItemProps<T>) {
 
   return (
     <div
-      ref={setNodeRef}
       className="rounded-md bg-white bg-opacity-50 p-1 shadow-md"
+      ref={setNodeRef}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -106,7 +114,7 @@ function SortableItem<T extends { id: string }>(props: SortableItemProps<T>) {
       })}
     </div>
   );
-}
+};
 
 type RenderItem<T> = (item: T, sortableProps: SortableProps) => ReactNode;
 

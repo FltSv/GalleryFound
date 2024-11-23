@@ -1,8 +1,13 @@
-const { merge } = require('webpack-merge');
-const common = require('./webpack.common.js');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+import { merge } from 'webpack-merge';
+import common from './webpack.common.js';
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
-module.exports = merge(
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default merge(
   common,
   /** @type import('webpack').Configuration */
   {
