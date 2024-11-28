@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/exhibit.dart';
@@ -15,24 +16,35 @@ class FirebaseRepo implements DataRepoBase {
 
     final ignoreIds = ConfigProvider().config.debugUserIds;
 
-    return querySnap.docs
+    final fetchTasks = querySnap.docs
         .where((docSnap) => kDebugMode || !ignoreIds.contains(docSnap.id))
-        .map((docSnap) {
+        .map((docSnap) async {
       final data = docSnap.data();
 
-      final exhibits = (docSnap.get("exhibits") as List<dynamic>)
+      final exhibitsMaps = (docSnap.get("exhibits") as List<dynamic>)
           .cast<Map<String, dynamic>>();
+      final exhibitTasks = exhibitsMaps.map((exhibit) async => Exhibit(
+            id: exhibit["id"],
+            title: exhibit["title"],
+            location: exhibit["location"],
+            galleryId: exhibit["galleryId"],
+            image: exhibit["image"],
+            thumbUrl: await getThumbUrl(docSnap.id, exhibit["image"]),
+            startDate: exhibit["startDate"].toDate(),
+            endDate: exhibit["endDate"].toDate(),
+          ));
+      final exhibits = await Future.wait(exhibitTasks);
 
       final productMaps = (docSnap.get("products") as List<dynamic>)
           .cast<Map<String, dynamic>>();
-      final products = productMaps
-          .map((product) => Product(
-                id: product["id"],
-                title: product["title"] ?? "",
-                detail: product["detail"] ?? "",
-                image: product["image"],
-              ))
-          .toList();
+      final productsTasks = productMaps.map((product) async => Product(
+            id: product["id"],
+            title: product["title"] ?? "",
+            detail: product["detail"] ?? "",
+            image: product["image"],
+            thumbUrl: await getThumbUrl(docSnap.id, product["image"]),
+          ));
+      final products = await Future.wait(productsTasks);
 
       final highlightProduct = products.isNotEmpty
           ? products.firstWhere(
@@ -49,19 +61,11 @@ class FirebaseRepo implements DataRepoBase {
         links: ((data["links"] ?? []) as List<dynamic>).cast<String>(),
         highlightProduct: highlightProduct,
         products: products,
-        exhibits: exhibits
-            .map((exhibit) => Exhibit(
-                  id: exhibit["id"],
-                  title: exhibit["title"],
-                  location: exhibit["location"],
-                  galleryId: exhibit["galleryId"],
-                  image: exhibit["image"],
-                  startDate: exhibit["startDate"].toDate(),
-                  endDate: exhibit["endDate"].toDate(),
-                ))
-            .toList(),
+        exhibits: exhibits,
       );
-    }).toList();
+    });
+
+    return Future.wait(fetchTasks);
   }
 
   @override
@@ -85,5 +89,18 @@ class FirebaseRepo implements DataRepoBase {
     const domain =
         "firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com";
     return "https://$domain/o/creators%2F$userId%2F$image";
+  }
+
+  Future<String?> getThumbUrl(String userId, String image) async {
+    final thumbImage = image.replaceAll(RegExp(r'\.png\?.*'), '.webp');
+    final path = 'creators/$userId/thumbs/$thumbImage';
+
+    try {
+      final ref = FirebaseStorage.instance.ref().child(path);
+      final url = await ref.getDownloadURL(); // ダウンロードURLを取得
+      return url;
+    } catch (e) {
+      return null;
+    }
   }
 }
