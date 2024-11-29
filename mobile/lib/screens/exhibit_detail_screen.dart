@@ -6,6 +6,7 @@ import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_detail_screen.dart';
 import 'package:mobile/screens/map_screen.dart';
 import 'package:mobile/widgets/link_text.dart';
+import 'package:mobile/widgets/thumb_interlace_image.dart';
 
 class ExhibitDetailScreen extends StatefulWidget {
   const ExhibitDetailScreen({
@@ -36,7 +37,10 @@ class _ExhibitDetailScreenState extends State<ExhibitDetailScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.network(exhibit.imageUrl),
+              ThumbInterlaceImage(
+                thumbURL: exhibit.thumbUrl,
+                imageURL: exhibit.imageUrl,
+              ),
               const Gap(8),
               Text(exhibit.displayDate),
               LinkText(

@@ -37,6 +37,12 @@ const imageCompOptions: Options = {
   maxWidthOrHeight: 1000,
 };
 
+const thumbOptions: Options = {
+  fileType: 'image/webp',
+  maxSizeMB: 0.1,
+  maxWidthOrHeight: 256,
+};
+
 const getCreatorStorageUrl = (userId: string) =>
   `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${userId}%2F`;
 
@@ -175,6 +181,12 @@ export const setCreatorData = async (user: User, data: Creator) => {
       `${collectionNames.creators}/${userId}/${unusedImage}`,
     );
     await deleteObject(unusedRef);
+
+    const unusedThumbRef = ref(
+      getStorage(),
+      `${collectionNames.creators}/${userId}/thumb/${unusedImage}`,
+    );
+    await deleteObject(unusedThumbRef);
   });
   await Promise.all(deleteTasks);
 
@@ -205,9 +217,17 @@ const uploadImageData = async <T extends ImageStatus>(
 
     // Storageへアップロード
     const storage = getStorage();
-    const path = `${collectionNames.creators}/${user.uid}/${getUlid()}.png`;
+    const fileId = getUlid();
+
+    const path = `${collectionNames.creators}/${user.uid}/${fileId}.png`;
     const storageRef = ref(storage, path);
     const result = await uploadBytes(storageRef, compressedFile);
+
+    // サムネイルの生成、アップロード
+    const thumbFile = await imageCompression(compressedFile, thumbOptions);
+    const thumbPath = `${collectionNames.creators}/${user.uid}/thumbs/${fileId}.webp`;
+    const thumbRef = ref(storage, thumbPath);
+    await uploadBytes(thumbRef, thumbFile);
 
     const url = await getDownloadURL(result.ref);
     const name = result.metadata.name;

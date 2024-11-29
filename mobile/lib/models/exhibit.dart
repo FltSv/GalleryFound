@@ -10,6 +10,7 @@ class Exhibit {
     required this.location,
     required this.galleryId,
     required this.image,
+    required this.thumbUrl,
     required this.startDate,
     required this.endDate,
   });
@@ -26,6 +27,9 @@ class Exhibit {
   /// イメージ画像のファイル名＋トークン
   final String image;
   String get imageUrl => DataProvider().getImageUrl(creator.id, image);
+
+  /// サムネイル画像のURL
+  final String? thumbUrl;
 
   /// 展示開始日
   final DateTime startDate;

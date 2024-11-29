@@ -4,6 +4,7 @@ import 'package:mobile/models/creator.dart';
 import 'package:mobile/providers/config_provider.dart';
 import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/screens/creator_detail_screen.dart';
+import 'package:mobile/widgets/thumb_image.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class CreatorListScreen extends StatefulWidget {
@@ -112,6 +113,7 @@ class CreatorItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageUrl = creator.highlightProduct?.imageUrl;
+    final thumbUrl = creator.highlightProduct?.thumbUrl;
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -124,10 +126,7 @@ class CreatorItem extends StatelessWidget {
           children: [
             // 背景画像またはプレースホルダー
             imageUrl != null
-                ? Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover,
-                  )
+                ? ThumbImage(thumbURL: thumbUrl, imageURL: imageUrl)
                 : Container(
                     color: Colors.grey[300], // プレースホルダーの背景色
                     child: Center(

@@ -9,6 +9,7 @@ import 'package:mobile/screens/product_detail_screen.dart';
 import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
 import 'package:mobile/widgets/link_text.dart';
+import 'package:mobile/widgets/thumb_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CreatorDetailScreen extends StatefulWidget {
@@ -113,6 +114,9 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.network(product.imageUrl);
+    return ThumbImage(
+      thumbURL: product.thumbUrl,
+      imageURL: product.imageUrl,
+    );
   }
 }
