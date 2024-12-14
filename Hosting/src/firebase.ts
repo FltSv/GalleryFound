@@ -6,10 +6,10 @@ import {
 } from 'firebase/app-check';
 import { getAuth } from 'firebase/auth';
 import {
-  getFirestore,
   FirestoreDataConverter,
   Timestamp,
   GeoPoint,
+  initializeFirestore,
 } from 'firebase/firestore';
 import {
   fetchAndActivate,
@@ -30,7 +30,9 @@ const reCAPTCHA_PUBLIC_KEY = '6LeS8AcqAAAAABQnEgiC2-HGfuuHFeNK_kMUD0Zq';
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const db = initializeFirestore(app, {
+  ignoreUndefinedProperties: true, // undefinedを無視してFirestoreに書き込む
+});
 
 // Remote Config
 // 最小フェッチ時間: dev1分、prod1時間
