@@ -45,12 +45,12 @@ dependencies:
   firebase_remote_config: ^5.0.4
   flutter_launcher_icons: ^0.14.1
   flutter_native_splash: ^2.4.1
-  package_info: ^2.0.2
   url_launcher: ^6.3.0
   pub_semver: ^2.1.4
   flutter_staggered_grid_view: ^0.7.0
   cached_network_image: ^3.4.1
   firebase_storage: ^12.3.6
+  package_info_plus: ^8.1.2
 
 dev_dependencies:
   flutter_test:
