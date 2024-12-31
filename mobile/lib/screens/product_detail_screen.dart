@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/product.dart';
+import 'package:mobile/widgets/thumb_interlace_image.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({
@@ -27,7 +28,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Image.network(product.imageUrl),
+          ThumbInterlaceImage(
+            thumbURL: product.thumbUrl,
+            imageURL: product.imageUrl,
+          ),
           const Gap(8),
           Text(product.detail),
         ].intersperse(const Gap(8)).toList(),

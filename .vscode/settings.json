@@ -19,10 +19,17 @@
   "yaml.schemaStore.enable": false,
 
   // スペルチェック除外リスト
-  "cSpell.words": ["appcheck", "firestore", "Mypage"],
+  "cSpell.words": ["appcheck", "firebasestorage", "firestore", "Mypage"],
   "cSpell.ignoreRegExpList": [
     "\\..*", // プロパティ名などを無視
     "/.*", // パス名などを無視
     "key.*" // APIKeyなど、keyをSuffixとした変数以降の値を無視
+  ],
+  "cSpell.overrides": [
+    {
+      // TailwindCSSのカスタムフォント名を無視
+      "filename": "**/*.{js,ts,jsx,tsx}",
+      "ignoreRegExpList": ["font-.*"]
+    }
   ]
 }

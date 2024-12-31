@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/exhibit.dart';
+import 'package:mobile/widgets/thumb_image.dart';
 
 class ExhibitItem extends StatelessWidget {
   const ExhibitItem({
@@ -22,7 +23,10 @@ class ExhibitItem extends StatelessWidget {
       children: [
         Expanded(
           flex: 3,
-          child: Image.network(exhibit.imageUrl),
+          child: ThumbImage(
+            thumbURL: exhibit.thumbUrl,
+            imageURL: exhibit.imageUrl,
+          ),
         ),
         Expanded(
           flex: 4,
