@@ -182,9 +182,10 @@ export const setCreatorData = async (user: User, data: Creator) => {
     );
     await deleteObject(unusedRef);
 
+    const unusedWebp = unusedImage.replace('.png', '.webp');
     const unusedThumbRef = ref(
       getStorage(),
-      `${collectionNames.creators}/${userId}/thumbs/${unusedImage}`,
+      `${collectionNames.creators}/${userId}/thumbs/${unusedWebp}`,
     );
     await deleteObject(unusedThumbRef);
   });
