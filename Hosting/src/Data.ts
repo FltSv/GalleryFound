@@ -184,7 +184,7 @@ export const setCreatorData = async (user: User, data: Creator) => {
 
     const unusedThumbRef = ref(
       getStorage(),
-      `${collectionNames.creators}/${userId}/thumb/${unusedImage}`,
+      `${collectionNames.creators}/${userId}/thumbs/${unusedImage}`,
     );
     await deleteObject(unusedThumbRef);
   });
