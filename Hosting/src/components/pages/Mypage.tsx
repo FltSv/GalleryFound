@@ -30,6 +30,7 @@ import { useAuthContext } from 'components/AuthContext';
 import {
   Button,
   FileInput,
+  HashtagTextarea,
   Switch,
   SubmitButton,
   Textbox,
@@ -350,10 +351,7 @@ export const Mypage = () => {
         <div>
           <p>作品ジャンル</p>
           <select
-            className="
-              my-1 block w-fit rounded-md 
-              border border-black bg-transparent px-2 py-2 
-              focus:border-2 focus:border-blue-600 focus:outline-none"
+            className="my-1 block w-fit rounded-md border border-black bg-transparent px-2 py-2 focus:border-2 focus:border-blue-600 focus:outline-none"
             defaultValue={creator?.genre}
             {...register('genre')}>
             {genres.map(genre => (
@@ -366,7 +364,7 @@ export const Mypage = () => {
 
         <div>
           <p>プロフィール</p>
-          <Textarea
+          <HashtagTextarea
             defaultValue={creator?.profile}
             minRows={3}
             sx={{
@@ -740,7 +738,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const tmpImage =
     selectedFiles !== undefined && selectedFiles.length > 0
       ? URL.createObjectURL(selectedFiles[0])
-      : exhibit?.tmpImageData ?? '';
+      : (exhibit?.tmpImageData ?? '');
 
   const location = watch('location');
   const matchGallery = galleries?.find(x => x.name === location);
