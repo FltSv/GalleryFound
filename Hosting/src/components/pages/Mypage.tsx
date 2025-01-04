@@ -63,6 +63,7 @@ export const Mypage = () => {
   const [editExhibit, setEditExhibit] = useState<Exhibit>();
   const [editProduct, setEditProduct] = useState<Product>();
   const [genres, setGenres] = useState<string[]>([]);
+  const [profileHashtags, setProfileHashtags] = useState<string[]>([]);
 
   useEffect(() => {
     if (user === null) {
@@ -304,6 +305,7 @@ export const Mypage = () => {
       // 一時データの結合
       const submitData = {
         ...data,
+        profileHashtags: profileHashtags,
         links: creator.links,
         products: creator.products,
         exhibits: creator.exhibits,
@@ -319,7 +321,7 @@ export const Mypage = () => {
       // リロード
       window.location.reload();
     },
-    [creator, user],
+    [creator, profileHashtags, user],
   );
 
   const onSubmit = useCallback(
@@ -367,6 +369,7 @@ export const Mypage = () => {
           <HashtagTextarea
             defaultValue={creator?.profile}
             minRows={3}
+            onHashtagsChange={setProfileHashtags}
             sx={{
               borderColor: 'black',
               marginY: '0.25rem',

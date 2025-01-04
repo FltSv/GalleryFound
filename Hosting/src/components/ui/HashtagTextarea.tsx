@@ -7,38 +7,62 @@ import {
   useCallback,
   ReactNode,
   Fragment,
+  useMemo,
 } from 'react';
 import { Textarea, TextareaProps } from '@mui/joy';
 
-export const HashtagTextarea = forwardRef<HTMLDivElement, TextareaProps>(
-  function HashtagTextarea(props, ref) {
-    // valueとdefaultValueの同時指定で不具合となるため、propsからdefaultValueを除外
-    const { defaultValue, ...restProps } = props;
+interface HashtagTextareaProps extends TextareaProps {
+  onHashtagsChange: (hashtags: string[]) => void;
+}
 
-    const [text, setText] = useState<string>(defaultValue?.toString() ?? '');
+export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
+  function HashtagTextarea(props, ref) {
+    const HASHTAG_REGEX = useMemo(() => /[\s\u3000s]#[^#\s\u3000]*/g, []);
+
+    // valueとdefaultValueの同時指定で不具合となるため、propsからdefaultValueを除外
+    const { defaultValue, onHashtagsChange, ...restProps } = props;
+    const defaultText = defaultValue?.toString() ?? '';
+
+    const [text, setText] = useState<string>(defaultText);
     const highlighterRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+    const extractHashtags = (input: string, regex: RegExp): string[] =>
+      [...input.matchAll(regex)].map(m => m[0]);
+
+    // ハッシュタグの配列から空白文字を削除し、コールバックを呼び出す
+    const setHashtags = useCallback(
+      (text: string) => {
+        const hashtags = extractHashtags(text, HASHTAG_REGEX);
+        const cleanedHashtags = hashtags.map(tag =>
+          tag.replace(/[\s\u3000]/g, ''),
+        );
+        onHashtagsChange(cleanedHashtags);
+      },
+      [HASHTAG_REGEX, onHashtagsChange],
+    );
+
     const handleChange = useCallback(
       (e: ChangeEvent<HTMLTextAreaElement>) => {
-        setText(e.target.value);
+        const newText = e.target.value;
+        setText(newText);
+        setHashtags(newText);
+
         props.onChange?.(e);
       },
-      [props],
+      [props, setHashtags],
     );
 
     // 入力テキストをハッシュタグ部分と通常テキスト部分に分割し、React要素の配列を返す関数
     const getHighlightedElements = (input: string): ReactNode[] => {
       if (input.trim() === '') return [<Fragment key="empty" />];
 
-      const HASHTAG_REGEX = /[\s\u3000]#[^#\s\u3000]*/g;
-
       // 入力テキストをハッシュタグで分割
       // 例: "テスト #hello #world テスト" → ["テスト ", "#hello", " ", "#world", " テスト"]
       const parts = input.split(HASHTAG_REGEX);
 
       // 入力テキストからハッシュタグを抽出
-      const matchedTags = [...input.matchAll(HASHTAG_REGEX)].map(m => m[0]);
+      const matchedTags = extractHashtags(input, HASHTAG_REGEX);
 
       // parts配列とmatchedTags配列から、通常テキストとハッシュタグを交互に含むReact要素の配列を生成
       // 例:
@@ -72,7 +96,9 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, TextareaProps>(
       if (textareaRef.current && highlighterRef.current) {
         highlighterRef.current.scrollTop = textareaRef.current.scrollTop;
       }
-    }, [text]);
+
+      setHashtags(defaultText);
+    }, [defaultText, setHashtags]);
 
     return (
       <div className="relative w-full" ref={ref}>

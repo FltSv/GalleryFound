@@ -63,6 +63,7 @@ export const getCreatorData = async (user: User) => {
       name: '',
       genre: '',
       profile: '',
+      profileHashtags: [],
       links: [],
       products: [],
       exhibits: [],
@@ -78,6 +79,7 @@ export const getCreatorData = async (user: User) => {
   const name = data.name ?? '';
   const genre = data.genre ?? '';
   const profile = data.profile ?? '';
+  const profileHashtags = data.profileHashtags ?? [];
   const links = data.links ?? [];
   const highlightProductId = data.highlightProductId ?? '';
 
@@ -112,6 +114,7 @@ export const getCreatorData = async (user: User) => {
     name: name,
     genre: genre,
     profile: profile,
+    profileHashtags: profileHashtags,
     links: links,
     products: products,
     exhibits: exhibits,
@@ -135,10 +138,12 @@ export const setCreatorData = async (user: User, data: Creator) => {
   const docRef = doc(db, collectionNames.creators, userId).withConverter(
     fbCreatorConverter,
   );
+
   await setDoc(docRef, {
     name: data.name,
     genre: data.genre,
     profile: data.profile,
+    profileHashtags: data.profileHashtags,
     links: data.links,
     highlightProductId: data.products.find(x => x.isHighlight)?.id,
     products: products.map(x => ({
@@ -367,6 +372,7 @@ export interface Creator {
 
   /** プロフィール */
   profile: string;
+  profileHashtags: string[];
 
   /** SNSリンク */
   links: string[];
