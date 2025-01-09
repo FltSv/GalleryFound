@@ -9,6 +9,7 @@ import 'package:mobile/screens/product_detail_screen.dart';
 import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
 import 'package:mobile/widgets/link_text.dart';
+import 'package:mobile/widgets/linkable_text.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -34,7 +35,15 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (creator.profile.isNotEmpty) Text(creator.profile),
+          if (creator.profile.isNotEmpty)
+            LinkableText(
+              text: creator.profile,
+              onHashtagTap: (hashtag) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Tapped on: $hashtag')),
+                );
+              },
+            ),
           if (creator.links.isNotEmpty)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

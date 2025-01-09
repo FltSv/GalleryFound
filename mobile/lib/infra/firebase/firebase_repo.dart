@@ -21,6 +21,9 @@ class FirebaseRepo implements DataRepoBase {
         .map((docSnap) async {
       final data = docSnap.data();
 
+      final profileHashtags =
+          ((data["profileHashtags"] ?? []) as List<dynamic>).cast<String>();
+
       final exhibitsMaps = (docSnap.get("exhibits") as List<dynamic>)
           .cast<Map<String, dynamic>>();
       final exhibitTasks = exhibitsMaps.map((exhibit) async => Exhibit(
@@ -58,6 +61,7 @@ class FirebaseRepo implements DataRepoBase {
         name: data["name"],
         genre: data["genre"],
         profile: data["profile"] ?? "",
+        profileHashtags: profileHashtags,
         links: ((data["links"] ?? []) as List<dynamic>).cast<String>(),
         highlightProduct: highlightProduct,
         products: products,
