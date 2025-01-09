@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/screens/creator_detail_screen.dart';
-import 'package:mobile/screens/creator_list_screen.dart';
+import 'package:mobile/widgets/creator_item.dart';
 import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/highlighted_text.dart';
 
