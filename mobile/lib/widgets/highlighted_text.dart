@@ -1,46 +1,36 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class LinkableText extends StatelessWidget {
+class HighlightedText extends StatelessWidget {
   final String text;
-  final void Function(String)? onHashtagTap;
+  final String word;
 
-  const LinkableText({
+  const HighlightedText({
     super.key,
     required this.text,
-    this.onHashtagTap,
+    required this.word,
   });
 
   @override
   Widget build(BuildContext context) {
-    // ハッシュタグ用のスタイル
-    final linkStyle = const TextStyle(
-      color: Colors.blue,
+    // word引数に一致する部分をハイライトするスタイル
+    final wordStyle = const TextStyle(
+      fontWeight: FontWeight.bold,
     );
-
-    // ハッシュタグをキャッチする正規表現
-    final RegExp hashtagRegExp = RegExp(r'([#\s\u3000]#[^#\s\u3000]+)');
 
     // TextSpanのリストを格納する
     final List<InlineSpan> children = [];
 
-    // splitMapJoin でハッシュタグと通常テキストを分割
+    // splitMapJoin でハイライト部分と通常テキストを分割
     text.splitMapJoin(
-      hashtagRegExp,
+      word,
       onMatch: (Match match) {
         final String matchedText = match[0]!; // "#..." の文字列
 
-        // ハッシュタグ部分：スタイル + タップ可能にする
+        // ハイライト部分：スタイルを適用する
         children.add(
           TextSpan(
             text: matchedText,
-            style: linkStyle,
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                final hashtag =
-                    matchedText.replaceAll(RegExp(r'[\s\u3000]'), '');
-                onHashtagTap?.call(hashtag);
-              },
+            style: wordStyle,
           ),
         );
         // splitMapJoin用に戻り値を返すが、子要素には追加済みなので空文字列でOK

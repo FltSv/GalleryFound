@@ -5,6 +5,7 @@ import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/product.dart';
 import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/exhibit_detail_screen.dart';
+import 'package:mobile/screens/word_search_screen.dart';
 import 'package:mobile/screens/product_detail_screen.dart';
 import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
@@ -39,8 +40,15 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
             LinkableText(
               text: creator.profile,
               onHashtagTap: (hashtag) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Tapped on: $hashtag')),
+                NavigateProvider.push(
+                  context,
+                  WordSearchScreen(
+                    query: hashtag,
+                    searchFilter: (creators, query) =>
+                        // ハッシュタグが含まれるクリエイターをフィルタリング
+                        creators.where((creator) =>
+                            creator.profileHashtags.contains(query)),
+                  ),
                 );
               },
             ),
