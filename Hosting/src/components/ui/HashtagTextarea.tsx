@@ -37,7 +37,7 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
         const cleanedHashtags = hashtags.map(tag =>
           tag.replace(/[\s\u3000]/g, ''),
         );
-        onHashtagsChange(cleanedHashtags);
+        onHashtagsChange([...new Set(cleanedHashtags)]);
       },
       [HASHTAG_REGEX, onHashtagsChange],
     );
