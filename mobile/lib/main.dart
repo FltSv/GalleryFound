@@ -28,7 +28,6 @@ void main() {
       );
     } else {
       await FirebaseAppCheck.instance.activate(
-        androidProvider: AndroidProvider.playIntegrity,
         appleProvider: AppleProvider.appAttest,
       );
     }
@@ -47,7 +46,7 @@ void main() {
     // エラーが発生した場合、エラーダイアログを表示
     FlutterNativeSplash.remove();
     runApp(MaterialApp(home: ErrorDialog(error: error)));
-    return Future.value(null);
+    return null;
   });
 }
 
@@ -64,7 +63,6 @@ class MyApp extends StatelessWidget {
       title: 'Gallery Found',
       theme: materialTheme.light(),
       darkTheme: materialTheme.dark(),
-      themeMode: ThemeMode.system,
       home: Builder(
         builder: (context) {
           // アップデートが必要な場合、ポップアップを表示

@@ -51,7 +51,7 @@ class FakeRepo implements DataRepoBase {
             image:
                 'e3f7f1f0-a302-4301-b13d-268b2253ff81.png?alt=media&token=dfa0ba77-4f30-4e1e-a662-09de94c93251',
             thumbUrl: null,
-            startDate: DateTime(2024, 7, 3, 0),
+            startDate: DateTime(2024, 7, 3),
             endDate: DateTime(2024, 7, 3, 23),
           ),
           Exhibit(
@@ -62,7 +62,7 @@ class FakeRepo implements DataRepoBase {
             image:
                 '01J1E3G2KXZ79YWGX0B7Q3YRZV.png?alt=media&token=2f66e11e-ed02-4b39-b8ac-4676f0e00adb',
             thumbUrl: null,
-            startDate: DateTime(2024, 7, 2, 0),
+            startDate: DateTime(2024, 7, 2),
             endDate: DateTime(2024, 7, 4, 23),
           ),
         ],
@@ -113,8 +113,8 @@ class FakeRepo implements DataRepoBase {
             image:
                 '01J1ZQTRPS8JNCM8Z5SKB5NPBT.png?alt=media&token=46e1f8da-49ae-41cf-b6a7-e82fc06d0e0c',
             thumbUrl: null,
-            startDate: DateTime(2024, 3, 13, 0),
-            endDate: DateTime(2024, 3, 28, 0),
+            startDate: DateTime(2024, 3, 13),
+            endDate: DateTime(2024, 3, 28),
           ),
         ],
       ),

@@ -46,7 +46,6 @@ class WordSearchScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            flex: 1, // CreatorItemの比率
                             child: CreatorItem(creator: creator, onTap: () {}),
                           ),
                           Expanded(

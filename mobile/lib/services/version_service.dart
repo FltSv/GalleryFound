@@ -43,7 +43,6 @@ class VersionService {
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       'アップデートのお知らせ',
