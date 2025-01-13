@@ -14,7 +14,7 @@ class LinkableText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // ハッシュタグ用のスタイル
-    final linkStyle = const TextStyle(
+    const linkStyle = TextStyle(
       color: Colors.blue,
     );
 

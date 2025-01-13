@@ -13,7 +13,7 @@ class HighlightedText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // word引数に一致する部分をハイライトするスタイル
-    final wordStyle = const TextStyle(
+    const wordStyle = TextStyle(
       fontWeight: FontWeight.bold,
     );
 
