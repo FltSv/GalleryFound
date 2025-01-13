@@ -355,7 +355,8 @@ class MaterialTheme {
 }
 
 class ExtendedColor {
-  final Color seed, value;
+  final Color seed;
+  final Color value;
   final ColorFamily light;
   final ColorFamily lightHighContrast;
   final ColorFamily lightMediumContrast;
