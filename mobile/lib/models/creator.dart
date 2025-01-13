@@ -13,10 +13,10 @@ class Creator {
     required this.products,
     required this.exhibits,
   }) {
-    for (var product in products) {
+    for (final product in products) {
       product.creator = this;
     }
-    for (var exhibit in exhibits) {
+    for (final exhibit in exhibits) {
       exhibit.creator = this;
     }
   }
