@@ -1,5 +1,5 @@
-import 'package:mobile/models/product.dart';
 import 'package:mobile/models/exhibit.dart';
+import 'package:mobile/models/product.dart';
 
 class Creator {
   Creator({

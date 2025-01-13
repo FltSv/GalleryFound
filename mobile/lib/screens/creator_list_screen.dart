@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/providers/config_provider.dart';
@@ -7,7 +8,6 @@ import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_detail_screen.dart';
 import 'package:mobile/screens/word_search_screen.dart';
 import 'package:mobile/widgets/creator_item.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class CreatorListScreen extends StatefulWidget {
   const CreatorListScreen({super.key});

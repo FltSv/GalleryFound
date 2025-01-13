@@ -1,8 +1,9 @@
 import 'dart:async';
+
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:mobile/firebase_options.dart';
 import 'package:mobile/providers/config_provider.dart';
