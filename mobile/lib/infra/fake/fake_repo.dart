@@ -14,6 +14,7 @@ class FakeRepo implements DataRepoBase {
         name: "suna",
         genre: "デジタル",
         profile: "すなプロフィール",
+        profileHashtags: [],
         links: ["https://mstdn.jp/@fltsv", "https://mstdn.jp/@himarori"],
         highlightProduct: Product(
           id: "10043286-3072-49b8-a04a-83b9b1f790f5",
@@ -71,6 +72,7 @@ class FakeRepo implements DataRepoBase {
         name: "ノゾミ",
         genre: null,
         profile: "ふぁぴ\n\n\n\nhttps://lit.link/choco78",
+        profileHashtags: [],
         links: [
           "https://x.com/mi_oilacrylart",
           "https://x.com/utsukikuroko",
