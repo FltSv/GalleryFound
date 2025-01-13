@@ -19,16 +19,16 @@ class LinkableText extends StatelessWidget {
     );
 
     // ハッシュタグをキャッチする正規表現
-    final RegExp hashtagRegExp = RegExp(r'([#\s\u3000]#[^#\s\u3000]+)');
+    final hashtagRegExp = RegExp(r'([#\s\u3000]#[^#\s\u3000]+)');
 
     // TextSpanのリストを格納する
-    final List<InlineSpan> children = [];
+    final children = <InlineSpan>[];
 
     // splitMapJoin でハッシュタグと通常テキストを分割
     text.splitMapJoin(
       hashtagRegExp,
       onMatch: (Match match) {
-        final String matchedText = match[0]!; // "#..." の文字列
+        final matchedText = match[0]!; // "#..." の文字列
 
         // ハッシュタグ部分：スタイル + タップ可能にする
         children.add(

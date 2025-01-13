@@ -17,7 +17,7 @@ class TopScreen extends StatelessWidget {
     final buttonSize = screenSize.width * 0.1;
     final radius = screenSize.width * 0.28; // ボタンの配置半径
 
-    final List<_ButtonProp> props = [
+    final props = <_ButtonProp>[
       _ButtonProp(Icons.menu_book, Colors.green, null),
       _ButtonProp(Icons.location_on, Colors.blue, const MapScreen()),
       _ButtonProp(Icons.brush, Colors.red, const ExhibitListScreen()),

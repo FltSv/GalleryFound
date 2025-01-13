@@ -18,13 +18,13 @@ class HighlightedText extends StatelessWidget {
     );
 
     // TextSpanのリストを格納する
-    final List<InlineSpan> children = [];
+    final children = <InlineSpan>[];
 
     // splitMapJoin でハイライト部分と通常テキストを分割
     text.splitMapJoin(
       word,
       onMatch: (Match match) {
-        final String matchedText = match[0]!; // "#..." の文字列
+        final matchedText = match[0]!; // "#..." の文字列
 
         // ハイライト部分：スタイルを適用する
         children.add(
