@@ -3,14 +3,14 @@ import 'package:mobile/models/creator.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 
 class CreatorItem extends StatelessWidget {
-  final Creator creator;
-  final VoidCallback onTap;
-
   const CreatorItem({
     super.key,
     required this.creator,
     required this.onTap,
   });
+
+  final Creator creator;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {

@@ -81,8 +81,9 @@ class MyApp extends StatelessWidget {
 }
 
 class ErrorDialog extends StatelessWidget {
-  final Object error;
   const ErrorDialog({super.key, required this.error});
+
+  final Object error;
 
   @override
   Widget build(BuildContext context) {

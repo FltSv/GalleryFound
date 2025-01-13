@@ -2,14 +2,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class LinkableText extends StatelessWidget {
-  final String text;
-  final void Function(String)? onHashtagTap;
-
   const LinkableText({
     super.key,
     required this.text,
     this.onHashtagTap,
   });
+
+  final String text;
+  final void Function(String)? onHashtagTap;
 
   @override
   Widget build(BuildContext context) {

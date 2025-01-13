@@ -101,9 +101,9 @@ class TopScreen extends StatelessWidget {
 }
 
 class _ButtonProp {
+  _ButtonProp(this.icon, this.color, this.screen);
+
   final IconData icon;
   final Color color;
   final Widget? screen;
-
-  _ButtonProp(this.icon, this.color, this.screen);
 }

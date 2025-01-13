@@ -2,14 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ThumbImage extends StatelessWidget {
-  final String? thumbURL;
-  final String imageURL;
-
   const ThumbImage({
     required this.thumbURL,
     required this.imageURL,
     super.key,
   });
+
+  final String? thumbURL;
+  final String imageURL;
 
   @override
   Widget build(BuildContext context) {

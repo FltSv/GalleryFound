@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 
 class ThumbInterlaceImage extends StatelessWidget {
-  final String? thumbURL;
-  final String imageURL;
-
   const ThumbInterlaceImage({
     required this.thumbURL,
     required this.imageURL,
     super.key,
   });
+
+  final String? thumbURL;
+  final String imageURL;
 
   @override
   Widget build(BuildContext context) {

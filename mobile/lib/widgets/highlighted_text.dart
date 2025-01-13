@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class HighlightedText extends StatelessWidget {
-  final String text;
-  final String word;
-
   const HighlightedText({
     super.key,
     required this.text,
     required this.word,
   });
+
+  final String text;
+  final String word;
 
   @override
   Widget build(BuildContext context) {
