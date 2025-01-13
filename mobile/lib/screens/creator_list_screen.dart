@@ -132,8 +132,8 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: ((context) =>
-                            CreatorDetailScreen(creator: creator)),
+                        builder: (context) =>
+                            CreatorDetailScreen(creator: creator),
                       ),
                     );
                   },

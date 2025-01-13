@@ -4,7 +4,7 @@ class NavigateProvider {
   static void push(BuildContext context, Widget screen) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: ((context) => screen),
+        builder: (context) => screen,
       ),
     );
   }
