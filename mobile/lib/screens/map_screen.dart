@@ -34,7 +34,10 @@ class _MapScreenState extends State<MapScreen> {
         },
         onGeolocationPermissionsShowPrompt: (controller, origin) async {
           return GeolocationPermissionShowPromptResponse(
-              origin: origin, allow: true, retain: true);
+            origin: origin,
+            allow: true,
+            retain: true,
+          );
         },
       ),
     );

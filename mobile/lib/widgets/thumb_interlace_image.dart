@@ -23,21 +23,25 @@ class ThumbInterlaceImage extends StatelessWidget {
       imageUrl: imageURL,
       placeholder: (context, url) => availThumb
           ? FittedBox(
-              child: Stack(children: [
-                ThumbImage(
-                  thumbURL: thumbURL,
-                  imageURL: imageURL,
-                ),
-                Positioned.fill(
-                  child: Stack(children: [
-                    BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
-                      child: Container(color: blurColor.withOpacity(0.2)),
+              child: Stack(
+                children: [
+                  ThumbImage(
+                    thumbURL: thumbURL,
+                    imageURL: imageURL,
+                  ),
+                  Positioned.fill(
+                    child: Stack(
+                      children: [
+                        BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                          child: Container(color: blurColor.withOpacity(0.2)),
+                        ),
+                        Center(child: CircularProgressIndicator()),
+                      ],
                     ),
-                    Center(child: CircularProgressIndicator()),
-                  ]),
-                ),
-              ]),
+                  ),
+                ],
+              ),
             )
           : Container(
               color: Colors.grey[300]?.withOpacity(0.5), // プレースホルダーの背景色

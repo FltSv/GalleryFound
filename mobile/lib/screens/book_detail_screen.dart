@@ -31,12 +31,15 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         children: [
           Image.network(book.image),
           const Gap(8),
-          ...book.urls.map((urltext) => LinkText(
+          ...book.urls.map(
+            (urltext) => LinkText(
               text: urltext,
               onTap: () async {
                 final url = Uri.parse(urltext);
                 await launchUrl(url, mode: LaunchMode.externalApplication);
-              }))
+              },
+            ),
+          ),
         ].intersperse(const Gap(8)).toList(),
       ),
     );

@@ -76,7 +76,7 @@ class FakeRepo implements DataRepoBase {
         links: [
           'https://x.com/mi_oilacrylart',
           'https://x.com/utsukikuroko',
-          'https://misskey.m544.net/@choco'
+          'https://misskey.m544.net/@choco',
         ],
         highlightProduct: Product(
           id: '43a0e71b-9761-4800-9e88-1a57a3a4ed53',
@@ -131,38 +131,42 @@ class FakeRepo implements DataRepoBase {
   static Future<List<Book>> fetchBooks() {
     return Future.value([
       Book(
-          id: '1',
-          title: 'ひまわり',
-          image:
-              'https://media.mstdn.jp/accounts/avatars/110/989/102/133/377/139/original/ef63d785a819a2f2.png',
-          urls: ['https://mstdn.jp/@himarori']),
+        id: '1',
+        title: 'ひまわり',
+        image:
+            'https://media.mstdn.jp/accounts/avatars/110/989/102/133/377/139/original/ef63d785a819a2f2.png',
+        urls: ['https://mstdn.jp/@himarori'],
+      ),
       Book(
-          id: '2',
-          title: '砂ちゃん',
-          image:
-              'https://media.mstdn.jp/accounts/avatars/000/113/775/original/4a94c289c389d678.jpg',
-          urls: ['https://mstdn.jp/@fltsv', 'https://mstdn.jp/@himarori']),
+        id: '2',
+        title: '砂ちゃん',
+        image:
+            'https://media.mstdn.jp/accounts/avatars/000/113/775/original/4a94c289c389d678.jpg',
+        urls: ['https://mstdn.jp/@fltsv', 'https://mstdn.jp/@himarori'],
+      ),
       Book(
-          id: '3',
-          title: 'よるねこ',
-          image:
-              'https://media.mstdn.jp/accounts/avatars/000/155/200/original/2e948193ee954e55428290ad6ecada7f.png',
-          urls: [
-            'https://mstdn.jp/@NightCat',
-            'https://mstdn.jp/@himarori',
-            'https://mstdn.jp/@fltsv'
-          ]),
+        id: '3',
+        title: 'よるねこ',
+        image:
+            'https://media.mstdn.jp/accounts/avatars/000/155/200/original/2e948193ee954e55428290ad6ecada7f.png',
+        urls: [
+          'https://mstdn.jp/@NightCat',
+          'https://mstdn.jp/@himarori',
+          'https://mstdn.jp/@fltsv',
+        ],
+      ),
       Book(
-          id: '4',
-          title: 'もやちゃ',
-          image:
-              'https://media.mstdn.jp/accounts/avatars/109/719/600/512/825/943/original/898331de566f6f5e.png',
-          urls: [
-            'https://mstdn.jp/@kisskamakiri',
-            'https://mstdn.jp/@fltsv',
-            'https://mstdn.jp/@NightCat',
-            'https://mstdn.jp/@himarori'
-          ])
+        id: '4',
+        title: 'もやちゃ',
+        image:
+            'https://media.mstdn.jp/accounts/avatars/109/719/600/512/825/943/original/898331de566f6f5e.png',
+        urls: [
+          'https://mstdn.jp/@kisskamakiri',
+          'https://mstdn.jp/@fltsv',
+          'https://mstdn.jp/@NightCat',
+          'https://mstdn.jp/@himarori',
+        ],
+      ),
     ]);
   }
 
@@ -170,9 +174,10 @@ class FakeRepo implements DataRepoBase {
   Future<List<Gallery>> fetchGalleries() {
     return Future.value([
       Gallery(
-          id: 'nkRObVdYriU5AolyNxJy5pIDKEs3',
-          name: '皇居',
-          location: '東京都千代田区千代田1-1'),
+        id: 'nkRObVdYriU5AolyNxJy5pIDKEs3',
+        name: '皇居',
+        location: '東京都千代田区千代田1-1',
+      ),
     ]);
   }
 }

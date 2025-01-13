@@ -29,9 +29,11 @@ class TopScreen extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(Theme.of(context).brightness == Brightness.light
-                ? 'assets/palette_background_light.png'
-                : 'assets/palette_background_dark.png'),
+            image: AssetImage(
+              Theme.of(context).brightness == Brightness.light
+                  ? 'assets/palette_background_light.png'
+                  : 'assets/palette_background_dark.png',
+            ),
           ),
         ),
         child: Stack(
@@ -51,7 +53,12 @@ class TopScreen extends StatelessWidget {
   }
 
   Widget _iconButton(
-      BuildContext context, _ButtonProp prop, double x, double y, double size) {
+    BuildContext context,
+    _ButtonProp prop,
+    double x,
+    double y,
+    double size,
+  ) {
     final isEnable = prop.screen != null;
 
     return Stack(

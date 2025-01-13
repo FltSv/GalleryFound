@@ -26,27 +26,31 @@ class FirebaseRepo implements DataRepoBase {
 
       final exhibitsMaps = (docSnap.get('exhibits') as List<dynamic>)
           .cast<Map<String, dynamic>>();
-      final exhibitTasks = exhibitsMaps.map((exhibit) async => Exhibit(
-            id: exhibit['id'],
-            title: exhibit['title'],
-            location: exhibit['location'],
-            galleryId: exhibit['galleryId'],
-            image: exhibit['image'],
-            thumbUrl: await getThumbUrl(docSnap.id, exhibit['image']),
-            startDate: exhibit['startDate'].toDate(),
-            endDate: exhibit['endDate'].toDate(),
-          ));
+      final exhibitTasks = exhibitsMaps.map(
+        (exhibit) async => Exhibit(
+          id: exhibit['id'],
+          title: exhibit['title'],
+          location: exhibit['location'],
+          galleryId: exhibit['galleryId'],
+          image: exhibit['image'],
+          thumbUrl: await getThumbUrl(docSnap.id, exhibit['image']),
+          startDate: exhibit['startDate'].toDate(),
+          endDate: exhibit['endDate'].toDate(),
+        ),
+      );
       final exhibits = await Future.wait(exhibitTasks);
 
       final productMaps = (docSnap.get('products') as List<dynamic>)
           .cast<Map<String, dynamic>>();
-      final productsTasks = productMaps.map((product) async => Product(
-            id: product['id'],
-            title: product['title'] ?? '',
-            detail: product['detail'] ?? '',
-            image: product['image'],
-            thumbUrl: await getThumbUrl(docSnap.id, product['image']),
-          ));
+      final productsTasks = productMaps.map(
+        (product) async => Product(
+          id: product['id'],
+          title: product['title'] ?? '',
+          detail: product['detail'] ?? '',
+          image: product['image'],
+          thumbUrl: await getThumbUrl(docSnap.id, product['image']),
+        ),
+      );
       final products = await Future.wait(productsTasks);
 
       final highlightProduct = products.isNotEmpty

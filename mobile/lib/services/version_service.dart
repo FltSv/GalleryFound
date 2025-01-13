@@ -53,21 +53,25 @@ class VersionService {
                       ),
                     ),
                     const Gap(12),
-                    Text('''新しいバージョンが公開されました。
+                    Text(
+                      '''新しいバージョンが公開されました。
 下記のボタンから最新バージョンをインストールしてください。''',
-                        style: textTheme.bodyMedium
-                            ?.copyWith(color: Colors.black)),
+                      style:
+                          textTheme.bodyMedium?.copyWith(color: Colors.black),
+                    ),
                     const Gap(20),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple,
-                          foregroundColor: Colors.white),
+                        backgroundColor: Colors.purple,
+                        foregroundColor: Colors.white,
+                      ),
                       onPressed: () {
                         // アップデート処理
                         final newVer =
                             ConfigProvider().config.requiredAppVersion;
                         final url = Uri.parse(
-                            'https://github.com/FltSv/GalleryFound/releases/tag/v$newVer');
+                          'https://github.com/FltSv/GalleryFound/releases/tag/v$newVer',
+                        );
                         launchUrl(url, mode: LaunchMode.inAppWebView);
                       },
                       child: const Text('アップデート'),

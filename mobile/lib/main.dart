@@ -65,16 +65,18 @@ class MyApp extends StatelessWidget {
       theme: materialTheme.light(),
       darkTheme: materialTheme.dark(),
       themeMode: ThemeMode.system,
-      home: Builder(builder: (context) {
-        // アップデートが必要な場合、ポップアップを表示
-        if (VersionService.isUpdateRequired) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            VersionService.showUpdatePopup(context);
-          });
-        }
+      home: Builder(
+        builder: (context) {
+          // アップデートが必要な場合、ポップアップを表示
+          if (VersionService.isUpdateRequired) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              VersionService.showUpdatePopup(context);
+            });
+          }
 
-        return const TopScreen();
-      }),
+          return const TopScreen();
+        },
+      ),
     );
   }
 }

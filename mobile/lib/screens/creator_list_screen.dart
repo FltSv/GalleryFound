@@ -63,15 +63,17 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
               child: Wrap(
                 spacing: 8.0,
                 children: genres
-                    .map((genre) => ChoiceChip(
-                          label: Text(genre),
-                          selected: genre == selectedGenre,
-                          onSelected: (selected) {
-                            setState(() {
-                              selectedGenre = selected ? genre : null;
-                            });
-                          },
-                        ))
+                    .map(
+                      (genre) => ChoiceChip(
+                        label: Text(genre),
+                        selected: genre == selectedGenre,
+                        onSelected: (selected) {
+                          setState(() {
+                            selectedGenre = selected ? genre : null;
+                          });
+                        },
+                      ),
+                    )
                     .toList(),
               ),
             ),
@@ -84,20 +86,24 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                   icon: Icon(Icons.tag),
                   onSelected: (hashtag) {
                     NavigateProvider.push(
-                        context,
-                        WordSearchScreen(
-                          query: hashtag,
-                          searchFilter: (creators, query) =>
-                              // ハッシュタグが含まれるクリエイターをフィルタリング
-                              creators.where((creator) =>
-                                  creator.profileHashtags.contains(query)),
-                        ));
+                      context,
+                      WordSearchScreen(
+                        query: hashtag,
+                        searchFilter: (creators, query) =>
+                            // ハッシュタグが含まれるクリエイターをフィルタリング
+                            creators.where(
+                          (creator) => creator.profileHashtags.contains(query),
+                        ),
+                      ),
+                    );
                   },
                   itemBuilder: (_) => hashtagCounts.entries
-                      .map((entry) => PopupMenuItem<String>(
-                            value: entry.key,
-                            child: Text('${entry.key} (${entry.value})'),
-                          ))
+                      .map(
+                        (entry) => PopupMenuItem<String>(
+                          value: entry.key,
+                          child: Text('${entry.key} (${entry.value})'),
+                        ),
+                      )
                       .toList(),
                 ),
                 Expanded(
@@ -124,10 +130,12 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                 return CreatorItem(
                   creator: creator,
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: ((context) =>
-                          CreatorDetailScreen(creator: creator)),
-                    ));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: ((context) =>
+                            CreatorDetailScreen(creator: creator)),
+                      ),
+                    );
                   },
                 );
               },

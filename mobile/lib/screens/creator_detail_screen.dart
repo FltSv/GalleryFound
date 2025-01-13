@@ -46,8 +46,9 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
                     query: hashtag,
                     searchFilter: (creators, query) =>
                         // ハッシュタグが含まれるクリエイターをフィルタリング
-                        creators.where((creator) =>
-                            creator.profileHashtags.contains(query)),
+                        creators.where(
+                      (creator) => creator.profileHashtags.contains(query),
+                    ),
                   ),
                 );
               },
@@ -56,23 +57,28 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: creator.links
-                  .map<Widget>((link) => Row(
-                        children: [
-                          Image.network(
-                            'http://www.google.com/s2/favicons?domain=$link',
-                            width: theme.textTheme.bodyMedium?.fontSize ?? 16,
-                            height: theme.textTheme.bodyMedium?.fontSize ?? 16,
-                          ),
-                          const Gap(4),
-                          LinkText(
-                              text: link,
-                              onTap: () async {
-                                final url = Uri.parse(link);
-                                await launchUrl(url,
-                                    mode: LaunchMode.externalApplication);
-                              }),
-                        ],
-                      ))
+                  .map<Widget>(
+                    (link) => Row(
+                      children: [
+                        Image.network(
+                          'http://www.google.com/s2/favicons?domain=$link',
+                          width: theme.textTheme.bodyMedium?.fontSize ?? 16,
+                          height: theme.textTheme.bodyMedium?.fontSize ?? 16,
+                        ),
+                        const Gap(4),
+                        LinkText(
+                          text: link,
+                          onTap: () async {
+                            final url = Uri.parse(link);
+                            await launchUrl(
+                              url,
+                              mode: LaunchMode.externalApplication,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  )
                   .intersperse(const Gap(8))
                   .toList(),
             ),
@@ -86,11 +92,15 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
           Column(
             children: creator.exhibits
                 .map<ExhibitItem>((exhibit) => ExhibitItem(exhibit: exhibit))
-                .map<Widget>((item) => GestureDetector(
-                      onTap: () => NavigateProvider.push(
-                          context, ExhibitDetailScreen(exhibit: item.exhibit)),
-                      child: item,
-                    ))
+                .map<Widget>(
+                  (item) => GestureDetector(
+                    onTap: () => NavigateProvider.push(
+                      context,
+                      ExhibitDetailScreen(exhibit: item.exhibit),
+                    ),
+                    child: item,
+                  ),
+                )
                 .intersperse(const Gap(8))
                 .toList(),
           ),
@@ -108,11 +118,15 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
             shrinkWrap: true, // GridViewの高さをコンテンツに合わせる
             children: creator.products
                 .map((product) => ProductItem(product: product))
-                .map<Widget>((item) => GestureDetector(
-                      onTap: () => NavigateProvider.push(
-                          context, ProductDetailScreen(product: item.product)),
-                      child: item,
-                    ))
+                .map<Widget>(
+                  (item) => GestureDetector(
+                    onTap: () => NavigateProvider.push(
+                      context,
+                      ProductDetailScreen(product: item.product),
+                    ),
+                    child: item,
+                  ),
+                )
                 .toList(),
           ),
         ].intersperse(const Gap(16)).toList(),

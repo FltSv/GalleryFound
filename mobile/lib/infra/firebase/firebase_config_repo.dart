@@ -24,10 +24,12 @@ class FirebaseConfigRepo implements ConfigRepoBase {
         kDebugMode ? Duration(minutes: 1) : Duration(hours: 1);
 
     final config = FirebaseRemoteConfig.instance;
-    await config.setConfigSettings(RemoteConfigSettings(
-      fetchTimeout: const Duration(minutes: 1),
-      minimumFetchInterval: minimumFetchInterval,
-    ));
+    await config.setConfigSettings(
+      RemoteConfigSettings(
+        fetchTimeout: const Duration(minutes: 1),
+        minimumFetchInterval: minimumFetchInterval,
+      ),
+    );
   }
 
   List<T> _getJsonAsList<T>(FirebaseRemoteConfig config, String key) {
