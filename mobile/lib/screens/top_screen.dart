@@ -83,7 +83,7 @@ class TopScreen extends StatelessWidget {
               padding: const EdgeInsets.all(4),
               color: Colors.black.withOpacity(0.5),
               child: const Text(
-                "準備中...",
+                '準備中...',
                 style: TextStyle(color: Colors.white),
               ),
             ),

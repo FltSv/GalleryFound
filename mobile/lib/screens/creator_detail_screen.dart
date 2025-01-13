@@ -59,7 +59,7 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
                   .map<Widget>((link) => Row(
                         children: [
                           Image.network(
-                            "http://www.google.com/s2/favicons?domain=$link",
+                            'http://www.google.com/s2/favicons?domain=$link',
                             width: theme.textTheme.bodyMedium?.fontSize ?? 16,
                             height: theme.textTheme.bodyMedium?.fontSize ?? 16,
                           ),

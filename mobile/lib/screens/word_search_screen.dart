@@ -33,7 +33,7 @@ class WordSearchScreen extends StatelessWidget {
         child: filteredCreators.isEmpty
             ? Center(
                 child: EmptyState(
-                  message: "該当するユーザーがいません",
+                  message: '該当するユーザーがいません',
                 ),
               )
             : ListView.builder(

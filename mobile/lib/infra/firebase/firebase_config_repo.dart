@@ -11,10 +11,10 @@ class FirebaseConfigRepo implements ConfigRepoBase {
     await config.fetchAndActivate();
 
     return Config(
-      mapUrl: config.getString("map_url"),
-      debugUserIds: _getJsonAsList<String>(config, "debug_user_ids"),
-      requiredAppVersion: config.getString("required_app_version"),
-      genres: _getJsonAsList(config, "genres"),
+      mapUrl: config.getString('map_url'),
+      debugUserIds: _getJsonAsList<String>(config, 'debug_user_ids'),
+      requiredAppVersion: config.getString('required_app_version'),
+      genres: _getJsonAsList(config, 'genres'),
     );
   }
 

@@ -4,7 +4,7 @@ import 'package:mobile/providers/config_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key, this.query = ""});
+  const MapScreen({super.key, this.query = ''});
 
   final String query;
   String get url => query.isEmpty
