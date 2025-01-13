@@ -19,7 +19,7 @@ class CreatorItem extends StatelessWidget {
 
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(10),
       ),
       clipBehavior: Clip.antiAlias,
       child: GestureDetector(
@@ -60,8 +60,8 @@ class CreatorItem extends StatelessWidget {
             ),
             // テキスト表示
             Positioned(
-              bottom: 10.0,
-              left: 10.0,
+              bottom: 10,
+              left: 10,
               child: Text(
                 creator.name,
                 style: Theme.of(context)

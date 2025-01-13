@@ -61,7 +61,7 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Wrap(
-                spacing: 8.0,
+                spacing: 8,
                 children: genres
                     .map(
                       (genre) => ChoiceChip(
