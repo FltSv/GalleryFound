@@ -3,8 +3,10 @@ import 'package:gap/gap.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/providers/config_provider.dart';
 import 'package:mobile/providers/data_provider.dart';
+import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_detail_screen.dart';
-import 'package:mobile/widgets/thumb_image.dart';
+import 'package:mobile/screens/word_search_screen.dart';
+import 'package:mobile/widgets/creator_item.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class CreatorListScreen extends StatefulWidget {
@@ -34,6 +36,17 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
       return matchesGenre && matchesSearch;
     }).toList();
   }
+
+  /// [results]リスト内のプロフィールに含まれる一意なハッシュタグの出現回数をマッピング
+  Map<String, int> get hashtagCounts => Map.unmodifiable(
+        results.expand((creator) => creator.profileHashtags).fold(
+          <String, int>{},
+          (counts, hashtag) => {
+            ...counts,
+            hashtag: (counts[hashtag] ?? 0) + 1,
+          },
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -65,11 +78,37 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: TextField(
-              decoration: const InputDecoration(hintText: '作家を検索'),
-              onChanged: (String value) {
-                setState(() => searchText = value);
-              },
+            child: Row(
+              children: [
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.tag),
+                  onSelected: (hashtag) {
+                    NavigateProvider.push(
+                        context,
+                        WordSearchScreen(
+                          query: hashtag,
+                          searchFilter: (creators, query) =>
+                              // ハッシュタグが含まれるクリエイターをフィルタリング
+                              creators.where((creator) =>
+                                  creator.profileHashtags.contains(query)),
+                        ));
+                  },
+                  itemBuilder: (_) => hashtagCounts.entries
+                      .map((entry) => PopupMenuItem<String>(
+                            value: entry.key,
+                            child: Text('${entry.key} (${entry.value})'),
+                          ))
+                      .toList(),
+                ),
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(hintText: '作家を検索'),
+                    onChanged: (String value) {
+                      setState(() => searchText = value);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           Gap(8),
@@ -95,81 +134,6 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class CreatorItem extends StatelessWidget {
-  final Creator creator;
-  final VoidCallback onTap;
-
-  const CreatorItem({
-    super.key,
-    required this.creator,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final imageUrl = creator.highlightProduct?.imageUrl;
-    final thumbUrl = creator.highlightProduct?.thumbUrl;
-
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Stack(
-          children: [
-            // 背景画像またはプレースホルダー
-            imageUrl != null
-                ? ThumbImage(thumbURL: thumbUrl, imageURL: imageUrl)
-                : Container(
-                    color: Colors.grey[300], // プレースホルダーの背景色
-                    child: Center(
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 50,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ),
-            // シャドウグラデーション
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 100,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.8),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // テキスト表示
-            Positioned(
-              bottom: 10.0,
-              left: 10.0,
-              child: Text(
-                creator.name,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

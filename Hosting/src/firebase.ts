@@ -92,6 +92,7 @@ export interface Creator {
   name?: string;
   genre?: string;
   profile?: string;
+  profileHashtags?: string[];
   links?: string[];
   highlightProductId?: string;
   products?: Product[];

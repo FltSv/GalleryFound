@@ -5,10 +5,12 @@ import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/product.dart';
 import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/exhibit_detail_screen.dart';
+import 'package:mobile/screens/word_search_screen.dart';
 import 'package:mobile/screens/product_detail_screen.dart';
 import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
 import 'package:mobile/widgets/link_text.dart';
+import 'package:mobile/widgets/linkable_text.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -34,7 +36,22 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (creator.profile.isNotEmpty) Text(creator.profile),
+          if (creator.profile.isNotEmpty)
+            LinkableText(
+              text: creator.profile,
+              onHashtagTap: (hashtag) {
+                NavigateProvider.push(
+                  context,
+                  WordSearchScreen(
+                    query: hashtag,
+                    searchFilter: (creators, query) =>
+                        // ハッシュタグが含まれるクリエイターをフィルタリング
+                        creators.where((creator) =>
+                            creator.profileHashtags.contains(query)),
+                  ),
+                );
+              },
+            ),
           if (creator.links.isNotEmpty)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

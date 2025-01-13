@@ -30,6 +30,7 @@ import { useAuthContext } from 'components/AuthContext';
 import {
   Button,
   FileInput,
+  HashtagTextarea,
   Switch,
   SubmitButton,
   Textbox,
@@ -62,6 +63,7 @@ export const Mypage = () => {
   const [editExhibit, setEditExhibit] = useState<Exhibit>();
   const [editProduct, setEditProduct] = useState<Product>();
   const [genres, setGenres] = useState<string[]>([]);
+  const [profileHashtags, setProfileHashtags] = useState<string[]>([]);
 
   useEffect(() => {
     if (user === null) {
@@ -303,6 +305,7 @@ export const Mypage = () => {
       // 一時データの結合
       const submitData = {
         ...data,
+        profileHashtags: profileHashtags,
         links: creator.links,
         products: creator.products,
         exhibits: creator.exhibits,
@@ -318,7 +321,7 @@ export const Mypage = () => {
       // リロード
       window.location.reload();
     },
-    [creator, user],
+    [creator, profileHashtags, user],
   );
 
   const onSubmit = useCallback(
@@ -350,10 +353,7 @@ export const Mypage = () => {
         <div>
           <p>作品ジャンル</p>
           <select
-            className="
-              my-1 block w-fit rounded-md 
-              border border-black bg-transparent px-2 py-2 
-              focus:border-2 focus:border-blue-600 focus:outline-none"
+            className="my-1 block w-fit rounded-md border border-black bg-transparent px-2 py-2 focus:border-2 focus:border-blue-600 focus:outline-none"
             defaultValue={creator?.genre}
             {...register('genre')}>
             {genres.map(genre => (
@@ -366,9 +366,10 @@ export const Mypage = () => {
 
         <div>
           <p>プロフィール</p>
-          <Textarea
+          <HashtagTextarea
             defaultValue={creator?.profile}
             minRows={3}
+            onHashtagsChange={setProfileHashtags}
             sx={{
               borderColor: 'black',
               marginY: '0.25rem',
@@ -740,7 +741,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const tmpImage =
     selectedFiles !== undefined && selectedFiles.length > 0
       ? URL.createObjectURL(selectedFiles[0])
-      : exhibit?.tmpImageData ?? '';
+      : (exhibit?.tmpImageData ?? '');
 
   const location = watch('location');
   const matchGallery = galleries?.find(x => x.name === location);

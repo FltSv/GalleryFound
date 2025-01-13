@@ -1,0 +1,39 @@
+{
+  // スペルチェック除外リスト
+  "words": [
+    "crosshairs",
+    "galleryfound",
+    "mypage",
+    "reviewdog",
+    "schyler",
+    "stefanzweifel",
+    "suna",
+    "technote",
+    "testflight",
+    "ulidx"
+  ],
+  "ignorePaths": [
+    "Hosting/node_modules/**",
+    "Maui/**",
+    "mobile/build/**",
+    "mobile/{android,ios}/**",
+    "mobile/lib/firebase_options.dart",
+    "**/assets/**",
+    "**/fake/**",
+    "**/tailwind.config.js"
+  ],
+  "ignoreRegExpList": [
+    "\\..*", // プロパティ名などを無視
+    "/.*", // パス名などを無視
+    "\bkey\b.*", // APIKeyなど、keyをSuffixとした変数以降の値を無視
+    "\bid\b.*" // IDなどの値を無視
+  ],
+  "overrides": [
+    {
+      // TailwindCSSのカスタムフォント名を無視
+      "filename": "**/*.{js,ts,jsx,tsx}",
+      "ignoreRegExpList": ["font-.*"]
+    }
+  ],
+  "dictionaries": ["google", "cpp", "html", "flutter"]
+}
