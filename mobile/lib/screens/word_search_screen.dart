@@ -31,7 +31,7 @@ class WordSearchScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: filteredCreators.isEmpty
-            ? Center(
+            ? const Center(
                 child: EmptyState(
                   message: '該当するユーザーがいません',
                 ),

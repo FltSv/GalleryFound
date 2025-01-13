@@ -83,7 +83,7 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
             child: Row(
               children: [
                 PopupMenuButton<String>(
-                  icon: Icon(Icons.tag),
+                  icon: const Icon(Icons.tag),
                   onSelected: (hashtag) {
                     NavigateProvider.push(
                       context,
@@ -117,10 +117,10 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
               ],
             ),
           ),
-          Gap(8),
+          const Gap(8),
           Expanded(
             child: MasonryGridView.builder(
-              gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // 横に並べる数を調整します
               ),
               itemCount: results.length,

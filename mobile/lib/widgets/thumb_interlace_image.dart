@@ -36,7 +36,7 @@ class ThumbInterlaceImage extends StatelessWidget {
                           filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
                           child: Container(color: blurColor.withOpacity(0.2)),
                         ),
-                        Center(child: CircularProgressIndicator()),
+                        const Center(child: CircularProgressIndicator()),
                       ],
                     ),
                   ),
@@ -46,7 +46,7 @@ class ThumbInterlaceImage extends StatelessWidget {
           : Container(
               color: Colors.grey[300]?.withOpacity(0.5), // プレースホルダーの背景色
               padding: const EdgeInsets.all(16),
-              child: Center(child: CircularProgressIndicator()),
+              child: const Center(child: CircularProgressIndicator()),
             ),
       errorWidget: (context, url, error) => const Icon(Icons.error),
     );

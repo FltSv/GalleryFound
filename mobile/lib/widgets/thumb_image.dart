@@ -20,7 +20,7 @@ class ThumbImage extends StatelessWidget {
       placeholder: (context, url) => Container(
         color: Colors.grey[300]?.withOpacity(0.5), // プレースホルダーの背景色
         padding: const EdgeInsets.all(16),
-        child: Center(
+        child: const Center(
           child: CircularProgressIndicator(),
         ),
       ),
