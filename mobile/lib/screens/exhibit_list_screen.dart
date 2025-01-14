@@ -33,23 +33,29 @@ class _ExhibitListScreenState extends State<ExhibitListScreen> {
 
   List<Widget> _getResults() {
     final results = creators
-        .map((creator) => creator.exhibits.map((exhibit) {
-              final gallery = galleries
-                  .firstWhere((gallery) => gallery.id == exhibit.galleryId);
-              final galleryAddress = gallery.location;
+        .map(
+          (creator) => creator.exhibits.map((exhibit) {
+            final gallery = galleries
+                .firstWhere((gallery) => gallery.id == exhibit.galleryId);
+            final galleryAddress = gallery.location;
 
-              return ExhibitItem(
-                exhibit: exhibit,
-                galleryAddress: galleryAddress,
-              );
-            }))
+            return ExhibitItem(
+              exhibit: exhibit,
+              galleryAddress: galleryAddress,
+            );
+          }),
+        )
         .expand((element) => element)
         .where((item) => item.exhibit.endDate.isAfter(DateTime.now()))
-        .map<Widget>((item) => GestureDetector(
-              onTap: () => NavigateProvider.push(
-                  context, ExhibitDetailScreen(exhibit: item.exhibit)),
-              child: item,
-            ))
+        .map<Widget>(
+          (item) => GestureDetector(
+            onTap: () => NavigateProvider.push(
+              context,
+              ExhibitDetailScreen(exhibit: item.exhibit),
+            ),
+            child: item,
+          ),
+        )
         .intersperse(const Gap(8))
         .toList();
 

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:mobile/providers/navigate_provider.dart';
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_list_screen.dart';
 import 'package:mobile/screens/exhibit_list_screen.dart';
 import 'package:mobile/screens/map_screen.dart';
@@ -17,7 +17,7 @@ class TopScreen extends StatelessWidget {
     final buttonSize = screenSize.width * 0.1;
     final radius = screenSize.width * 0.28; // ボタンの配置半径
 
-    final List<_ButtonProp> props = [
+    final props = <_ButtonProp>[
       _ButtonProp(Icons.menu_book, Colors.green, null),
       _ButtonProp(Icons.location_on, Colors.blue, const MapScreen()),
       _ButtonProp(Icons.brush, Colors.red, const ExhibitListScreen()),
@@ -29,9 +29,11 @@ class TopScreen extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(Theme.of(context).brightness == Brightness.light
-                ? 'assets/palette_background_light.png'
-                : 'assets/palette_background_dark.png'),
+            image: AssetImage(
+              Theme.of(context).brightness == Brightness.light
+                  ? 'assets/palette_background_light.png'
+                  : 'assets/palette_background_dark.png',
+            ),
           ),
         ),
         child: Stack(
@@ -51,7 +53,12 @@ class TopScreen extends StatelessWidget {
   }
 
   Widget _iconButton(
-      BuildContext context, _ButtonProp prop, double x, double y, double size) {
+    BuildContext context,
+    _ButtonProp prop,
+    double x,
+    double y,
+    double size,
+  ) {
     final isEnable = prop.screen != null;
 
     return Stack(
@@ -83,7 +90,7 @@ class TopScreen extends StatelessWidget {
               padding: const EdgeInsets.all(4),
               color: Colors.black.withOpacity(0.5),
               child: const Text(
-                "準備中...",
+                '準備中...',
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -94,9 +101,9 @@ class TopScreen extends StatelessWidget {
 }
 
 class _ButtonProp {
+  _ButtonProp(this.icon, this.color, this.screen);
+
   final IconData icon;
   final Color color;
   final Widget? screen;
-
-  _ButtonProp(this.icon, this.color, this.screen);
 }

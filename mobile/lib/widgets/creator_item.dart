@@ -3,14 +3,14 @@ import 'package:mobile/models/creator.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 
 class CreatorItem extends StatelessWidget {
-  final Creator creator;
-  final VoidCallback onTap;
-
   const CreatorItem({
     super.key,
     required this.creator,
     required this.onTap,
   });
+
+  final Creator creator;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class CreatorItem extends StatelessWidget {
 
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(10),
       ),
       clipBehavior: Clip.antiAlias,
       child: GestureDetector(
@@ -60,8 +60,8 @@ class CreatorItem extends StatelessWidget {
             ),
             // テキスト表示
             Positioned(
-              bottom: 10.0,
-              left: 10.0,
+              bottom: 10,
+              left: 10,
               child: Text(
                 creator.name,
                 style: Theme.of(context)

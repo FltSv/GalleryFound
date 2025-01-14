@@ -36,11 +36,15 @@ class _BookListScreenState extends State<BookListScreen> {
     final results = DataProvider()
         .books
         .map((book) => BookItem(book: book))
-        .map<Widget>((item) => GestureDetector(
-              onTap: () => NavigateProvider.push(
-                  context, BookDetailScreen(book: item.book)),
-              child: item,
-            ))
+        .map<Widget>(
+          (item) => GestureDetector(
+            onTap: () => NavigateProvider.push(
+              context,
+              BookDetailScreen(book: item.book),
+            ),
+            child: item,
+          ),
+        )
         .toList();
 
     return results.isEmpty

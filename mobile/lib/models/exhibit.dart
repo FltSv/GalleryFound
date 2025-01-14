@@ -40,7 +40,7 @@ class Exhibit {
   /// 展示日の表示
   static final DateFormat _dateFormat = DateFormat('yyyy/MM/dd');
   String get displayDate =>
-      "${_dateFormat.format(startDate)} ～ ${_dateFormat.format(endDate)}";
+      '${_dateFormat.format(startDate)} ～ ${_dateFormat.format(endDate)}';
 
   late final Creator creator;
 

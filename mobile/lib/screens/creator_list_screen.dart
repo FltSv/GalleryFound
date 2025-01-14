@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/providers/config_provider.dart';
@@ -7,7 +8,6 @@ import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_detail_screen.dart';
 import 'package:mobile/screens/word_search_screen.dart';
 import 'package:mobile/widgets/creator_item.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class CreatorListScreen extends StatefulWidget {
   const CreatorListScreen({super.key});
@@ -61,17 +61,19 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Wrap(
-                spacing: 8.0,
+                spacing: 8,
                 children: genres
-                    .map((genre) => ChoiceChip(
-                          label: Text(genre),
-                          selected: genre == selectedGenre,
-                          onSelected: (selected) {
-                            setState(() {
-                              selectedGenre = selected ? genre : null;
-                            });
-                          },
-                        ))
+                    .map(
+                      (genre) => ChoiceChip(
+                        label: Text(genre),
+                        selected: genre == selectedGenre,
+                        onSelected: (selected) {
+                          setState(() {
+                            selectedGenre = selected ? genre : null;
+                          });
+                        },
+                      ),
+                    )
                     .toList(),
               ),
             ),
@@ -81,23 +83,27 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
             child: Row(
               children: [
                 PopupMenuButton<String>(
-                  icon: Icon(Icons.tag),
+                  icon: const Icon(Icons.tag),
                   onSelected: (hashtag) {
                     NavigateProvider.push(
-                        context,
-                        WordSearchScreen(
-                          query: hashtag,
-                          searchFilter: (creators, query) =>
-                              // ハッシュタグが含まれるクリエイターをフィルタリング
-                              creators.where((creator) =>
-                                  creator.profileHashtags.contains(query)),
-                        ));
+                      context,
+                      WordSearchScreen(
+                        query: hashtag,
+                        searchFilter: (creators, query) =>
+                            // ハッシュタグが含まれるクリエイターをフィルタリング
+                            creators.where(
+                          (creator) => creator.profileHashtags.contains(query),
+                        ),
+                      ),
+                    );
                   },
                   itemBuilder: (_) => hashtagCounts.entries
-                      .map((entry) => PopupMenuItem<String>(
-                            value: entry.key,
-                            child: Text('${entry.key} (${entry.value})'),
-                          ))
+                      .map(
+                        (entry) => PopupMenuItem<String>(
+                          value: entry.key,
+                          child: Text('${entry.key} (${entry.value})'),
+                        ),
+                      )
                       .toList(),
                 ),
                 Expanded(
@@ -111,10 +117,10 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
               ],
             ),
           ),
-          Gap(8),
+          const Gap(8),
           Expanded(
             child: MasonryGridView.builder(
-              gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // 横に並べる数を調整します
               ),
               itemCount: results.length,
@@ -124,10 +130,12 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                 return CreatorItem(
                   creator: creator,
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: ((context) =>
-                          CreatorDetailScreen(creator: creator)),
-                    ));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            CreatorDetailScreen(creator: creator),
+                      ),
+                    );
                   },
                 );
               },

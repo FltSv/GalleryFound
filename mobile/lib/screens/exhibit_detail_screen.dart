@@ -44,15 +44,21 @@ class _ExhibitDetailScreenState extends State<ExhibitDetailScreen> {
               const Gap(8),
               Text(exhibit.displayDate),
               LinkText(
-                  text: exhibit.location,
-                  onTap: () => NavigateProvider.push(
-                      context, MapScreen(query: exhibit.location))),
+                text: exhibit.location,
+                onTap: () => NavigateProvider.push(
+                  context,
+                  MapScreen(query: exhibit.location),
+                ),
+              ),
               LinkText(
-                  text: creator.name,
-                  onTap: () => NavigateProvider.push(
-                      context, CreatorDetailScreen(creator: creator))),
+                text: creator.name,
+                onTap: () => NavigateProvider.push(
+                  context,
+                  CreatorDetailScreen(creator: creator),
+                ),
+              ),
             ].intersperse(const Gap(8)).toList(),
-          )
+          ),
         ],
       ),
     );

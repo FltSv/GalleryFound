@@ -7,15 +7,15 @@ import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/highlighted_text.dart';
 
 class WordSearchScreen extends StatelessWidget {
-  final String query;
-  final Iterable<Creator> Function(List<Creator> creators, String query)
-      searchFilter; // 検索ロジック
-
   const WordSearchScreen({
     super.key,
     required this.query,
     required this.searchFilter,
   });
+
+  final String query;
+  final Iterable<Creator> Function(List<Creator> creators, String query)
+      searchFilter; // 検索ロジック
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +31,9 @@ class WordSearchScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: filteredCreators.isEmpty
-            ? Center(
+            ? const Center(
                 child: EmptyState(
-                  message: "該当するユーザーがいません",
+                  message: '該当するユーザーがいません',
                 ),
               )
             : ListView.builder(
@@ -46,7 +46,6 @@ class WordSearchScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            flex: 1, // CreatorItemの比率
                             child: CreatorItem(creator: creator, onTap: () {}),
                           ),
                           Expanded(
