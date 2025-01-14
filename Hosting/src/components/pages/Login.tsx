@@ -95,7 +95,7 @@ export const Login = () => {
     return <Navigate replace to="/mypage" />;
   }
 
-  const actionText = isRegister ? 'sign up' : 'rogin';
+  const actionText = isRegister ? 'sign up' : 'login';
 
   const visiblePwd = watch('visiblePwd', false);
 

@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 
 class HighlightedText extends StatelessWidget {
-  final String text;
-  final String word;
-
   const HighlightedText({
     super.key,
     required this.text,
     required this.word,
   });
 
+  final String text;
+  final String word;
+
   @override
   Widget build(BuildContext context) {
     // word引数に一致する部分をハイライトするスタイル
-    final wordStyle = const TextStyle(
+    const wordStyle = TextStyle(
       fontWeight: FontWeight.bold,
     );
 
     // TextSpanのリストを格納する
-    final List<InlineSpan> children = [];
+    final children = <InlineSpan>[];
 
     // splitMapJoin でハイライト部分と通常テキストを分割
     text.splitMapJoin(
       word,
       onMatch: (Match match) {
-        final String matchedText = match[0]!; // "#..." の文字列
+        final matchedText = match[0]!; // "#..." の文字列
 
         // ハイライト部分：スタイルを適用する
         children.add(

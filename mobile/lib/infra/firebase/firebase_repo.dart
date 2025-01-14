@@ -12,7 +12,7 @@ class FirebaseRepo implements DataRepoBase {
   @override
   Future<List<Creator>> fetchCreators() async {
     final db = FirebaseFirestore.instance;
-    final querySnap = await db.collection("creators").get();
+    final querySnap = await db.collection('creators').get();
 
     final ignoreIds = ConfigProvider().config.debugUserIds;
 
@@ -22,47 +22,51 @@ class FirebaseRepo implements DataRepoBase {
       final data = docSnap.data();
 
       final profileHashtags =
-          ((data["profileHashtags"] ?? []) as List<dynamic>).cast<String>();
+          ((data['profileHashtags'] ?? []) as List<dynamic>).cast<String>();
 
-      final exhibitsMaps = (docSnap.get("exhibits") as List<dynamic>)
+      final exhibitsMaps = (docSnap.get('exhibits') as List<dynamic>)
           .cast<Map<String, dynamic>>();
-      final exhibitTasks = exhibitsMaps.map((exhibit) async => Exhibit(
-            id: exhibit["id"],
-            title: exhibit["title"],
-            location: exhibit["location"],
-            galleryId: exhibit["galleryId"],
-            image: exhibit["image"],
-            thumbUrl: await getThumbUrl(docSnap.id, exhibit["image"]),
-            startDate: exhibit["startDate"].toDate(),
-            endDate: exhibit["endDate"].toDate(),
-          ));
+      final exhibitTasks = exhibitsMaps.map(
+        (exhibit) async => Exhibit(
+          id: exhibit['id'],
+          title: exhibit['title'],
+          location: exhibit['location'],
+          galleryId: exhibit['galleryId'],
+          image: exhibit['image'],
+          thumbUrl: await getThumbUrl(docSnap.id, exhibit['image']),
+          startDate: exhibit['startDate'].toDate(),
+          endDate: exhibit['endDate'].toDate(),
+        ),
+      );
       final exhibits = await Future.wait(exhibitTasks);
 
-      final productMaps = (docSnap.get("products") as List<dynamic>)
+      final productMaps = (docSnap.get('products') as List<dynamic>)
           .cast<Map<String, dynamic>>();
-      final productsTasks = productMaps.map((product) async => Product(
-            id: product["id"],
-            title: product["title"] ?? "",
-            detail: product["detail"] ?? "",
-            image: product["image"],
-            thumbUrl: await getThumbUrl(docSnap.id, product["image"]),
-          ));
+      final productsTasks = productMaps.map(
+        (product) async => Product(
+          id: product['id'],
+          title: product['title'] ?? '',
+          detail: product['detail'] ?? '',
+          image: product['image'],
+          thumbUrl: await getThumbUrl(docSnap.id, product['image']),
+        ),
+      );
       final products = await Future.wait(productsTasks);
 
       final highlightProduct = products.isNotEmpty
           ? products.firstWhere(
-              (product) => product.id == data["highlightProductId"],
+              (product) => product.id == data['highlightProductId'],
               orElse: () => products.first,
             )
           : null;
 
       return Creator(
         id: docSnap.id,
-        name: data["name"],
-        genre: data["genre"],
-        profile: data["profile"] ?? "",
+        name: data['name'],
+        genre: data['genre'],
+        profile: data['profile'] ?? '',
         profileHashtags: profileHashtags,
-        links: ((data["links"] ?? []) as List<dynamic>).cast<String>(),
+        links: ((data['links'] ?? []) as List<dynamic>).cast<String>(),
         highlightProduct: highlightProduct,
         products: products,
         exhibits: exhibits,
@@ -75,15 +79,15 @@ class FirebaseRepo implements DataRepoBase {
   @override
   Future<List<Gallery>> fetchGalleries() async {
     final db = FirebaseFirestore.instance;
-    final querySnap = await db.collection("galleries").get();
+    final querySnap = await db.collection('galleries').get();
 
     return querySnap.docs.map((docSnap) {
       final data = docSnap.data();
 
       return Gallery(
         id: docSnap.id,
-        name: data["name"],
-        location: data["location"],
+        name: data['name'],
+        location: data['location'],
       );
     }).toList();
   }
@@ -91,8 +95,8 @@ class FirebaseRepo implements DataRepoBase {
   @override
   String getImageUrl(String userId, String image) {
     const domain =
-        "firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com";
-    return "https://$domain/o/creators%2F$userId%2F$image";
+        'firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com';
+    return 'https://$domain/o/creators%2F$userId%2F$image';
   }
 
   Future<String?> getThumbUrl(String userId, String image) async {

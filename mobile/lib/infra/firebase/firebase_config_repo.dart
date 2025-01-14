@@ -11,10 +11,10 @@ class FirebaseConfigRepo implements ConfigRepoBase {
     await config.fetchAndActivate();
 
     return Config(
-      mapUrl: config.getString("map_url"),
-      debugUserIds: _getJsonAsList<String>(config, "debug_user_ids"),
-      requiredAppVersion: config.getString("required_app_version"),
-      genres: _getJsonAsList(config, "genres"),
+      mapUrl: config.getString('map_url'),
+      debugUserIds: _getJsonAsList<String>(config, 'debug_user_ids'),
+      requiredAppVersion: config.getString('required_app_version'),
+      genres: _getJsonAsList(config, 'genres'),
     );
   }
 
@@ -24,10 +24,12 @@ class FirebaseConfigRepo implements ConfigRepoBase {
         kDebugMode ? Duration(minutes: 1) : Duration(hours: 1);
 
     final config = FirebaseRemoteConfig.instance;
-    await config.setConfigSettings(RemoteConfigSettings(
-      fetchTimeout: const Duration(minutes: 1),
-      minimumFetchInterval: minimumFetchInterval,
-    ));
+    await config.setConfigSettings(
+      RemoteConfigSettings(
+        fetchTimeout: const Duration(minutes: 1),
+        minimumFetchInterval: minimumFetchInterval,
+      ),
+    );
   }
 
   List<T> _getJsonAsList<T>(FirebaseRemoteConfig config, String key) {

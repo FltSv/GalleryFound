@@ -74,9 +74,17 @@ jobs:
           reviewdog_flags: -fail-level=error # エラーは指摘するが、警告は指摘しない
           fail_on_error: true # 指摘が発生したらjobを失敗扱いにする
 
+  spell-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: streetsidesoftware/cspell-action@v6
+        with:
+          check_dot_files: false
+
   deploy:
     if: "${{ github.event.pull_request.head.repo.full_name == github.repository }}"
-    needs: [setup, prettier, eslint]
+    needs: [setup, prettier, eslint, spell-check]
     environment: production
     runs-on: ubuntu-latest
     steps:
