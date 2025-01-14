@@ -48,8 +48,10 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
 
   /// [genreFilteredCreators]リスト内のプロフィールに含まれる一意なハッシュタグの出現回数をマッピング
   Map<String, int> get hashtagCounts {
-    final Map<String, int> map = Map.unmodifiable(
-      genreFilteredCreators.expand((creator) => creator.profileHashtags).fold(
+    final map = Map<String, int>.unmodifiable(
+      genreFilteredCreators
+          .expand((creator) => creator.profileHashtags)
+          .fold<Map<String, int>>(
         <String, int>{},
         (counts, hashtag) => {
           ...counts,
@@ -118,7 +120,7 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                 if (!tagSearch)
                   Expanded(
                     child: TextField(
-                      decoration: InputDecoration(hintText: '作家を検索'),
+                      decoration: const InputDecoration(hintText: '作家を検索'),
                       onChanged: (String value) {
                         setState(() => searchText = value);
                       },
@@ -133,7 +135,8 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                         return TextField(
                           controller: controller,
                           focusNode: focusNode,
-                          decoration: InputDecoration(hintText: 'ハッシュタグで検索'),
+                          decoration:
+                              const InputDecoration(hintText: 'ハッシュタグで検索'),
                         );
                       },
                       optionsBuilder: (TextEditingValue textEditingValue) {
@@ -158,18 +161,21 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                         _rebuildAutoComplete();
 
                         NavigateProvider.push(
-                            context,
-                            WordSearchScreen(
-                              query: hashtag,
-                              searchFilter: (creators, query) => creators.where(
-                                  (creator) {
-                                if (selectedGenre == null) {
-                                  return true;
-                                }
-                                return creator.genre == selectedGenre;
-                              }).where((creator) =>
-                                  creator.profileHashtags.contains(hashtag)),
-                            ));
+                          context,
+                          WordSearchScreen(
+                            query: hashtag,
+                            searchFilter: (creators, query) =>
+                                creators.where((creator) {
+                              if (selectedGenre == null) {
+                                return true;
+                              }
+                              return creator.genre == selectedGenre;
+                            }).where(
+                              (creator) =>
+                                  creator.profileHashtags.contains(hashtag),
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -191,7 +197,7 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                   creator: creator,
                   onTap: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
+                      MaterialPageRoute<void>(
                         builder: (context) =>
                             CreatorDetailScreen(creator: creator),
                       ),
