@@ -50,6 +50,7 @@ import {
 import { getUlid } from 'src/ULID';
 import { DraggableList, SortableProps } from 'components/ui/DraggableList';
 import { getConfig } from 'src/firebase';
+import { UserName } from 'src/domains/UserName';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -305,6 +306,7 @@ export const Mypage = () => {
       // 一時データの結合
       const submitData = {
         ...data,
+        name: new UserName(data.name).toString(),
         profileHashtags: profileHashtags,
         links: creator.links,
         products: creator.products,
@@ -347,7 +349,16 @@ export const Mypage = () => {
           defaultValue={creator?.name}
           fieldError={errors.name}
           label="表示作家名"
-          {...register('name', { required: '1文字以上の入力が必要です。' })}
+          {...register('name', {
+            validate: value => {
+              try {
+                new UserName(value);
+                return true;
+              } catch (e) {
+                return (e as Error).message;
+              }
+            },
+          })}
         />
 
         <div>
