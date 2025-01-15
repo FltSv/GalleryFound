@@ -95,7 +95,7 @@ export const Mypage = () => {
   // SNSリンク関係の処理
 
   const isValidUrl = (url: string) => {
-    if (!url) return true;
+    if (url.length == 0) return false;
 
     try {
       new URL(url);
@@ -424,7 +424,7 @@ export const Mypage = () => {
             endDecorator={
               <MuiJoyButton
                 color="neutral"
-                disabled={addLinkError}
+                disabled={addLinkError || addLink.length == 0}
                 onClick={onAddLink}
                 size="sm"
                 variant="plain">
