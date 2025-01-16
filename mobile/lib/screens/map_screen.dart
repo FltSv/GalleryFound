@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/providers/config_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key, this.query = ''});
+  const MapScreen({super.key, this.exhibit});
 
-  final String query;
-  String get url => query.isEmpty
-      ? ConfigProvider().config.mapUrl
-      : 'https://maps.google.com/maps?q=$query';
+  final Exhibit? exhibit;
+  String get url {
+    final eidParam = exhibit != null ? '?eid=${exhibit!.id}' : '';
+    return ConfigProvider().config.mapUrl + eidParam;
+  }
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -29,7 +31,7 @@ class _MapScreenState extends State<MapScreen> {
 
           // 権限が許可されてもページは位置情報権限エラーが出たままなのでリロードを行う
           if (status.isGranted) {
-            controller.reload();
+            await controller.reload();
           }
         },
         onGeolocationPermissionsShowPrompt: (controller, origin) async {
