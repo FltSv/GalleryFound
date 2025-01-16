@@ -43,7 +43,7 @@ void main() {
     // スプラッシュ画面を解除
     FlutterNativeSplash.remove();
     runApp(const MyApp());
-  }).catchError((error, stackTrace) {
+  }).catchError((Object error) {
     // エラーが発生した場合、エラーダイアログを表示
     FlutterNativeSplash.remove();
     runApp(MaterialApp(home: ErrorDialog(error: error)));
@@ -88,7 +88,7 @@ class ErrorDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
+      showDialog<void>(
         context: context,
         builder: (_) => AlertDialog(
           title: const Text('エラー'),

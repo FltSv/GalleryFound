@@ -22,20 +22,21 @@ class FirebaseRepo implements DataRepoBase {
       final data = docSnap.data();
 
       final profileHashtags =
-          ((data['profileHashtags'] ?? []) as List<dynamic>).cast<String>();
+          ((data['profileHashtags'] ?? <String>[]) as List<dynamic>)
+              .cast<String>();
 
       final exhibitsMaps = (docSnap.get('exhibits') as List<dynamic>)
           .cast<Map<String, dynamic>>();
       final exhibitTasks = exhibitsMaps.map(
         (exhibit) async => Exhibit(
-          id: exhibit['id'],
-          title: exhibit['title'],
-          location: exhibit['location'],
-          galleryId: exhibit['galleryId'],
-          image: exhibit['image'],
-          thumbUrl: await getThumbUrl(docSnap.id, exhibit['image']),
-          startDate: exhibit['startDate'].toDate(),
-          endDate: exhibit['endDate'].toDate(),
+          id: exhibit['id'].toString(),
+          title: exhibit['title'].toString(),
+          location: exhibit['location'].toString(),
+          galleryId: exhibit['galleryId'].toString(),
+          image: exhibit['image'].toString(),
+          thumbUrl: await getThumbUrl(docSnap.id, exhibit['image'].toString()),
+          startDate: toDateTime(exhibit['startDate']),
+          endDate: toDateTime(exhibit['endDate']),
         ),
       );
       final exhibits = await Future.wait(exhibitTasks);
@@ -44,11 +45,11 @@ class FirebaseRepo implements DataRepoBase {
           .cast<Map<String, dynamic>>();
       final productsTasks = productMaps.map(
         (product) async => Product(
-          id: product['id'],
-          title: product['title'] ?? '',
-          detail: product['detail'] ?? '',
-          image: product['image'],
-          thumbUrl: await getThumbUrl(docSnap.id, product['image']),
+          id: product['id'].toString(),
+          title: product['title'].toString(),
+          detail: product['detail'].toString(),
+          image: product['image'].toString(),
+          thumbUrl: await getThumbUrl(docSnap.id, product['image'].toString()),
         ),
       );
       final products = await Future.wait(productsTasks);
@@ -62,11 +63,11 @@ class FirebaseRepo implements DataRepoBase {
 
       return Creator(
         id: docSnap.id,
-        name: data['name'],
-        genre: data['genre'],
-        profile: data['profile'] ?? '',
+        name: data['name'].toString(),
+        genre: data['genre'].toString(),
+        profile: data['profile'].toString(),
         profileHashtags: profileHashtags,
-        links: ((data['links'] ?? []) as List<dynamic>).cast<String>(),
+        links: ((data['links'] ?? <String>[]) as List<dynamic>).cast<String>(),
         highlightProduct: highlightProduct,
         products: products,
         exhibits: exhibits,
@@ -86,8 +87,8 @@ class FirebaseRepo implements DataRepoBase {
 
       return Gallery(
         id: docSnap.id,
-        name: data['name'],
-        location: data['location'],
+        name: data['name'].toString(),
+        location: data['location'].toString(),
       );
     }).toList();
   }
@@ -107,8 +108,16 @@ class FirebaseRepo implements DataRepoBase {
       final ref = FirebaseStorage.instance.ref().child(path);
       final url = await ref.getDownloadURL(); // ダウンロードURLを取得
       return url;
-    } catch (e) {
+    } on Object {
       return null;
     }
+  }
+
+  DateTime toDateTime(dynamic value, {DateTime? defaultValue}) {
+    if (value is! Timestamp) {
+      return defaultValue ?? DateTime(1970);
+    }
+
+    return value.toDate();
   }
 }
