@@ -1,4 +1,11 @@
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FaLocationCrosshairs } from 'react-icons/fa6';
 import {
   APIProvider,
@@ -7,6 +14,7 @@ import {
   Pin,
   InfoWindow,
   useAdvancedMarkerRef,
+  MapEvent,
 } from '@vis.gl/react-google-maps';
 import { Env } from 'src/Env';
 import {
@@ -54,10 +62,37 @@ interface MapViewProps {
 
 const MapView = ({ coords, error }: MapViewProps) => {
   const [galleries, setGalleries] = useState<GalleryExhibits[]>([]);
+  const [viewExhibit, setViewExhibit] = useState<GalleryExhibits | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const exhibitId = urlParams.get('eid');
 
   useEffect(() => {
     void (async () => {
       const galleries = await getGalleryExhibits();
+      if (exhibitId !== null) {
+        // 一致するギャラリーを検索
+        const gallery = galleries.find(x =>
+          x.exhibits.find(x => x.id === exhibitId),
+        );
+
+        if (gallery !== undefined) {
+          const viewGallery = {
+            ...gallery,
+            exhibits: gallery.exhibits.filter(x => exhibitId === x.id),
+          };
+          setViewExhibit(viewGallery);
+
+          // centerPosが更新されたときに地図の中心を移動
+          if (mapRef.current) {
+            mapRef.current.setZoom(15);
+            mapRef.current.panTo(gallery.gallery.latLng);
+          }
+          return;
+        }
+      }
+
       const conditionally = galleries
         .map(x => ({
           ...x,
@@ -66,7 +101,7 @@ const MapView = ({ coords, error }: MapViewProps) => {
         .filter(x => x.exhibits.length > 0);
       setGalleries(conditionally);
     })();
-  }, []);
+  }, [exhibitId]);
 
   // 現在地
   const currPos: google.maps.LatLngLiteral | undefined = coords && {
@@ -76,6 +111,10 @@ const MapView = ({ coords, error }: MapViewProps) => {
 
   // Map表示時の中央地点
   const centerPos = currPos ?? TOKYO_POS;
+
+  const onTilesLoaded = useCallback((e: MapEvent) => {
+    mapRef.current = e.map;
+  }, []);
 
   return (
     <APIProvider apiKey={Env.MAPS_JS_API}>
@@ -87,7 +126,8 @@ const MapView = ({ coords, error }: MapViewProps) => {
       <GoogleMap
         defaultCenter={centerPos}
         defaultZoom={12}
-        mapId="f63e2cf30554f3f8">
+        mapId="f63e2cf30554f3f8"
+        onTilesLoaded={onTilesLoaded}>
         {currPos !== undefined && (
           <AdvancedMarker position={currPos}>
             <FaLocationCrosshairs className="text-3xl text-cyan-400" />
@@ -96,14 +136,24 @@ const MapView = ({ coords, error }: MapViewProps) => {
         {galleries.map(x => (
           <GalleryMarker item={x} key={x.gallery.id} />
         ))}
+        {viewExhibit !== null && <GalleryMarker item={viewExhibit} show />}
       </GoogleMap>
     </APIProvider>
   );
 };
 
-const GalleryMarker = (props: { item: GalleryExhibits }) => {
+interface GalleryMarkerProps {
+  item: GalleryExhibits;
+  show?: boolean;
+}
+
+const GalleryMarker = (props: GalleryMarkerProps) => {
   const [showInfo, setShowInfo] = useState(false);
   const [markerRef, marker] = useAdvancedMarkerRef();
+
+  useEffect(() => {
+    setShowInfo(props.show ?? false);
+  }, [props.show]);
 
   const { gallery, exhibits } = props.item;
 

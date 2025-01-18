@@ -47,7 +47,7 @@ class _ExhibitDetailScreenState extends State<ExhibitDetailScreen> {
                 text: exhibit.location,
                 onTap: () => NavigateProvider.push(
                   context,
-                  MapScreen(query: exhibit.location),
+                  MapScreen(exhibit: exhibit),
                 ),
               ),
               LinkText(
