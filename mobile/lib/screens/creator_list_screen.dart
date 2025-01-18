@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/providers/config_provider.dart';
@@ -110,7 +111,14 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.tag),
+                  icon: SvgPicture.asset(
+                    'assets/hashtag.svg',
+                    width: 24,
+                    height: 24,
+                    colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.onSurface,
+                        BlendMode.srcIn),
+                  ),
                   color: tagSearch ? null : Colors.grey,
                   onPressed: () {
                     setState(() => tagSearch = !tagSearch);
