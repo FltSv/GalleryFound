@@ -29,11 +29,11 @@ class FirebaseRepo implements DataRepoBase {
           .cast<Map<String, dynamic>>();
       final exhibitTasks = exhibitsMaps.map(
         (exhibit) async => Exhibit(
-          id: exhibit['id'].toString(),
-          title: exhibit['title'].toString(),
-          location: exhibit['location'].toString(),
-          galleryId: exhibit['galleryId'].toString(),
-          image: exhibit['image'].toString(),
+          id: toStr(exhibit['id']),
+          title: toStr(exhibit['title']),
+          location: toStr(exhibit['location']),
+          galleryId: toStr(exhibit['galleryId']),
+          image: toStr(exhibit['image']),
           fetchThumbUrl: getThumbUrl,
           startDate: toDateTime(exhibit['startDate']),
           endDate: toDateTime(exhibit['endDate']),
@@ -45,10 +45,10 @@ class FirebaseRepo implements DataRepoBase {
           .cast<Map<String, dynamic>>();
       final productsTasks = productMaps.map(
         (product) async => Product(
-          id: product['id'].toString(),
-          title: product['title'].toString(),
-          detail: product['detail'].toString(),
-          image: product['image'].toString(),
+          id: toStr(product['id']),
+          title: toStr(product['title']),
+          detail: toStr(product['detail']),
+          image: toStr(product['image']),
           fetchThumbUrl: getThumbUrl,
         ),
       );
@@ -63,9 +63,9 @@ class FirebaseRepo implements DataRepoBase {
 
       return Creator(
         id: docSnap.id,
-        name: data['name'].toString(),
-        genre: data['genre'].toString(),
-        profile: data['profile'].toString(),
+        name: toStr(data['name']),
+        genre: toStr(data['genre']),
+        profile: toStr(data['profile']),
         profileHashtags: profileHashtags,
         links: ((data['links'] ?? <String>[]) as List<dynamic>).cast<String>(),
         highlightProduct: highlightProduct,
@@ -87,8 +87,8 @@ class FirebaseRepo implements DataRepoBase {
 
       return Gallery(
         id: docSnap.id,
-        name: data['name'].toString(),
-        location: data['location'].toString(),
+        name: toStr(data['name']),
+        location: toStr(data['location']),
       );
     }).toList();
   }
@@ -120,5 +120,13 @@ class FirebaseRepo implements DataRepoBase {
     }
 
     return value.toDate();
+  }
+
+  String toStr(dynamic value) {
+    if (value == null) {
+      return '';
+    }
+
+    return value.toString();
   }
 }
