@@ -65,7 +65,7 @@ class WordSearchScreen extends StatelessWidget {
                       // クリエイターの詳細画面に遷移する処理を追加
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
+                        MaterialPageRoute<void>(
                           builder: (context) =>
                               CreatorDetailScreen(creator: creator),
                         ),

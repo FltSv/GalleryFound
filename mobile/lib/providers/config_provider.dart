@@ -11,7 +11,7 @@ class ConfigProvider {
   late Config _config;
   Config get config => _config;
 
-  Future init() async {
+  Future<void> init() async {
     final repo = Factory.getConfigRepo();
 
     await repo.init();

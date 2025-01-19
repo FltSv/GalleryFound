@@ -77,7 +77,10 @@ class TopScreen extends StatelessWidget {
             ),
             onPressed: () {
               final screen = prop.screen;
-              if (screen == null) return;
+              if (screen == null) {
+                return;
+              }
+
               NavigateProvider.push(context, screen);
             },
           ),

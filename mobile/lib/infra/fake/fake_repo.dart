@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:mobile/models/book.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/exhibit.dart';

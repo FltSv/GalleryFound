@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 class VersionService {
   static late final bool isUpdateRequired;
 
-  static Future checkUpdateRequired() async {
+  static Future<void> checkUpdateRequired() async {
     // 実行中のアプリバージョンを取得
     final packageInfo = await PackageInfo.fromPlatform();
     final currentVer = Version.parse(packageInfo.version);
@@ -29,7 +29,7 @@ class VersionService {
     final overlay = Overlay.of(context);
     final overlayEntry = OverlayEntry(
       builder: (context) => PopScope(
-        onPopInvoked: (didPop) => false, // 戻るボタンを無効化
+        onPopInvokedWithResult: (didPop, result) => false, // 戻るボタンを無効化
         child: Material(
           color: Colors.black.withOpacity(0.5), // 背景を暗くする
           child: Center(

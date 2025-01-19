@@ -9,7 +9,7 @@ class LinkText extends StatelessWidget {
   });
 
   final String text;
-  final Function() onTap;
+  final void Function() onTap;
 
   @override
   Widget build(BuildContext context) {

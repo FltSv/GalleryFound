@@ -19,7 +19,7 @@ class FirebaseConfigRepo implements ConfigRepoBase {
   }
 
   @override
-  Future init() async {
+  Future<void> init() async {
     const minimumFetchInterval =
         kDebugMode ? Duration(minutes: 1) : Duration(hours: 1);
 
