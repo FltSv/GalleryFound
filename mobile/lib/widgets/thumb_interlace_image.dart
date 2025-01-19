@@ -2,52 +2,41 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile/models/image_base.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 
 class ThumbInterlaceImage extends StatelessWidget {
   const ThumbInterlaceImage({
-    required this.thumbURL,
-    required this.imageURL,
+    required this.imageBase,
     super.key,
   });
 
-  final String? thumbURL;
-  final String imageURL;
+  final ImageBase imageBase;
 
   @override
   Widget build(BuildContext context) {
-    final availThumb = thumbURL != null && thumbURL!.isNotEmpty;
-    final blurColor = Theme.of(context).colorScheme.surface;
+    final blurColor = Theme.of(context).colorScheme.surface.withOpacity(0.2);
 
     return CachedNetworkImage(
-      imageUrl: imageURL,
-      placeholder: (context, url) => availThumb
-          ? FittedBox(
+      imageUrl: imageBase.imageUrl,
+      placeholder: (context, url) => FittedBox(
+        child: Stack(
+          children: [
+            ThumbImage(imageBase: imageBase),
+            Positioned.fill(
               child: Stack(
                 children: [
-                  ThumbImage(
-                    thumbURL: thumbURL,
-                    imageURL: imageURL,
+                  BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                    child: Container(color: blurColor),
                   ),
-                  Positioned.fill(
-                    child: Stack(
-                      children: [
-                        BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
-                          child: Container(color: blurColor.withOpacity(0.2)),
-                        ),
-                        const Center(child: CircularProgressIndicator()),
-                      ],
-                    ),
-                  ),
+                  const Center(child: CircularProgressIndicator()),
                 ],
               ),
-            )
-          : Container(
-              color: Colors.grey[300]?.withOpacity(0.5), // プレースホルダーの背景色
-              padding: const EdgeInsets.all(16),
-              child: const Center(child: CircularProgressIndicator()),
             ),
+          ],
+        ),
+      ),
       errorWidget: (context, url, error) => const Icon(Icons.error),
     );
   }

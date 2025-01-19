@@ -145,9 +145,6 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ThumbImage(
-      thumbURL: product.thumbUrl,
-      imageURL: product.imageUrl,
-    );
+    return ThumbImage(imageBase: product);
   }
 }

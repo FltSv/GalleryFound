@@ -28,10 +28,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          ThumbInterlaceImage(
-            thumbURL: product.thumbUrl,
-            imageURL: product.imageUrl,
-          ),
+          ThumbInterlaceImage(imageBase: product),
           const Gap(8),
           Text(product.detail),
         ].intersperse(const Gap(8)).toList(),

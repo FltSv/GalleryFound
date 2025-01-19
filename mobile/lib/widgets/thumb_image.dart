@@ -1,30 +1,35 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile/models/image_base.dart';
+import 'package:mobile/widgets/loading_placeholder.dart';
 
 class ThumbImage extends StatelessWidget {
   const ThumbImage({
-    required this.thumbURL,
-    required this.imageURL,
+    required this.imageBase,
     super.key,
   });
 
-  final String? thumbURL;
-  final String imageURL;
+  final ImageBase imageBase;
 
   @override
   Widget build(BuildContext context) {
-    final availThumb = thumbURL != null && thumbURL!.isNotEmpty;
+    return FutureBuilder<String?>(
+      future: imageBase.thumbUrl,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const LoadingPlaceholder();
+        }
 
-    return CachedNetworkImage(
-      imageUrl: availThumb ? thumbURL! : imageURL,
-      placeholder: (context, url) => Container(
-        color: Colors.grey[300]?.withOpacity(0.5), // プレースホルダーの背景色
-        padding: const EdgeInsets.all(16),
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      errorWidget: (context, url, error) => const Icon(Icons.error),
+        final resolvedThumbURL = snapshot.data;
+        final availThumb =
+            resolvedThumbURL != null && resolvedThumbURL.isNotEmpty;
+
+        return CachedNetworkImage(
+          imageUrl: availThumb ? resolvedThumbURL : imageBase.imageUrl,
+          placeholder: (context, url) => const LoadingPlaceholder(),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
+        );
+      },
     );
   }
 }

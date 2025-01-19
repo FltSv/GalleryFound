@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 // このファイルは #BB67BF をソースカラーとして下記URLから生成されました:
-// This file was generated from the following URL with #BB67BF as the source colour:
+// This file was generated from the following URL
+// with #BB67BF as the source colour:
 // https://material-foundation.github.io/material-theme-builder/
 
 class MaterialTheme {

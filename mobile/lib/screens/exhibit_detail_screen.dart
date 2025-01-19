@@ -37,10 +37,7 @@ class _ExhibitDetailScreenState extends State<ExhibitDetailScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ThumbInterlaceImage(
-                thumbURL: exhibit.thumbUrl,
-                imageURL: exhibit.imageUrl,
-              ),
+              ThumbInterlaceImage(imageBase: exhibit),
               const Gap(8),
               Text(exhibit.displayDate),
               LinkText(
