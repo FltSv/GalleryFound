@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/models/creator.dart';
+import 'package:mobile/widgets/empty_image_placeholder.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 
 class CreatorItem extends StatelessWidget {
@@ -14,8 +15,7 @@ class CreatorItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = creator.highlightProduct?.imageUrl;
-    final thumbUrl = creator.highlightProduct?.thumbUrl;
+    final product = creator.highlightProduct;
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -27,18 +27,9 @@ class CreatorItem extends StatelessWidget {
         child: Stack(
           children: [
             // 背景画像またはプレースホルダー
-            imageUrl != null
-                ? ThumbImage(thumbURL: thumbUrl, imageURL: imageUrl)
-                : Container(
-                    color: Colors.grey[300], // プレースホルダーの背景色
-                    child: Center(
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 50,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ),
+            product != null
+                ? ThumbImage(imageBase: product)
+                : const EmptyImagePlaceholder(),
             // シャドウグラデーション
             Positioned(
               bottom: 0,

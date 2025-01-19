@@ -34,7 +34,7 @@ class FirebaseRepo implements DataRepoBase {
           location: exhibit['location'].toString(),
           galleryId: exhibit['galleryId'].toString(),
           image: exhibit['image'].toString(),
-          thumbUrl: await getThumbUrl(docSnap.id, exhibit['image'].toString()),
+          fetchThumbUrl: getThumbUrl,
           startDate: toDateTime(exhibit['startDate']),
           endDate: toDateTime(exhibit['endDate']),
         ),
@@ -49,7 +49,7 @@ class FirebaseRepo implements DataRepoBase {
           title: product['title'].toString(),
           detail: product['detail'].toString(),
           image: product['image'].toString(),
-          thumbUrl: await getThumbUrl(docSnap.id, product['image'].toString()),
+          fetchThumbUrl: getThumbUrl,
         ),
       );
       final products = await Future.wait(productsTasks);
@@ -100,6 +100,7 @@ class FirebaseRepo implements DataRepoBase {
     return 'https://$domain/o/creators%2F$userId%2F$image';
   }
 
+  @override
   Future<String?> getThumbUrl(String userId, String image) async {
     final thumbImage = image.replaceAll(RegExp(r'\.png\?.*'), '.webp');
     final path = 'creators/$userId/thumbs/$thumbImage';
