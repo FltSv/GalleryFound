@@ -9,7 +9,7 @@ import {
   Fragment,
   useMemo,
 } from 'react';
-import { Textarea, TextareaProps } from '@mui/joy';
+import { Textarea, TextareaProps, useTheme } from '@mui/joy';
 
 interface HashtagTextareaProps extends TextareaProps {
   onHashtagsChange: (hashtags: string[]) => void;
@@ -26,6 +26,8 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
     const [text, setText] = useState<string>(defaultText);
     const highlighterRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const joyTheme = useTheme();
 
     const extractHashtags = (input: string, regex: RegExp): string[] =>
       [...input.matchAll(regex)].map(m => m[0]);
@@ -80,7 +82,7 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
         if (i < matchedTags.length) {
           const tag = matchedTags[i];
           const hashTag = (
-            <span className="text-blue-500" key={`hash-${i}`}>
+            <span className="text-pink-500" key={`hash-${i}`}>
               {tag}
             </span>
           );
@@ -106,8 +108,9 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
         <div
           ref={highlighterRef}
           style={{
+            fontFamily: joyTheme.fontFamily.body,
             position: 'absolute',
-            padding: '0.5rem 0.75rem',
+            padding: '0.5rem 1rem 0.5rem 0.75rem',
             left: 0,
             top: 0,
             width: '100%',
