@@ -48,6 +48,8 @@ class CreatorDetailScreen extends StatelessWidget {
                   ),
                 );
               },
+              onUrlTap: _launchUrl,
+              onEmailTap: (address) => _launchUrl('mailto:$address'),
             ),
           if (creator.links.isNotEmpty)
             Column(
@@ -64,13 +66,7 @@ class CreatorDetailScreen extends StatelessWidget {
                         const Gap(4),
                         LinkText(
                           text: link,
-                          onTap: () async {
-                            final url = Uri.parse(link);
-                            await launchUrl(
-                              url,
-                              mode: LaunchMode.externalApplication,
-                            );
-                          },
+                          onTap: () => _launchUrl(link),
                         ),
                       ],
                     ),
@@ -127,6 +123,14 @@ class CreatorDetailScreen extends StatelessWidget {
           ),
         ].intersperse(const Gap(16)).toList(),
       ),
+    );
+  }
+
+  Future<void> _launchUrl(String uri) async {
+    final url = Uri.parse(uri);
+    await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
     );
   }
 }

@@ -7,10 +7,14 @@ class LinkableText extends StatelessWidget {
     super.key,
     required this.text,
     this.onHashtagTap,
+    this.onUrlTap,
+    this.onEmailTap,
   });
 
   final String text;
   final void Function(String)? onHashtagTap;
+  final void Function(String)? onUrlTap;
+  final void Function(String)? onEmailTap;
 
   @override
   Widget build(BuildContext context) {
@@ -34,16 +38,29 @@ class LinkableText extends StatelessWidget {
                     onHashtagTap?.call(element.trim());
                   },
               ),
-            PlainText() => TextSpan(
-                text: element.value,
-                style: DefaultTextStyle.of(context).style,
-              )
+            Url() => TextSpan(
+                text: element.toString(),
+                style: linkStyle,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    onUrlTap?.call(element.toString());
+                  },
+              ),
+            Email() => TextSpan(
+                text: element.toString(),
+                style: linkStyle,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    onEmailTap?.call(element.toString());
+                  },
+              ),
+            PlainText() => TextSpan(text: element.value)
           },
         )
         .toList();
 
-    return RichText(
-      text: TextSpan(
+    return SelectableText.rich(
+      TextSpan(
         // デフォルトのテキストスタイル（サイズや色）を適用させつつ、追加したTextSpanを表示
         style: DefaultTextStyle.of(context).style,
         children: children,
