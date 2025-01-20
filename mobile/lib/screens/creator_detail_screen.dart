@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/product.dart';
+import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/exhibit_detail_screen.dart';
 import 'package:mobile/screens/product_detail_screen.dart';
@@ -14,19 +15,13 @@ import 'package:mobile/widgets/linkable_text.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class CreatorDetailScreen extends StatefulWidget {
+class CreatorDetailScreen extends StatelessWidget {
   const CreatorDetailScreen({super.key, required this.creator});
 
   final Creator creator;
 
   @override
-  State<CreatorDetailScreen> createState() => _CreatorDetailScreenState();
-}
-
-class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
-  @override
   Widget build(BuildContext context) {
-    final creator = widget.creator;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -43,6 +38,7 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
                 NavigateProvider.push(
                   context,
                   WordSearchScreen(
+                    creators: DataProvider().creators,
                     query: hashtag,
                     searchFilter: (creators, query) =>
                         // ハッシュタグが含まれるクリエイターをフィルタリング

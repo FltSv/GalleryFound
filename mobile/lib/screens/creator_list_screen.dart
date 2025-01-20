@@ -36,15 +36,13 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
   }
 
   /// [selectedGenre]と[searchText]に一致する[Creator]を取得
-  List<Creator> get results {
+  Iterable<Creator> get results {
     if (tagSearch || searchText.isEmpty) {
-      return genreFilteredCreators.toList();
+      return genreFilteredCreators;
     }
 
-    return genreFilteredCreators.where((creator) {
-      final matchesSearch = creator.name.contains(searchText);
-      return matchesSearch;
-    }).toList();
+    return genreFilteredCreators
+        .where((creator) => creator.name.contains(searchText));
   }
 
   /// [genreFilteredCreators]リスト内のプロフィールに含まれる一意なハッシュタグの出現回数をマッピング
@@ -116,8 +114,9 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                     width: 24,
                     height: 24,
                     colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.onSurface,
-                        BlendMode.srcIn),
+                      Theme.of(context).colorScheme.onSurface,
+                      BlendMode.srcIn,
+                    ),
                   ),
                   color: tagSearch ? null : Colors.grey,
                   onPressed: () {
@@ -171,16 +170,11 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                         NavigateProvider.push(
                           context,
                           WordSearchScreen(
+                            creators: genreFilteredCreators,
                             query: hashtag,
-                            searchFilter: (creators, query) =>
-                                creators.where((creator) {
-                              if (selectedGenre == null) {
-                                return true;
-                              }
-                              return creator.genre == selectedGenre;
-                            }).where(
+                            searchFilter: (creators, query) => creators.where(
                               (creator) =>
-                                  creator.profileHashtags.contains(hashtag),
+                                  creator.profileHashtags.contains(query),
                             ),
                           ),
                         );
@@ -192,27 +186,33 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
           ),
           const Gap(8),
           Expanded(
-            child: MasonryGridView.builder(
-              gridDelegate:
-                  const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // 横に並べる数を調整します
-              ),
-              itemCount: results.length,
-              itemBuilder: (context, index) {
-                final creator = results[index];
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 100),
+              transitionBuilder: (Widget child, Animation<double> animation) =>
+                  FadeTransition(opacity: animation, child: child),
+              child: MasonryGridView.builder(
+                key: ValueKey(tagSearch.hashCode + selectedGenre.hashCode),
+                gridDelegate:
+                    const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // 横に並べる数を調整します
+                ),
+                itemCount: results.length,
+                itemBuilder: (context, index) {
+                  final creator = results.elementAt(index);
 
-                return CreatorItem(
-                  creator: creator,
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (context) =>
-                            CreatorDetailScreen(creator: creator),
-                      ),
-                    );
-                  },
-                );
-              },
+                  return CreatorItem(
+                    creator: creator,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (context) =>
+                              CreatorDetailScreen(creator: creator),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ),
         ],
