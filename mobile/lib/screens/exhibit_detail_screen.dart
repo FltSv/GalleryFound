@@ -5,7 +5,7 @@ import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_detail_screen.dart';
 import 'package:mobile/screens/map_screen.dart';
-import 'package:mobile/widgets/link_text.dart';
+import 'package:mobile/widgets/action_text.dart';
 import 'package:mobile/widgets/thumb_interlace_image.dart';
 
 class ExhibitDetailScreen extends StatefulWidget {
@@ -40,14 +40,14 @@ class _ExhibitDetailScreenState extends State<ExhibitDetailScreen> {
               ThumbInterlaceImage(imageBase: exhibit),
               const Gap(8),
               Text(exhibit.displayDate),
-              LinkText(
+              ActionText(
                 text: exhibit.location,
                 onTap: () => NavigateProvider.push(
                   context,
                   MapScreen(exhibit: exhibit),
                 ),
               ),
-              LinkText(
+              ActionText(
                 text: creator.name,
                 onTap: () => NavigateProvider.push(
                   context,

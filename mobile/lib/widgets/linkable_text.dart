@@ -26,6 +26,13 @@ class LinkableText extends StatelessWidget {
       color: Colors.blue,
     );
 
+    // URL用のスタイル
+    const lineLinkStyle = TextStyle(
+      color: Colors.blue,
+      decoration: TextDecoration.underline,
+      decorationColor: Colors.blue,
+    );
+
     // TextSpanのリストを格納する
     final children = parsedText
         .map<InlineSpan>(
@@ -40,7 +47,7 @@ class LinkableText extends StatelessWidget {
               ),
             Url() => TextSpan(
                 text: element.toString(),
-                style: linkStyle,
+                style: lineLinkStyle,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
                     onUrlTap?.call(element.toString());
@@ -48,7 +55,7 @@ class LinkableText extends StatelessWidget {
               ),
             Email() => TextSpan(
                 text: element.toString(),
-                style: linkStyle,
+                style: lineLinkStyle,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
                     onEmailTap?.call(element.toString());

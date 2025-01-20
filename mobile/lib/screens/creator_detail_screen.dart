@@ -11,7 +11,7 @@ import 'package:mobile/screens/product_detail_screen.dart';
 import 'package:mobile/screens/word_search_screen.dart';
 import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
-import 'package:mobile/widgets/link_text.dart';
+import 'package:mobile/widgets/action_text.dart';
 import 'package:mobile/widgets/linkable_text.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -73,7 +73,7 @@ class CreatorDetailScreen extends StatelessWidget {
                           ),
                         ),
                         const Gap(4),
-                        LinkText(
+                        ActionText(
                           text: link,
                           onTap: () => _launchUrl(link),
                         ),
