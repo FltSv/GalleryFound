@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
@@ -23,6 +24,7 @@ class CreatorDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final iconSize = theme.textTheme.bodyMedium?.fontSize ?? 16;
 
     return Scaffold(
       appBar: AppBar(
@@ -58,10 +60,17 @@ class CreatorDetailScreen extends StatelessWidget {
                   .map<Widget>(
                     (link) => Row(
                       children: [
-                        Image.network(
-                          'http://www.google.com/s2/favicons?domain=$link',
-                          width: theme.textTheme.bodyMedium?.fontSize ?? 16,
-                          height: theme.textTheme.bodyMedium?.fontSize ?? 16,
+                        CachedNetworkImage(
+                          imageUrl:
+                              'http://www.google.com/s2/favicons?domain=$link',
+                          width: iconSize,
+                          height: iconSize,
+                          fadeInDuration: const Duration(milliseconds: 100),
+                          errorWidget: (context, url, error) => Icon(
+                            Icons.public,
+                            size: iconSize,
+                            color: Colors.grey,
+                          ),
                         ),
                         const Gap(4),
                         LinkText(
