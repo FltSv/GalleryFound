@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class LinkText extends StatelessWidget {
-  const LinkText({
+class ActionText extends StatelessWidget {
+  const ActionText({
     super.key,
     required this.text,
     required this.onTap,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/models/creator.dart';
-import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/screens/creator_detail_screen.dart';
 import 'package:mobile/widgets/creator_item.dart';
 import 'package:mobile/widgets/empty_state.dart';
@@ -9,18 +8,18 @@ import 'package:mobile/widgets/highlighted_text.dart';
 class WordSearchScreen extends StatelessWidget {
   const WordSearchScreen({
     super.key,
+    required this.creators,
     required this.query,
     required this.searchFilter,
   });
 
+  final Iterable<Creator> creators;
   final String query;
-  final Iterable<Creator> Function(List<Creator> creators, String query)
+  final Iterable<Creator> Function(Iterable<Creator> creators, String query)
       searchFilter; // 検索ロジック
 
   @override
   Widget build(BuildContext context) {
-    final creators = DataProvider().creators;
-
     // 外部から渡された検索ロジックを適用
     final filteredCreators = searchFilter(creators, query).toList();
 
