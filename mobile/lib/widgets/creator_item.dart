@@ -7,11 +7,9 @@ class CreatorItem extends StatelessWidget {
   const CreatorItem({
     super.key,
     required this.creator,
-    required this.onTap,
   });
 
   final Creator creator;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -22,47 +20,44 @@ class CreatorItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       clipBehavior: Clip.antiAlias,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Stack(
-          children: [
-            // 背景画像またはプレースホルダー
-            product != null
-                ? ThumbImage(imageBase: product)
-                : const EmptyImagePlaceholder(),
-            // シャドウグラデーション
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 100,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.8),
-                    ],
-                  ),
+      child: Stack(
+        children: [
+          // 背景画像またはプレースホルダー
+          product != null
+              ? ThumbImage(imageBase: product)
+              : const EmptyImagePlaceholder(),
+          // シャドウグラデーション
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 100,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.8),
+                  ],
                 ),
               ),
             ),
-            // テキスト表示
-            Positioned(
-              bottom: 10,
-              left: 10,
-              child: Text(
-                creator.name,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(color: Colors.white),
-              ),
+          ),
+          // テキスト表示
+          Positioned(
+            bottom: 10,
+            left: 10,
+            child: Text(
+              creator.name,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(color: Colors.white),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -200,8 +200,7 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                 itemBuilder: (context, index) {
                   final creator = results.elementAt(index);
 
-                  return CreatorItem(
-                    creator: creator,
+                  return GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute<void>(
@@ -210,6 +209,7 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                         ),
                       );
                     },
+                    child: CreatorItem(creator: creator),
                   );
                 },
               ),
