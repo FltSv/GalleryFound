@@ -8,9 +8,11 @@ import {
   ReactNode,
   Fragment,
   useMemo,
+  TextareaHTMLAttributes,
 } from 'react';
-import { Textarea, TextareaProps, useTheme } from '@mui/joy';
+import { useTheme } from '@mui/joy';
 
+type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement>;
 interface HashtagTextareaProps extends TextareaProps {
   onHashtagsChange: (hashtags: string[]) => void;
 }
@@ -44,11 +46,22 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
       [HASHTAG_REGEX, onHashtagsChange],
     );
 
+    const adjustHeight = () => {
+      const textarea = textareaRef.current;
+      if (textarea) {
+        /* eslint-disable functional/immutable-data */
+        textarea.style.height = 'auto'; // 一旦リセット
+        textarea.style.height = `${textarea.scrollHeight}px`; // スクロール高さに合わせる
+        /* eslint-enable functional/immutable-data */
+      }
+    };
+
     const handleChange = useCallback(
       (e: ChangeEvent<HTMLTextAreaElement>) => {
         const newText = e.target.value;
         setText(newText);
         setHashtags(newText);
+        adjustHeight();
 
         props.onChange?.(e);
       },
@@ -99,21 +112,22 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
         highlighterRef.current.scrollTop = textareaRef.current.scrollTop;
       }
 
+      adjustHeight();
       setHashtags(defaultText);
+
+      // 画面幅変更時の折り返しによる高さ調整
+      window.addEventListener('resize', adjustHeight);
+      return () => window.removeEventListener('resize', adjustHeight);
     }, [defaultText, setHashtags]);
 
     return (
       <div className="relative w-full" ref={ref}>
         {/* 重ねるための下レイヤー */}
         <div
+          className="absolute left-0 top-0 w-full border border-transparent px-3 py-2"
           ref={highlighterRef}
           style={{
             fontFamily: joyTheme.fontFamily.body,
-            position: 'absolute',
-            padding: '0.5rem 1rem 0.5rem 0.75rem',
-            left: 0,
-            top: 0,
-            width: '100%',
             whiteSpace: 'pre-wrap', // 改行を保持
             wordBreak: 'break-word',
             pointerEvents: 'none', // 下の Textarea の操作を邪魔しないようにする
@@ -121,20 +135,18 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
           {getHighlightedElements(text)}
         </div>
         {/* 実際の入力用 Textarea（透明にして上に重ねる） */}
-        <Textarea
+        <textarea
           {...restProps}
+          className="relative w-full rounded-md border border-black bg-transparent px-3 py-2 text-transparent outline-none focus:border-2 focus:border-blue-600"
           onChange={handleChange}
-          slotProps={{
-            ...props.slotProps,
-            textarea: { ref: textareaRef },
-          }}
-          sx={{
-            ...props.sx,
-            'position': 'relative',
-            'backgroundColor': 'transparent',
-            'color': 'transparent',
-            'caretColor': 'black', // キャレットだけは見えるように
-            '&::placeholder': { color: 'gray' },
+          ref={textareaRef}
+          style={{
+            ...props.style,
+            fontFamily: joyTheme.fontFamily.body,
+            caretColor: 'black', // キャレットだけは見えるように
+            overflow: 'hidden',
+            resize: 'none',
+            transition: 'height 0.2s ease', // 高さ変更時のラグ軽減
           }}
           value={text}
         />
