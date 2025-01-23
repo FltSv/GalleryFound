@@ -379,13 +379,8 @@ export const Mypage = () => {
           <p>プロフィール</p>
           <HashtagTextarea
             defaultValue={creator?.profile}
-            minRows={3}
             onHashtagsChange={setProfileHashtags}
-            sx={{
-              borderColor: 'black',
-              marginY: '0.25rem',
-              backgroundColor: 'transparent',
-            }}
+            rows={3}
             {...register('profile')}
           />
         </div>
