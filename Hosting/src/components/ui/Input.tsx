@@ -20,6 +20,8 @@ import {
 } from '@mui/joy';
 import { FaCloudUploadAlt } from 'react-icons/fa';
 
+export { HashtagTextarea } from './HashtagTextarea';
+
 interface TextboxProps extends InputProps {
   label: string;
   fieldError?: FieldError;
@@ -57,7 +59,7 @@ export const Button: FC<ButtonProps> = props => (
     {...props}
     className={`rounded-full font-normal transition hover:opacity-80 ${props.className ?? ''}`}
     sx={{
-      opacity: props.disabled ?? false ? 0.4 : 1,
+      opacity: (props.disabled ?? false) ? 0.4 : 1,
     }}>
     {props.children}
   </MuiJoyButton>
@@ -70,8 +72,7 @@ export const SubmitButton: FC<ButtonProps> = props => {
   return (
     <MuiJoyButton
       {...props}
-      className={`rounded-full font-normal transition
-        ${disabled ? '' : 'hover:opacity-80'} ${props.className ?? ''}`}
+      className={`rounded-full font-normal transition ${disabled ? '' : 'hover:opacity-80'} ${props.className ?? ''}`}
       disabled={disabled}
       loadingPosition="start"
       startDecorator={props.startDecorator}

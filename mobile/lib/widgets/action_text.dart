@@ -1,20 +1,19 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class LinkText extends StatelessWidget {
-  const LinkText({
+class ActionText extends StatelessWidget {
+  const ActionText({
     super.key,
     required this.text,
     required this.onTap,
   });
 
   final String text;
-  final Function() onTap;
+  final void Function() onTap;
 
   @override
   Widget build(BuildContext context) {
     return Flexible(
-      fit: FlexFit.loose,
       child: RichText(
         overflow: TextOverflow.fade,
         maxLines: 1,

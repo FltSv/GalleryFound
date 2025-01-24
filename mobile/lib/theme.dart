@@ -1,13 +1,14 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
 // このファイルは #BB67BF をソースカラーとして下記URLから生成されました:
-// This file was generated from the following URL with #BB67BF as the source colour:
+// This file was generated from the following URL
+// with #BB67BF as the source colour:
 // https://material-foundation.github.io/material-theme-builder/
 
 class MaterialTheme {
-  final TextTheme textTheme;
-
   const MaterialTheme(this.textTheme);
+
+  final TextTheme textTheme;
 
   static ColorScheme lightScheme() {
     return const ColorScheme(
@@ -355,14 +356,6 @@ class MaterialTheme {
 }
 
 class ExtendedColor {
-  final Color seed, value;
-  final ColorFamily light;
-  final ColorFamily lightHighContrast;
-  final ColorFamily lightMediumContrast;
-  final ColorFamily dark;
-  final ColorFamily darkHighContrast;
-  final ColorFamily darkMediumContrast;
-
   const ExtendedColor({
     required this.seed,
     required this.value,
@@ -373,6 +366,14 @@ class ExtendedColor {
     required this.darkHighContrast,
     required this.darkMediumContrast,
   });
+  final Color seed;
+  final Color value;
+  final ColorFamily light;
+  final ColorFamily lightHighContrast;
+  final ColorFamily lightMediumContrast;
+  final ColorFamily dark;
+  final ColorFamily darkHighContrast;
+  final ColorFamily darkMediumContrast;
 }
 
 class ColorFamily {

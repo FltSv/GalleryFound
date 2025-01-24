@@ -17,10 +17,12 @@ export const ErrorScreen: FC<{ error: unknown }> = ({ error }) => {
       await new Promise(r => setTimeout(r, 1000));
       setReportProgress(0.2);
 
-      ReactGA.event('exception', {
-        description: formatError(error),
-        fatal: true,
-      });
+      if (process.env.NODE_ENV !== 'development') {
+        ReactGA.event('exception', {
+          description: formatError(error),
+          fatal: true,
+        });
+      }
       await new Promise(r => setTimeout(r, 1000));
 
       // 送信完了

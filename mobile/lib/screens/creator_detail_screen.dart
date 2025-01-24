@@ -1,31 +1,30 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/product.dart';
+import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/exhibit_detail_screen.dart';
 import 'package:mobile/screens/product_detail_screen.dart';
+import 'package:mobile/screens/word_search_screen.dart';
 import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
-import 'package:mobile/widgets/link_text.dart';
+import 'package:mobile/widgets/action_text.dart';
+import 'package:mobile/widgets/linkable_text.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class CreatorDetailScreen extends StatefulWidget {
+class CreatorDetailScreen extends StatelessWidget {
   const CreatorDetailScreen({super.key, required this.creator});
 
   final Creator creator;
 
   @override
-  State<CreatorDetailScreen> createState() => _CreatorDetailScreenState();
-}
-
-class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
-  @override
   Widget build(BuildContext context) {
-    final creator = widget.creator;
     final theme = Theme.of(context);
+    final iconSize = theme.textTheme.bodyMedium?.fontSize ?? 16;
 
     return Scaffold(
       appBar: AppBar(
@@ -34,28 +33,53 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (creator.profile.isNotEmpty) Text(creator.profile),
+          if (creator.profile.isNotEmpty)
+            LinkableText(
+              text: creator.profile,
+              onHashtagTap: (hashtag) {
+                NavigateProvider.push(
+                  context,
+                  WordSearchScreen(
+                    creators: DataProvider().creators,
+                    query: hashtag,
+                    searchFilter: (creators, query) =>
+                        // ハッシュタグが含まれるクリエイターをフィルタリング
+                        creators.where(
+                      (creator) => creator.profileHashtags.contains(query),
+                    ),
+                  ),
+                );
+              },
+              onUrlTap: _launchUrl,
+              onEmailTap: (address) => _launchUrl('mailto:$address'),
+            ),
           if (creator.links.isNotEmpty)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: creator.links
-                  .map<Widget>((link) => Row(
-                        children: [
-                          Image.network(
-                            "http://www.google.com/s2/favicons?domain=$link",
-                            width: theme.textTheme.bodyMedium?.fontSize ?? 16,
-                            height: theme.textTheme.bodyMedium?.fontSize ?? 16,
+                  .map<Widget>(
+                    (link) => Row(
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl:
+                              'http://www.google.com/s2/favicons?domain=$link',
+                          width: iconSize,
+                          height: iconSize,
+                          fadeInDuration: const Duration(milliseconds: 100),
+                          errorWidget: (context, url, error) => Icon(
+                            Icons.public,
+                            size: iconSize,
+                            color: Colors.grey,
                           ),
-                          const Gap(4),
-                          LinkText(
-                              text: link,
-                              onTap: () async {
-                                final url = Uri.parse(link);
-                                await launchUrl(url,
-                                    mode: LaunchMode.externalApplication);
-                              }),
-                        ],
-                      ))
+                        ),
+                        const Gap(4),
+                        ActionText(
+                          text: link,
+                          onTap: () => _launchUrl(link),
+                        ),
+                      ],
+                    ),
+                  )
                   .intersperse(const Gap(8))
                   .toList(),
             ),
@@ -69,11 +93,15 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
           Column(
             children: creator.exhibits
                 .map<ExhibitItem>((exhibit) => ExhibitItem(exhibit: exhibit))
-                .map<Widget>((item) => GestureDetector(
-                      onTap: () => NavigateProvider.push(
-                          context, ExhibitDetailScreen(exhibit: item.exhibit)),
-                      child: item,
-                    ))
+                .map<Widget>(
+                  (item) => GestureDetector(
+                    onTap: () => NavigateProvider.push(
+                      context,
+                      ExhibitDetailScreen(exhibit: item.exhibit),
+                    ),
+                    child: item,
+                  ),
+                )
                 .intersperse(const Gap(8))
                 .toList(),
           ),
@@ -91,15 +119,27 @@ class _CreatorDetailScreenState extends State<CreatorDetailScreen> {
             shrinkWrap: true, // GridViewの高さをコンテンツに合わせる
             children: creator.products
                 .map((product) => ProductItem(product: product))
-                .map<Widget>((item) => GestureDetector(
-                      onTap: () => NavigateProvider.push(
-                          context, ProductDetailScreen(product: item.product)),
-                      child: item,
-                    ))
+                .map<Widget>(
+                  (item) => GestureDetector(
+                    onTap: () => NavigateProvider.push(
+                      context,
+                      ProductDetailScreen(product: item.product),
+                    ),
+                    child: item,
+                  ),
+                )
                 .toList(),
           ),
         ].intersperse(const Gap(16)).toList(),
       ),
+    );
+  }
+
+  Future<void> _launchUrl(String uri) async {
+    final url = Uri.parse(uri);
+    await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
     );
   }
 }
@@ -114,9 +154,6 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ThumbImage(
-      thumbURL: product.thumbUrl,
-      imageURL: product.imageUrl,
-    );
+    return ThumbImage(imageBase: product);
   }
 }

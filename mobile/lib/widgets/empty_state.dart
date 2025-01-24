@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class EmptyState extends StatelessWidget {
-  final String message;
-
   const EmptyState({
     super.key,
     this.message = '表示できる項目がありません',
   });
+
+  final String message;
 
   @override
   Widget build(BuildContext context) {

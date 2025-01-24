@@ -11,4 +11,7 @@ abstract class DataRepoBase {
   /// - [userId] : クリエイターのユーザーID
   /// - [image] : DBのファイル名＋トークン
   String getImageUrl(String userId, String image);
+
+  /// サムネイル画像URLを取得
+  Future<String?> getThumbUrl(String userId, String image);
 }

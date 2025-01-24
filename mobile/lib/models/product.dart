@@ -1,14 +1,13 @@
-import 'package:mobile/models/creator.dart';
-import 'package:mobile/providers/data_provider.dart';
+import 'package:mobile/models/image_base.dart';
 
 /// 作品
-class Product {
+class Product extends ImageBase {
   Product({
     required this.id,
     required this.title,
     required this.detail,
-    required this.image,
-    required this.thumbUrl,
+    required super.image,
+    required super.fetchThumbUrl,
   });
 
   final String id;
@@ -18,13 +17,4 @@ class Product {
 
   /// 作品詳細、他
   final String detail;
-
-  /// 作品のサムネイル画像のファイル名＋トークン
-  final String image;
-  String get imageUrl => DataProvider().getImageUrl(creator.id, image);
-
-  /// サムネイル画像のURL
-  final String? thumbUrl;
-
-  late final Creator creator;
 }

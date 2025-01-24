@@ -1,5 +1,5 @@
-import 'package:mobile/models/product.dart';
 import 'package:mobile/models/exhibit.dart';
+import 'package:mobile/models/product.dart';
 
 class Creator {
   Creator({
@@ -7,15 +7,16 @@ class Creator {
     required this.name,
     required this.genre,
     required this.profile,
+    required this.profileHashtags,
     required this.links,
     required this.highlightProduct,
     required this.products,
     required this.exhibits,
   }) {
-    for (var product in products) {
+    for (final product in products) {
       product.creator = this;
     }
-    for (var exhibit in exhibits) {
+    for (final exhibit in exhibits) {
       exhibit.creator = this;
     }
   }
@@ -30,6 +31,9 @@ class Creator {
 
   /// プロフィール
   final String profile;
+
+  /// プロフィールに含まれるハッシュタグ
+  final List<String> profileHashtags;
 
   /// SNSリンク
   final List<String> links;

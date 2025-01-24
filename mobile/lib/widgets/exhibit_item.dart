@@ -23,10 +23,7 @@ class ExhibitItem extends StatelessWidget {
       children: [
         Expanded(
           flex: 3,
-          child: ThumbImage(
-            thumbURL: exhibit.thumbUrl,
-            imageURL: exhibit.imageUrl,
-          ),
+          child: ThumbImage(imageBase: exhibit),
         ),
         Expanded(
           flex: 4,

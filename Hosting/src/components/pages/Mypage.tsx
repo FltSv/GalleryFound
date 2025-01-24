@@ -30,6 +30,7 @@ import { useAuthContext } from 'components/AuthContext';
 import {
   Button,
   FileInput,
+  HashtagTextarea,
   Switch,
   SubmitButton,
   Textbox,
@@ -49,6 +50,7 @@ import {
 import { getUlid } from 'src/ULID';
 import { DraggableList, SortableProps } from 'components/ui/DraggableList';
 import { getConfig } from 'src/firebase';
+import { UserName } from 'src/domains/UserName';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -62,6 +64,7 @@ export const Mypage = () => {
   const [editExhibit, setEditExhibit] = useState<Exhibit>();
   const [editProduct, setEditProduct] = useState<Product>();
   const [genres, setGenres] = useState<string[]>([]);
+  const [profileHashtags, setProfileHashtags] = useState<string[]>([]);
 
   useEffect(() => {
     if (user === null) {
@@ -92,7 +95,7 @@ export const Mypage = () => {
   // SNSリンク関係の処理
 
   const isValidUrl = (url: string) => {
-    if (!url) return true;
+    if (url.length == 0) return false;
 
     try {
       new URL(url);
@@ -303,6 +306,8 @@ export const Mypage = () => {
       // 一時データの結合
       const submitData = {
         ...data,
+        name: new UserName(data.name).toString(),
+        profileHashtags: profileHashtags,
         links: creator.links,
         products: creator.products,
         exhibits: creator.exhibits,
@@ -318,7 +323,7 @@ export const Mypage = () => {
       // リロード
       window.location.reload();
     },
-    [creator, user],
+    [creator, profileHashtags, user],
   );
 
   const onSubmit = useCallback(
@@ -344,16 +349,22 @@ export const Mypage = () => {
           defaultValue={creator?.name}
           fieldError={errors.name}
           label="表示作家名"
-          {...register('name', { required: '1文字以上の入力が必要です。' })}
+          {...register('name', {
+            validate: value => {
+              try {
+                new UserName(value);
+                return true;
+              } catch (e) {
+                return (e as Error).message;
+              }
+            },
+          })}
         />
 
         <div>
           <p>作品ジャンル</p>
           <select
-            className="
-              my-1 block w-fit rounded-md 
-              border border-black bg-transparent px-2 py-2 
-              focus:border-2 focus:border-blue-600 focus:outline-none"
+            className="my-1 block w-fit rounded-md border border-black bg-transparent px-2 py-2 focus:border-2 focus:border-blue-600 focus:outline-none"
             defaultValue={creator?.genre}
             {...register('genre')}>
             {genres.map(genre => (
@@ -366,14 +377,10 @@ export const Mypage = () => {
 
         <div>
           <p>プロフィール</p>
-          <Textarea
+          <HashtagTextarea
             defaultValue={creator?.profile}
-            minRows={3}
-            sx={{
-              borderColor: 'black',
-              marginY: '0.25rem',
-              backgroundColor: 'transparent',
-            }}
+            onHashtagsChange={setProfileHashtags}
+            rows={3}
             {...register('profile')}
           />
         </div>
@@ -412,7 +419,7 @@ export const Mypage = () => {
             endDecorator={
               <MuiJoyButton
                 color="neutral"
-                disabled={addLinkError}
+                disabled={addLinkError || addLink.length == 0}
                 onClick={onAddLink}
                 size="sm"
                 variant="plain">
@@ -740,7 +747,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const tmpImage =
     selectedFiles !== undefined && selectedFiles.length > 0
       ? URL.createObjectURL(selectedFiles[0])
-      : exhibit?.tmpImageData ?? '';
+      : (exhibit?.tmpImageData ?? '');
 
   const location = watch('location');
   const matchGallery = galleries?.find(x => x.name === location);

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/book.dart';
-import 'package:mobile/widgets/link_text.dart';
+import 'package:mobile/widgets/action_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BookDetailScreen extends StatefulWidget {
@@ -31,12 +31,15 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         children: [
           Image.network(book.image),
           const Gap(8),
-          ...book.urls.map((urltext) => LinkText(
+          ...book.urls.map(
+            (urltext) => ActionText(
               text: urltext,
               onTap: () async {
                 final url = Uri.parse(urltext);
                 await launchUrl(url, mode: LaunchMode.externalApplication);
-              }))
+              },
+            ),
+          ),
         ].intersperse(const Gap(8)).toList(),
       ),
     );

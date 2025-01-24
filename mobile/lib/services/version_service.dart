@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 class VersionService {
   static late final bool isUpdateRequired;
 
-  static Future checkUpdateRequired() async {
+  static Future<void> checkUpdateRequired() async {
     // 実行中のアプリバージョンを取得
     final packageInfo = await PackageInfo.fromPlatform();
     final currentVer = Version.parse(packageInfo.version);
@@ -29,7 +29,7 @@ class VersionService {
     final overlay = Overlay.of(context);
     final overlayEntry = OverlayEntry(
       builder: (context) => PopScope(
-        onPopInvoked: (didPop) => false, // 戻るボタンを無効化
+        onPopInvokedWithResult: (didPop, result) => false, // 戻るボタンを無効化
         child: Material(
           color: Colors.black.withOpacity(0.5), // 背景を暗くする
           child: Center(
@@ -43,7 +43,6 @@ class VersionService {
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       'アップデートのお知らせ',
@@ -53,21 +52,25 @@ class VersionService {
                       ),
                     ),
                     const Gap(12),
-                    Text('''新しいバージョンが公開されました。
+                    Text(
+                      '''新しいバージョンが公開されました。
 下記のボタンから最新バージョンをインストールしてください。''',
-                        style: textTheme.bodyMedium
-                            ?.copyWith(color: Colors.black)),
+                      style:
+                          textTheme.bodyMedium?.copyWith(color: Colors.black),
+                    ),
                     const Gap(20),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple,
-                          foregroundColor: Colors.white),
+                        backgroundColor: Colors.purple,
+                        foregroundColor: Colors.white,
+                      ),
                       onPressed: () {
                         // アップデート処理
                         final newVer =
                             ConfigProvider().config.requiredAppVersion;
                         final url = Uri.parse(
-                            'https://github.com/FltSv/GalleryFound/releases/tag/v$newVer');
+                          'https://github.com/FltSv/GalleryFound/releases/tag/v$newVer',
+                        );
                         launchUrl(url, mode: LaunchMode.inAppWebView);
                       },
                       child: const Text('アップデート'),

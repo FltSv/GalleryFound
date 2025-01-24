@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/providers/config_provider.dart';
 import 'package:mobile/providers/data_provider.dart';
+import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_detail_screen.dart';
-import 'package:mobile/widgets/thumb_image.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:mobile/screens/word_search_screen.dart';
+import 'package:mobile/widgets/creator_item.dart';
 
 class CreatorListScreen extends StatefulWidget {
   const CreatorListScreen({super.key});
@@ -20,19 +23,53 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
 
   String searchText = '';
   String? selectedGenre;
+  bool tagSearch = false;
+  int _autoCompleteKey = 0;
 
-  List<Creator> get results {
-    if (selectedGenre == null && searchText.isEmpty) {
+  /// [selectedGenre]に一致する[Creator]を取得
+  Iterable<Creator> get genreFilteredCreators {
+    if (selectedGenre == null) {
       return creators;
     }
 
-    return creators.where((creator) {
-      final matchesGenre =
-          selectedGenre == null || creator.genre == selectedGenre;
-      final matchesSearch =
-          searchText.isEmpty || creator.name.contains(searchText);
-      return matchesGenre && matchesSearch;
-    }).toList();
+    return creators.where((creator) => creator.genre == selectedGenre);
+  }
+
+  /// [selectedGenre]と[searchText]に一致する[Creator]を取得
+  Iterable<Creator> get results {
+    if (tagSearch || searchText.isEmpty) {
+      return genreFilteredCreators;
+    }
+
+    return genreFilteredCreators
+        .where((creator) => creator.name.contains(searchText));
+  }
+
+  /// [genreFilteredCreators]リスト内のプロフィールに含まれる一意なハッシュタグの出現回数をマッピング
+  Map<String, int> get hashtagCounts {
+    final map = Map<String, int>.unmodifiable(
+      genreFilteredCreators
+          .expand((creator) => creator.profileHashtags)
+          .fold<Map<String, int>>(
+        <String, int>{},
+        (counts, hashtag) => {
+          ...counts,
+          hashtag: (counts[hashtag] ?? 0) + 1,
+        },
+      ),
+    );
+
+    final sortedEntries = map.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    return Map.fromEntries(sortedEntries);
+  }
+
+  /// AutoCompleteの再描画
+  void _rebuildAutoComplete() {
+    setState(() {
+      _autoCompleteKey ^= DateTime.now().hashCode;
+    });
   }
 
   @override
@@ -48,128 +85,137 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Wrap(
-                spacing: 8.0,
+                spacing: 8,
                 children: genres
-                    .map((genre) => ChoiceChip(
-                          label: Text(genre),
-                          selected: genre == selectedGenre,
-                          onSelected: (selected) {
-                            setState(() {
-                              selectedGenre = selected ? genre : null;
-                            });
-                          },
-                        ))
+                    .map(
+                      (genre) => ChoiceChip(
+                        label: Text(genre),
+                        selected: genre == selectedGenre,
+                        onSelected: (selected) {
+                          setState(() {
+                            selectedGenre = selected ? genre : null;
+                          });
+
+                          _rebuildAutoComplete();
+                        },
+                      ),
+                    )
                     .toList(),
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: TextField(
-              decoration: const InputDecoration(hintText: '作家を検索'),
-              onChanged: (String value) {
-                setState(() => searchText = value);
-              },
+            child: Row(
+              children: [
+                IconButton(
+                  icon: SvgPicture.asset(
+                    'assets/hashtag.svg',
+                    width: 24,
+                    height: 24,
+                    colorFilter: ColorFilter.mode(
+                      Theme.of(context).colorScheme.onSurface,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  color: tagSearch ? null : Colors.grey,
+                  onPressed: () {
+                    setState(() => tagSearch = !tagSearch);
+                  },
+                  isSelected: tagSearch,
+                ),
+                if (!tagSearch)
+                  Expanded(
+                    child: TextField(
+                      decoration: const InputDecoration(hintText: '作家を検索'),
+                      onChanged: (String value) {
+                        setState(() => searchText = value);
+                      },
+                    ),
+                  ),
+                if (tagSearch)
+                  Expanded(
+                    child: Autocomplete<String>(
+                      key: ValueKey(_autoCompleteKey),
+                      fieldViewBuilder:
+                          (context, controller, focusNode, onFieldSubmitted) {
+                        return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          decoration:
+                              const InputDecoration(hintText: 'ハッシュタグで検索'),
+                        );
+                      },
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                        const maxTagCount = 10;
+                        final text = textEditingValue.text;
+
+                        // 入力文字が空のときのみ、使用頻度の高いハッシュタグを表示
+                        if (text.isEmpty) {
+                          return hashtagCounts.keys.take(maxTagCount);
+                        }
+
+                        // それ以外は通常のサジェスト
+                        return hashtagCounts.keys
+                            .where(
+                              (word) => word
+                                  .toLowerCase()
+                                  .contains(text.toLowerCase()),
+                            )
+                            .take(maxTagCount);
+                      },
+                      onSelected: (hashtag) {
+                        _rebuildAutoComplete();
+
+                        NavigateProvider.push(
+                          context,
+                          WordSearchScreen(
+                            creators: genreFilteredCreators,
+                            query: hashtag,
+                            searchFilter: (creators, query) => creators.where(
+                              (creator) =>
+                                  creator.profileHashtags.contains(query),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+              ],
             ),
           ),
-          Gap(8),
+          const Gap(8),
           Expanded(
-            child: MasonryGridView.builder(
-              gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // 横に並べる数を調整します
-              ),
-              itemCount: results.length,
-              itemBuilder: (context, index) {
-                final creator = results[index];
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 100),
+              transitionBuilder: (Widget child, Animation<double> animation) =>
+                  FadeTransition(opacity: animation, child: child),
+              child: MasonryGridView.builder(
+                key: ValueKey(tagSearch.hashCode + selectedGenre.hashCode),
+                gridDelegate:
+                    const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // 横に並べる数を調整します
+                ),
+                itemCount: results.length,
+                itemBuilder: (context, index) {
+                  final creator = results.elementAt(index);
 
-                return CreatorItem(
-                  creator: creator,
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: ((context) =>
-                          CreatorDetailScreen(creator: creator)),
-                    ));
-                  },
-                );
-              },
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (context) =>
+                              CreatorDetailScreen(creator: creator),
+                        ),
+                      );
+                    },
+                    child: CreatorItem(creator: creator),
+                  );
+                },
+              ),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class CreatorItem extends StatelessWidget {
-  final Creator creator;
-  final VoidCallback onTap;
-
-  const CreatorItem({
-    super.key,
-    required this.creator,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final imageUrl = creator.highlightProduct?.imageUrl;
-    final thumbUrl = creator.highlightProduct?.thumbUrl;
-
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Stack(
-          children: [
-            // 背景画像またはプレースホルダー
-            imageUrl != null
-                ? ThumbImage(thumbURL: thumbUrl, imageURL: imageUrl)
-                : Container(
-                    color: Colors.grey[300], // プレースホルダーの背景色
-                    child: Center(
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 50,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ),
-            // シャドウグラデーション
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 100,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.8),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // テキスト表示
-            Positioned(
-              bottom: 10.0,
-              left: 10.0,
-              child: Text(
-                creator.name,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

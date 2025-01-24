@@ -6,10 +6,11 @@ import 'package:mobile/models/gallery.dart';
 
 /// データの取得と保持を行う
 class DataProvider {
-  // シングルトンのインスタンスを作成
-  static final DataProvider _instance = DataProvider._internal();
   factory DataProvider() => _instance;
   DataProvider._internal();
+
+  // シングルトンのインスタンスを作成
+  static final DataProvider _instance = DataProvider._internal();
 
   late List<Creator> _creators;
   List<Creator> get creators => _creators;
