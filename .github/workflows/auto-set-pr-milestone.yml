@@ -12,14 +12,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # PRのタイトルから#に続く数字を抽出
           issue_number=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" | jq -r '.linked_issues[0].number')
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" | \
+            jq -r '.title' | grep -o '#[0-9]\+' | grep -o '[0-9]\+')
 
           if [ ! -z "$issue_number" ]; then
+            # Issueからマイルストーン番号を取得
             milestone=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
               "https://api.github.com/repos/${{ github.repository }}/issues/$issue_number" | jq -r '.milestone.number')
 
             if [ "$milestone" != "null" ]; then
+              # PRにマイルストーンを設定
               curl -s -X PATCH \
                 -H "Authorization: token $GITHUB_TOKEN" \
                 -H "Content-Type: application/json" \
