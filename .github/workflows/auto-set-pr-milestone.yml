@@ -12,14 +12,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          issue_number=$(jq -r '.pull_request.issue_url | split("/")[-1]' <<< "$GITHUB_EVENT_PATH")
+          issue_number=${{ github.event.pull_request.number }}
           milestone=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            https://api.github.com/repos/${{ github.repository }}/issues/$issue_number | jq -r '.milestone.number')
+            "https://api.github.com/repos/${{ github.repository }}/issues/$issue_number" | jq -r '.milestone.number')
 
           if [ "$milestone" != "null" ]; then
             curl -s -X PATCH \
               -H "Authorization: token $GITHUB_TOKEN" \
               -H "Content-Type: application/json" \
               -d "{\"milestone\": $milestone}" \
-              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}
+              "https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
           fi
