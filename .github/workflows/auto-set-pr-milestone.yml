@@ -1,0 +1,25 @@
+name: Auto Set PR Milestone
+
+on:
+  pull_request:
+
+jobs:
+  set-milestone:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set Milestone
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          issue_number=$(jq -r '.pull_request.issue_url | split("/")[-1]' <<< "$GITHUB_EVENT_PATH")
+          milestone=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            https://api.github.com/repos/${{ github.repository }}/issues/$issue_number | jq -r '.milestone.number')
+
+          if [ "$milestone" != "null" ]; then
+            curl -s -X PATCH \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"milestone\": $milestone}" \
+              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}
+          fi
