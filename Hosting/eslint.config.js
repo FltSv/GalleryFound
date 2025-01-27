@@ -9,6 +9,7 @@ import globals from 'globals';
 import functional from 'eslint-plugin-functional';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import reactPlugin from 'eslint-plugin-react';
+import readableTailwind from 'eslint-plugin-readable-tailwind';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -196,6 +197,16 @@ export default tseslint.config(
 
   // react-hooks
   ...compat.extends('plugin:react-hooks/recommended'),
+
+  // readable-tailwindの設定記述
+  {
+    plugins: { 'readable-tailwind': readableTailwind },
+    rules: {
+      // 推奨ルールを警告扱い
+      ...readableTailwind.configs.warning.rules,
+      'readable-tailwind/multiline': ['warn', { lineBreakStyle: 'windows' }],
+    },
+  },
 
   // 配列末尾への配置が推奨されている
   eslintConfigPrettier,
