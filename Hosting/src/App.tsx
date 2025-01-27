@@ -44,7 +44,12 @@ const App = () => {
     <BrowserRouter>
       <Header />
       <ErrorBoundaryProvider>
-        <div className="mx-4 pb-8 md:mx-10">
+        <div
+          className={`
+            mx-4 pb-8
+
+            md:mx-10
+          `}>
           <Routes>
             <Route element={<Top />} path="/" />
             <Route element={<Login />} path="login" />

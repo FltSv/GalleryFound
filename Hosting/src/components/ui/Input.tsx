@@ -40,7 +40,11 @@ export const Textbox = forwardRef<HTMLInputElement, TextboxProps>(
         <Input
           {...others}
           autoComplete={others.autoComplete ?? 'off'}
-          className={`my-1 border bg-transparent ${others.className ?? ''}`}
+          className={`
+            my-1 border bg-transparent
+
+            ${others.className ?? ''}
+          `}
           defaultValue={defaultDate ?? others.defaultValue}
           ref={ref}
           sx={{
@@ -57,7 +61,13 @@ export const Textbox = forwardRef<HTMLInputElement, TextboxProps>(
 export const Button: FC<ButtonProps> = props => (
   <MuiJoyButton
     {...props}
-    className={`rounded-full font-normal transition hover:opacity-80 ${props.className ?? ''}`}
+    className={`
+      rounded-full font-normal transition
+
+      hover:opacity-80
+
+      ${props.className ?? ''}
+    `}
     sx={{
       opacity: (props.disabled ?? false) ? 0.4 : 1,
     }}>
@@ -72,7 +82,12 @@ export const SubmitButton: FC<ButtonProps> = props => {
   return (
     <MuiJoyButton
       {...props}
-      className={`rounded-full font-normal transition ${disabled ? '' : 'hover:opacity-80'} ${props.className ?? ''}`}
+      className={`
+        rounded-full font-normal transition
+
+        ${disabled ? '' : `hover:opacity-80`}
+        ${props.className ?? ''}
+      `}
       disabled={disabled}
       loadingPosition="start"
       startDecorator={props.startDecorator}
