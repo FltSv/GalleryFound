@@ -204,7 +204,6 @@ export default tseslint.config(
     rules: {
       // 推奨ルールを警告扱い
       ...readableTailwind.configs.warning.rules,
-      'readable-tailwind/multiline': ['warn', { lineBreakStyle: 'windows' }],
     },
   },
 
