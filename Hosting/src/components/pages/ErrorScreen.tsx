@@ -36,7 +36,13 @@ export const ErrorScreen: FC<{ error: unknown }> = ({ error }) => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 bg-red-100 bg-opacity-50 px-8 py-6 text-center text-red-700 md:mx-10 md:rounded-md">
+    <div
+      className={`
+        flex flex-col items-center justify-center gap-4 bg-red-100 bg-opacity-50
+        px-8 py-6 text-center text-red-700
+
+        md:mx-10 md:rounded-md
+      `}>
       <h2 className="font-yojo text-6xl font-bold">えらー</h2>
       <p>処理中に予期せぬ問題が発生しました。</p>
       {errorInstance && (
@@ -95,7 +101,10 @@ const ProgressBar: FC<{ value: number }> = ({ value }) => {
   return (
     <div className="w-full rounded-full bg-gray-300">
       <div
-        className="rounded-full bg-green-500 p-0.5 text-center text-xs text-white transition-all duration-500 ease-out"
+        className={`
+          rounded-full bg-green-500 p-0.5 text-center text-xs text-white
+          transition-all duration-500 ease-out
+        `}
         style={{ width: `${progress}%` }}>
         {progress}%
       </div>

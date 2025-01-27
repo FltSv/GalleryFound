@@ -20,7 +20,12 @@ export const Galleries = () => {
     <>
       <h2>Gallery List</h2>
       <p>現在データベースに登録されているギャラリー情報の一覧ページです。</p>
-      <div className="mx-2 my-4 flex flex-col flex-wrap gap-2 md:flex-row">
+      <div
+        className={`
+          mx-2 my-4 flex flex-col flex-wrap gap-2
+
+          md:flex-row
+        `}>
         {galleries?.map(x => (
           <Card key={x.id}>
             <div>
