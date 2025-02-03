@@ -16,8 +16,6 @@ void main() {
   final widgetBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetBinding);
 
-  final int test = 0 as dynamic;
-
   Future(() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
