@@ -38,4 +38,4 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           dart analyze |&
-          reviewdog -efm=" %#%t%*[a-z] • %f:%l:%c • %m" -reporter=github-pr-review -fail-level=warning
+          reviewdog -efm=" %#%t%*[a-z] • %f:%l:%c • %m" -reporter=github-pr-review -fail-level=warning -filter-mode=nofilter -tee
