@@ -1,0 +1,41 @@
+name: Flutter Lint
+on:
+  pull_request:
+    paths:
+      - "mobile/**"
+
+defaults:
+  run:
+    working-directory: mobile
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Cache flutter dependencies
+        uses: actions/cache@v3
+        with:
+          # Flutter の pub パッケージキャッシュ
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('mobile/pubspec.yaml', 'mobile/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - run: flutter pub get
+
+      - name: Set up reviewdog
+        uses: reviewdog/action-setup@v1
+
+      - name: Run Flutter Analyzer and Report via reviewdog
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          dart analyze |
+          reviewdog -efm=" %#%t%*[a-z] %. %f:%l:%c %. %m" -reporter=github-pr-review -fail-level=warning -tee
