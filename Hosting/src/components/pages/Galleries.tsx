@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card } from '@mui/joy';
-import { Gallery } from '../../Data';
+import { Gallery } from 'src/domains/entities';
 import { getGalleries } from '../../Data';
 
 export const Galleries = () => {

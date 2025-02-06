@@ -39,17 +39,14 @@ import { Popup } from 'components/ui/Popup';
 import {
   getCreatorData,
   setCreatorData,
-  Creator,
-  Product,
-  Exhibit,
   getGalleries,
   addGallery,
-  Gallery,
   getDatePeriodString,
 } from 'src/Data';
+import { Gallery, Creator, Product, Exhibit } from 'src/domains/entities';
 import { getUlid } from 'src/ULID';
 import { DraggableList, SortableProps } from 'components/ui/DraggableList';
-import { getConfig } from 'src/firebase';
+import { getConfig } from 'src/infra/firebase/firebaseConfig';
 import { UserName } from 'src/domains/UserName';
 
 export const Mypage = () => {
