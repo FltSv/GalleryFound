@@ -1,17 +1,9 @@
-import { collection, getDocs } from 'firebase/firestore';
 import { User } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
-import {
-  collectionNames,
-  db,
-  fbCreatorConverter,
-  getConfig,
-} from 'src/infra/firebase/firebaseConfig';
+import { collectionNames } from 'src/infra/firebase/firebaseConfig';
 import { getUlid } from 'src/ULID';
-import { Exhibit, Gallery, ImageStatus } from 'src/domains/entities';
-import { getCreatorStorageUrl } from 'src/infra/firebase/CreatorRepo';
-import { getGalleries } from 'src/infra/firebase/GalleryRepo';
+import { ImageStatus } from 'src/domains/entities';
 
 const imageCompOptions: Options = {
   fileType: 'image/png',
@@ -69,65 +61,6 @@ export const uploadImageData = async <T extends ImageStatus>(
 
   const tasks = images.map(uploadImage);
   return await Promise.all(tasks);
-};
-
-/** すべての展示情報の取得 */
-export const getAllExhibits = async () => {
-  const creatorsSnap = await getDocs(
-    collection(db, collectionNames.creators).withConverter(fbCreatorConverter),
-  );
-
-  const config = await getConfig();
-  const ignoreIds = config.debugUserIds;
-  const isDebug = process.env.NODE_ENV === 'development';
-
-  const exhibitsPromises = creatorsSnap.docs
-    .filter(d => isDebug || !ignoreIds.includes(d.id))
-    .map(creatorDocSnap => {
-      const data = creatorDocSnap.data();
-      const today = new Date();
-      const exhibits: Exhibit[] =
-        data.exhibits?.map(x => ({
-          ...x,
-          startDate: x.startDate?.toDate() ?? today,
-          endDate: x.endDate?.toDate() ?? today,
-          galleryId: x.galleryId,
-          srcImage: x.image,
-          imageUrl: getCreatorStorageUrl(creatorDocSnap.id) + x.image,
-          tmpImageData: '',
-        })) ?? [];
-
-      return exhibits;
-    });
-
-  const resolvedExhibits = await Promise.all(exhibitsPromises);
-  return resolvedExhibits.flat();
-};
-
-export interface GalleryExhibits {
-  gallery: Gallery;
-  exhibits: Exhibit[];
-}
-
-/** ギャラリー情報と関連する展示の配列を取得 */
-export const getGalleryExhibits = async () => {
-  const galleries = await getGalleries();
-  const exhibits = await getAllExhibits();
-
-  const groupedExhibits = Map.groupBy(exhibits, x => x.location);
-
-  const array = Array.from(groupedExhibits.entries())
-    .map(([key, value]) => {
-      const gallery = galleries.find(x => x.name === key);
-      if (gallery === undefined) return null;
-      return {
-        gallery: gallery,
-        exhibits: value,
-      };
-    })
-    .filter((x): x is GalleryExhibits => x !== null);
-
-  return array;
 };
 
 /** 住所から緯度経度を取得する */

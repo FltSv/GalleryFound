@@ -17,6 +17,7 @@ import {
   collectionNames,
   db,
   fbCreatorConverter,
+  getConfig,
 } from 'src/infra/firebase/firebaseConfig';
 import { Creator, Exhibit, ImageStatus, Product } from 'src/domains/entities';
 import { uploadImageData } from 'src/Data';
@@ -286,33 +287,80 @@ const getProductsCollectionRef = (userId: string) =>
 const getExhibitsCollectionRef = (userId: string) =>
   collection(db, collectionNames.creators, userId, collectionNames.exhibits);
 
+// todo: 次バージョンで削除
+/** すべての展示情報の取得 */
+export const getAllExhibits = async () => {
+  const creatorsSnap = await getDocs(
+    collection(db, collectionNames.creators).withConverter(fbCreatorConverter),
+  );
+
+  const config = await getConfig();
+  const ignoreIds = config.debugUserIds;
+  const isDebug = process.env.NODE_ENV === 'development';
+
+  const exhibitsPromises = creatorsSnap.docs
+    .filter(d => isDebug || !ignoreIds.includes(d.id))
+    .map(creatorDocSnap => {
+      const data = creatorDocSnap.data();
+      const today = new Date();
+      const exhibits: Exhibit[] =
+        data.exhibits?.map(x => ({
+          ...x,
+          startDate: x.startDate?.toDate() ?? today,
+          endDate: x.endDate?.toDate() ?? today,
+          galleryId: x.galleryId,
+          srcImage: x.image,
+          imageUrl: getCreatorStorageUrl(creatorDocSnap.id) + x.image,
+          tmpImageData: '',
+        })) ?? [];
+
+      return exhibits;
+    });
+
+  const resolvedExhibits = await Promise.all(exhibitsPromises);
+  return resolvedExhibits.flat();
+};
+
 /**
  * 指定日時以降の展示を取得する
  */
-// todo: 動作未確認
 export const getActiveExhibits = async (date: Date): Promise<Exhibit[]> => {
+  const config = await getConfig();
+  const ignoreIds = config.debugUserIds;
+  const isDebug = process.env.NODE_ENV === 'development';
+
   const exhibitsQuery = query(
     collectionGroup(db, collectionNames.exhibits),
     where('startDate', '>=', date),
   );
   const exhibitsSnapshot = await getDocs(exhibitsQuery);
 
-  const exhibits: Exhibit[] = exhibitsSnapshot.docs.map(doc => {
-    const data = doc.data();
-    const creatorUrl = getCreatorStorageUrl(doc.ref.id);
+  return exhibitsSnapshot.docs
+    .map(doc => {
+      const data = doc.data();
+      const creatorId = doc.ref.parent.parent?.id;
+      if (creatorId === undefined) {
+        return;
+      }
 
-    return {
-      id: data.id,
-      title: data.title,
-      location: data.location,
-      galleryId: data.galleryId,
-      startDate: data.startDate.toDate(),
-      endDate: data.endDate.toDate(),
-      srcImage: data.image,
-      imageUrl: creatorUrl + (data.image as string),
-      tmpImageData: '',
-    };
-  });
+      // 本番環境ではデバッグユーザー非表示
+      if (!isDebug && ignoreIds.includes(creatorId)) {
+        return;
+      }
 
-  return exhibits;
+      const creatorUrl = getCreatorStorageUrl(creatorId);
+
+      return {
+        id: data.id,
+        title: data.title,
+        location: data.location,
+        galleryId: data.galleryId,
+        startDate: data.startDate.toDate(),
+        endDate: data.endDate.toDate(),
+        srcImage: data.image,
+        imageUrl: creatorUrl + (data.image as string),
+        tmpImageData: '',
+      };
+    })
+    .filter(x => x !== undefined);
 };
