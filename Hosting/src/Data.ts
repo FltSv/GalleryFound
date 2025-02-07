@@ -1,23 +1,7 @@
-import {
-  collection,
-  doc,
-  GeoPoint,
-  getDoc,
-  getDocs,
-  setDoc,
-  Timestamp,
-} from 'firebase/firestore';
+import { collection, doc, GeoPoint, getDocs, setDoc } from 'firebase/firestore';
 import { User } from 'firebase/auth';
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  listAll,
-  deleteObject,
-} from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
-
 import {
   db,
   fbCreatorConverter,
@@ -25,12 +9,11 @@ import {
   getConfig,
 } from 'src/infra/firebase/firebaseConfig';
 import { getUlid } from 'src/ULID';
-import { Creator, Exhibit, Gallery, ImageStatus } from 'src/domains/entities';
-
-const collectionNames = {
-  creators: 'creators',
-  galleries: 'galleries',
-} as const;
+import { Exhibit, Gallery, ImageStatus } from 'src/domains/entities';
+import {
+  collectionNames,
+  getCreatorStorageUrl,
+} from 'src/infra/firebase/CreatorRepo';
 
 const imageCompOptions: Options = {
   fileType: 'image/png',
@@ -44,167 +27,10 @@ const thumbOptions: Options = {
   maxWidthOrHeight: 256,
 };
 
-const getCreatorStorageUrl = (userId: string) =>
-  `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${userId}%2F`;
-
-export const getCreatorData = async (user: User) => {
-  const userId = user.uid;
-  const creatorUrl = getCreatorStorageUrl(userId);
-
-  // Firestoreからユーザーデータを取得
-  const docRef = doc(db, collectionNames.creators, userId).withConverter(
-    fbCreatorConverter,
-  );
-  const docSnap = await getDoc(docRef);
-
-  // 作家情報が存在しているか
-  if (!docSnap.exists()) {
-    // 存在しない場合、情報は空のままで登録を促す
-    const empty: Creator = {
-      name: '',
-      genre: '',
-      profile: '',
-      profileHashtags: [],
-      links: [],
-      products: [],
-      exhibits: [],
-    };
-
-    return empty;
-  }
-
-  // ドキュメントが存在する場合、詳細を取得
-  const data = docSnap.data();
-  console.debug('docSnap.data:', data);
-
-  const name = data.name ?? '';
-  const genre = data.genre ?? '';
-  const profile = data.profile ?? '';
-  const profileHashtags = data.profileHashtags ?? [];
-  const links = data.links ?? [];
-  const highlightProductId = data.highlightProductId ?? '';
-
-  // 発表作品
-  const fbProducts = data.products ?? [];
-  const products = fbProducts.map(x => ({
-    id: x.id,
-    title: x.title ?? '',
-    isHighlight: x.id === highlightProductId,
-    detail: x.detail ?? '',
-    srcImage: x.image,
-    imageUrl: creatorUrl + x.image,
-    tmpImageData: '',
-  }));
-
-  // 展示登録
-  const fbExhibits = data.exhibits ?? [];
-  const today = new Date();
-  const exhibits = fbExhibits.map(x => ({
-    id: x.id,
-    title: x.title,
-    location: x.location,
-    startDate: x.startDate?.toDate() ?? today,
-    endDate: x.endDate?.toDate() ?? today,
-    galleryId: x.galleryId,
-    srcImage: x.image,
-    imageUrl: creatorUrl + x.image,
-    tmpImageData: '',
-  }));
-
-  const creator: Creator = {
-    name: name,
-    genre: genre,
-    profile: profile,
-    profileHashtags: profileHashtags,
-    links: links,
-    products: products,
-    exhibits: exhibits,
-  };
-
-  console.debug('creator:', creator);
-  return creator;
-};
-
-/**
- *  値の確定、DBへデータを送信する
- */
-export const setCreatorData = async (user: User, data: Creator) => {
-  const userId = user.uid;
-
-  // 画像のアップロード
-  const products = await uploadImageData(user, data.products);
-  const exhibits = await uploadImageData(user, data.exhibits);
-
-  // DB更新
-  const docRef = doc(db, collectionNames.creators, userId).withConverter(
-    fbCreatorConverter,
-  );
-
-  await setDoc(docRef, {
-    name: data.name,
-    genre: data.genre,
-    profile: data.profile,
-    profileHashtags: data.profileHashtags,
-    links: data.links,
-    highlightProductId: data.products.find(x => x.isHighlight)?.id,
-    products: products.map(x => ({
-      id: x.id,
-      title: x.title,
-      detail: x.detail,
-      image: x.srcImage,
-    })),
-    exhibits: exhibits.map(x => ({
-      id: x.id,
-      title: x.title,
-      location: x.location,
-      galleryId: x.galleryId,
-      startDate: Timestamp.fromDate(x.startDate),
-      endDate: Timestamp.fromDate(x.endDate),
-      image: x.srcImage,
-    })),
-  });
-
-  // 使用されていない画像の削除
-  // 使用中の画像
-  const usingImages = [...products, ...exhibits].map(
-    (x: ImageStatus) => x.srcImage.split('?')[0],
-  );
-
-  // Storage内の画像
-  const allImagesRef = ref(
-    getStorage(),
-    `${collectionNames.creators}/${userId}`,
-  );
-  const allImages = await listAll(allImagesRef).then(res =>
-    res.items.map(item => item.name),
-  );
-
-  // 未使用画像の抽出、削除
-  const unusedImages = allImages.filter(image => !usingImages.includes(image));
-  const deleteTasks = unusedImages.map(async unusedImage => {
-    const unusedRef = ref(
-      getStorage(),
-      `${collectionNames.creators}/${userId}/${unusedImage}`,
-    );
-    await deleteObject(unusedRef);
-
-    const unusedWebp = unusedImage.replace('.png', '.webp');
-    const unusedThumbRef = ref(
-      getStorage(),
-      `${collectionNames.creators}/${userId}/thumbs/${unusedWebp}`,
-    );
-    await deleteObject(unusedThumbRef);
-  });
-  await Promise.all(deleteTasks);
-
-  // 処理完了
-  console.debug('complete setCreatorData');
-};
-
 /**
  * tmpImageDataの画像をアップロード、URLを格納
  */
-const uploadImageData = async <T extends ImageStatus>(
+export const uploadImageData = async <T extends ImageStatus>(
   user: User,
   images: T[],
 ): Promise<T[]> => {
