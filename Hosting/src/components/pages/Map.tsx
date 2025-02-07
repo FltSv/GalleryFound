@@ -17,11 +17,11 @@ import {
   MapEvent,
 } from '@vis.gl/react-google-maps';
 import { Env } from 'src/Env';
+import { getDatePeriodString } from 'src/Data';
 import {
   GalleryExhibits,
-  getDatePeriodString,
   getGalleryExhibits,
-} from 'src/Data';
+} from 'src/application/GalleryMapService';
 
 // 東京駅
 const TOKYO_POS = {
