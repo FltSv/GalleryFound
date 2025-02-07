@@ -13,16 +13,13 @@ import {
 } from 'firebase/firestore';
 import { User } from 'firebase/auth';
 import { getStorage, ref, listAll, deleteObject } from 'firebase/storage';
-import { db, fbCreatorConverter } from 'src/infra/firebase/firebaseConfig';
+import {
+  collectionNames,
+  db,
+  fbCreatorConverter,
+} from 'src/infra/firebase/firebaseConfig';
 import { Creator, Exhibit, ImageStatus, Product } from 'src/domains/entities';
 import { uploadImageData } from 'src/Data';
-
-export const collectionNames = {
-  creators: 'creators',
-  galleries: 'galleries',
-  products: 'products',
-  exhibits: 'exhibits',
-} as const;
 
 export const getCreatorStorageUrl = (userId: string) =>
   `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${userId}%2F`;

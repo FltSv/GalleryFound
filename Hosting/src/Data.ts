@@ -1,19 +1,17 @@
-import { collection, doc, GeoPoint, getDocs, setDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { User } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
 import {
+  collectionNames,
   db,
   fbCreatorConverter,
-  fbGalleryConverter,
   getConfig,
 } from 'src/infra/firebase/firebaseConfig';
 import { getUlid } from 'src/ULID';
 import { Exhibit, Gallery, ImageStatus } from 'src/domains/entities';
-import {
-  collectionNames,
-  getCreatorStorageUrl,
-} from 'src/infra/firebase/CreatorRepo';
+import { getCreatorStorageUrl } from 'src/infra/firebase/CreatorRepo';
+import { getGalleries } from 'src/infra/firebase/GalleryRepo';
 
 const imageCompOptions: Options = {
   fileType: 'image/png',
@@ -132,30 +130,8 @@ export const getGalleryExhibits = async () => {
   return array;
 };
 
-/** ギャラリー情報の一覧を取得 */
-export const getGalleries = async () => {
-  const colRef = collection(db, collectionNames.galleries);
-  const querySnap = await getDocs(colRef.withConverter(fbGalleryConverter));
-
-  return querySnap.docs.map(doc => {
-    const data = doc.data();
-    const { latitude, longitude } = data.latLng.toJSON();
-    return { ...data, id: doc.id, latLng: { lat: latitude, lng: longitude } };
-  });
-};
-
-/** ギャラリー情報を追加 */
-export const addGallery = async (data: Gallery) => {
-  const { lat, lng } = await getLatLngFromAddress(data.location);
-  const { id, ...firebaseData } = { ...data, latLng: new GeoPoint(lat, lng) };
-  void id;
-
-  const docRef = doc(db, collectionNames.galleries, getUlid());
-  await setDoc(docRef.withConverter(fbGalleryConverter), firebaseData);
-};
-
 /** 住所から緯度経度を取得する */
-const getLatLngFromAddress = async (address: string) => {
+export const getLatLngFromAddress = async (address: string) => {
   const geocoder = new google.maps.Geocoder();
   const geocodingTask = new Promise<google.maps.GeocoderResult[]>(
     (resolve, reject) =>

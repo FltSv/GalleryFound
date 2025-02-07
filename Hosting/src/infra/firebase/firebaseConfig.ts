@@ -28,6 +28,13 @@ const firebaseConfig = {
 
 const reCAPTCHA_PUBLIC_KEY = '6LeS8AcqAAAAABQnEgiC2-HGfuuHFeNK_kMUD0Zq';
 
+export const collectionNames = {
+  creators: 'creators',
+  galleries: 'galleries',
+  products: 'products',
+  exhibits: 'exhibits',
+} as const;
+
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = initializeFirestore(app, {
