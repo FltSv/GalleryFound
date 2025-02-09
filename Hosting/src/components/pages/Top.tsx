@@ -14,7 +14,11 @@ export const Top = () => (
 
     <div className="flex items-center">
       <img
-        className="w-24 md:w-40"
+        className={`
+          w-24
+
+          md:w-40
+        `}
         src="img/exhibit-screen.png"
         style={screenshot}
       />
@@ -26,7 +30,11 @@ export const Top = () => (
 
     <div className="flex flex-row-reverse items-center">
       <img
-        className="w-24 md:w-40"
+        className={`
+          w-24
+
+          md:w-40
+        `}
         src="img/map-screen.png"
         style={screenshot}
       />
@@ -54,7 +62,11 @@ export const Top = () => (
 
     <div className="flex items-center">
       <img
-        className="w-24 md:w-40"
+        className={`
+          w-24
+
+          md:w-40
+        `}
         src="img/creator-screen.png"
         style={screenshot}
       />
@@ -65,14 +77,23 @@ export const Top = () => (
     </div>
 
     {/* アプリDLボタン */}
-    <div className="mx-auto my-16 flex gap-1 md:gap-4">
+    <div
+      className={`
+        mx-auto my-16 flex gap-1
+
+        md:gap-4
+      `}>
       <div className="relative">
         <a
           className="pointer-events-none cursor-default opacity-50"
           href="#"
           target="_blank">
           <img
-            className="m-2 h-12 object-contain md:h-16"
+            className={`
+              m-2 h-12 object-contain
+
+              md:h-16
+            `}
             src="img/google-play-badge_JP.png"
           />
         </a>
@@ -86,7 +107,11 @@ export const Top = () => (
           href="#"
           target="_blank">
           <img
-            className="m-2 h-12 object-contain md:h-16"
+            className={`
+              m-2 h-12 object-contain
+
+              md:h-16
+            `}
             src="img/DownloadAppStore_JP.svg"
           />
         </a>

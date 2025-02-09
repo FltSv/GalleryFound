@@ -1,0 +1,52 @@
+name: Auto Set PR Milestone
+
+on:
+  pull_request:
+
+jobs:
+  set-milestone:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set Milestone
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "PRのタイトルを取得し、issue番号を抽出しています..."
+          issue_number=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" | \
+            jq -r '.title' | grep -o '#[0-9]\+' | grep -o '[0-9]\+')
+
+          echo "抽出されたIssue番号: $issue_number"
+
+          if [ ! -z "$issue_number" ]; then
+            echo "issue #$issue_number のマイルストーンを取得しています..."
+            milestone=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/$issue_number" | jq -r '.milestone.number')
+            
+            echo "抽出されたマイルストーン番号: $milestone"
+
+            if [ "$milestone" != "null" ]; then
+              echo "マイルストーン $milestone を PR #${{ github.event.pull_request.number }} に設定しています..."
+              set_milestone_response=$(curl -s -X PATCH \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Content-Type: application/json" \
+                -d "{\"milestone\": $milestone}" \
+                "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}")
+              
+              # レスポンスからマイルストーン番号を取得して確認
+              set_milestone_number=$(echo "$set_milestone_response" | jq -r '.milestone.number')
+              
+              if [ "$set_milestone_number" = "$milestone" ]; then
+                echo "✅ マイルストーンの設定に成功しました！"
+              else
+                echo "❌ マイルストーンの設定に失敗しました。"
+                echo "マイルストーン設定レスポンス: $set_milestone_response"
+                exit 1
+              fi
+            else
+              echo "issue #$issue_number にマイルストーンが見つかりませんでした"
+            fi
+          else
+            echo "PRタイトルにissue番号が見つかりませんでした"
+          fi

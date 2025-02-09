@@ -18,7 +18,13 @@ export const SendVerify = () => {
       <h1 className={h1Style}>確認メールを送信しました！</h1>
       <p className="my-4 text-lg text-gray-800">
         Gallery Foundにご登録頂き、ありがとうございます。
-        <br className="hidden md:block" />
+        <br
+          className={`
+            hidden
+
+            md:block
+          `}
+        />
         ご登録のメールアドレスに確認メールを送信しました。
       </p>
       <p className="my-4 text-gray-800">

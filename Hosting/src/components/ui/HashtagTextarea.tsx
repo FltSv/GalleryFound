@@ -124,7 +124,9 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
       <div className="relative w-full" ref={ref}>
         {/* 重ねるための下レイヤー */}
         <div
-          className="absolute left-0 top-0 w-full border border-transparent px-3 py-2"
+          className={`
+            absolute left-0 top-0 w-full border border-transparent px-3 py-2
+          `}
           ref={highlighterRef}
           style={{
             fontFamily: joyTheme.fontFamily.body,
@@ -137,7 +139,12 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
         {/* 実際の入力用 Textarea（透明にして上に重ねる） */}
         <textarea
           {...restProps}
-          className="relative w-full rounded-md border border-black bg-transparent px-3 py-2 text-transparent outline-none focus:border-2 focus:border-blue-600"
+          className={`
+            relative w-full rounded-md border border-black bg-transparent px-3
+            py-2 text-transparent outline-none
+
+            focus:border-2 focus:border-blue-600
+          `}
           onChange={handleChange}
           ref={textareaRef}
           style={{

@@ -36,21 +36,14 @@ import {
   Textbox,
 } from 'components/ui/Input';
 import { Popup } from 'components/ui/Popup';
-import {
-  getCreatorData,
-  setCreatorData,
-  Creator,
-  Product,
-  Exhibit,
-  getGalleries,
-  addGallery,
-  Gallery,
-  getDatePeriodString,
-} from 'src/Data';
+import { getDatePeriodString } from 'src/Data';
+import { Gallery, Creator, Product, Exhibit } from 'src/domains/entities';
 import { getUlid } from 'src/ULID';
 import { DraggableList, SortableProps } from 'components/ui/DraggableList';
-import { getConfig } from 'src/firebase';
+import { getConfig } from 'src/infra/firebase/firebaseConfig';
 import { UserName } from 'src/domains/UserName';
+import { getCreatorData, setCreatorData } from 'src/infra/firebase/CreatorRepo';
+import { addGallery, getGalleries } from 'src/infra/firebase/GalleryRepo';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -364,7 +357,12 @@ export const Mypage = () => {
         <div>
           <p>作品ジャンル</p>
           <select
-            className="my-1 block w-fit rounded-md border border-black bg-transparent px-2 py-2 focus:border-2 focus:border-blue-600 focus:outline-none"
+            className={`
+              my-1 block w-fit rounded-md border border-black bg-transparent
+              px-2 py-2
+
+              focus:border-2 focus:border-blue-600 focus:outline-none
+            `}
             defaultValue={creator?.genre}
             {...register('genre')}>
             {genres.map(genre => (
@@ -409,7 +407,14 @@ export const Mypage = () => {
                   size="sm"
                   variant="plain">
                   <FaTimes />
-                  <label className="hidden md:inline md:pl-2">削除</label>
+                  <label
+                    className={`
+                      hidden
+
+                      md:inline md:pl-2
+                    `}>
+                    削除
+                  </label>
                 </MuiJoyButton>
               </div>
             );
@@ -424,7 +429,14 @@ export const Mypage = () => {
                 size="sm"
                 variant="plain">
                 <FaPlus />
-                <label className="hidden md:inline md:pl-2">追加</label>
+                <label
+                  className={`
+                    hidden
+
+                    md:inline md:pl-2
+                  `}>
+                  追加
+                </label>
               </MuiJoyButton>
             }
             onChange={onChangeLinkInput}
@@ -530,17 +542,29 @@ const ProductCell = (props: ProductCellProps) => {
   const bgHighlight = data.isHighlight ? 'bg-yellow-100' : '';
 
   return (
-    <div className={`relative min-w-fit ${bgHighlight}`}>
+    <div
+      className={`
+        relative min-w-fit
+
+        ${bgHighlight}
+      `}>
       <div className="flex">
         <div className="max-w-min content-center" {...sortableProps}>
           <RiDraggable />
         </div>
         <img
-          className="h-28 p-2 md:h-40"
+          className={`
+            h-28 p-2
+
+            md:h-40
+          `}
           key={data.id}
           src={data.tmpImageData || data.imageUrl}
         />
-        <p className="absolute bottom-0 w-fit bg-black bg-opacity-50 px-2 text-white">
+        <p
+          className={`
+            absolute bottom-0 w-fit bg-black bg-opacity-50 px-2 text-white
+          `}>
           {data.title}
         </p>
       </div>
@@ -584,12 +608,21 @@ const ExhibitRow = (props: ExhibitRowProps) => {
   }, [data, onDelete]);
 
   return (
-    <tr className="odd:bg-neutral-200 even:bg-neutral-50">
+    <tr
+      className={`
+        even:bg-neutral-50
+
+        odd:bg-neutral-200
+      `}>
       <td className="flex gap-4 p-2">
         {/* 画像 */}
         <img
           alt={data.title}
-          className="max-w-32 md:max-w-40"
+          className={`
+            max-w-32
+
+            md:max-w-40
+          `}
           src={data.tmpImageData || data.imageUrl}
         />
         {/* 内容 */}
@@ -606,7 +639,14 @@ const ExhibitRow = (props: ExhibitRowProps) => {
             size="sm"
             variant="plain">
             <FaPen />
-            <label className="hidden md:inline md:pl-2">編集</label>
+            <label
+              className={`
+                hidden
+
+                md:inline md:pl-2
+              `}>
+              編集
+            </label>
           </MuiJoyButton>
           <MuiJoyButton
             color="neutral"
@@ -614,7 +654,14 @@ const ExhibitRow = (props: ExhibitRowProps) => {
             size="sm"
             variant="plain">
             <FaTimes />
-            <label className="hidden md:inline md:pl-2">削除</label>
+            <label
+              className={`
+                hidden
+
+                md:inline md:pl-2
+              `}>
+              削除
+            </label>
           </MuiJoyButton>
         </div>
       </td>
@@ -666,14 +713,24 @@ const ProductPopup = (props: ProductPopupProps) => {
       <form onSubmit={onSubmitForm}>
         <h2 className="w-fit">作品情報編集</h2>
 
-        <div className="mb-4 mt-2 flex max-w-2xl flex-col gap-4 md:flex-row">
+        <div
+          className={`
+            mb-4 mt-2 flex max-w-2xl flex-col gap-4
+
+            md:flex-row
+          `}>
           <div className="flex max-w-max basis-1/2 flex-col">
             <img
               className="w-full max-w-xs"
               src={product.tmpImageData || product.imageUrl}
             />
           </div>
-          <div className="flex basis-1/2 flex-col gap-2 md:w-max">
+          <div
+            className={`
+              flex basis-1/2 flex-col gap-2
+
+              md:w-max
+            `}>
             <Textbox label="作品名" {...register('title')} />
             <div>
               <Switch
@@ -854,7 +911,12 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     <form onSubmit={onSubmitForm}>
       <h2 className="w-fit">{isAdd ? '展示登録' : '展示修正'}</h2>
 
-      <div className="my-2 flex max-w-2xl flex-col md:flex-row">
+      <div
+        className={`
+          my-2 flex max-w-2xl flex-col
+
+          md:flex-row
+        `}>
         <div className="flex max-w-max basis-1/2 flex-col gap-2 p-2">
           <FileInput
             accept="image/*"
@@ -878,7 +940,12 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             src={tmpImage || exhibit?.imageUrl}
           />
         </div>
-        <div className="flex basis-1/2 flex-col gap-2 p-2 md:w-max">
+        <div
+          className={`
+            flex basis-1/2 flex-col gap-2 p-2
+
+            md:w-max
+          `}>
           <Textbox
             label="展示名"
             {...register('title', { required: requireMsg })}
@@ -939,7 +1006,15 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       </div>
 
       <button>
-        <i className={`fa-solid ${isAdd ? 'fa-add' : 'fa-check'} m-0 mr-2`} />
+        <i
+          className={`
+            fa-solid
+
+            ${isAdd ? 'fa-add' : 'fa-check'}
+
+            m-0 mr-2
+          `}
+        />
         {isAdd ? '追加' : '変更'}
       </button>
     </form>

@@ -6,8 +6,12 @@ import { useAuthContext } from '../AuthContext';
 import { useCallback } from 'react';
 
 const Header = () => {
-  const styles =
-    'px-4 py-2 text-nowrap border border-solid border-current rounded-3xl no-underline transition hover:bg-sky-200 hover:bg-opacity-60';
+  const styles = `
+    text-nowrap rounded-3xl border border-solid border-current px-4 py-2
+    no-underline transition
+
+    hover:bg-sky-200 hover:bg-opacity-60
+  `;
 
   const { user, loading } = useAuthContext();
   const location = useLocation();
@@ -27,7 +31,12 @@ const Header = () => {
   return (
     <header className="mb-4 flex gap-4 p-4">
       <div className="inline-block w-full">
-        <h1 className="mb-4 font-magneto text-4xl md:text-5xl">
+        <h1
+          className={`
+            mb-4 font-magneto text-4xl
+
+            md:text-5xl
+          `}>
           <Link to="/">Gallery Found</Link>
         </h1>
       </div>
@@ -74,7 +83,12 @@ const Header = () => {
           </div>
 
           {/* ボタンメニュー */}
-          <div className="hidden gap-4 md:flex">
+          <div
+            className={`
+              hidden gap-4
+
+              md:flex
+            `}>
             {visibleLogin && (
               <Link className={styles} to="login">
                 Creator Login
