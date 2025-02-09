@@ -8,7 +8,7 @@ import {
   signInWithPopup,
 } from 'firebase/auth';
 
-type providerTypes = 'google' | 'facebook' | 'email';
+type providerTypes = 'google' | 'facebook';
 
 /**
  * メール・パスワードによるログイン処理
