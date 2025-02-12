@@ -1,17 +1,56 @@
 /**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ * firebase shell開始方法
+ * 1. cd Functions\functions
+ * 2. npm run start
  */
 
-import {onRequest} from "firebase-functions/v2/https";
-import * as logger from "firebase-functions/logger";
+import { firestore } from "firebase-admin";
+import { initializeApp } from "firebase-admin/app";
+import { HttpsError, onCall } from "firebase-functions/v2/https";
+import { getDataPatchScript } from "./data-patch/scripts";
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+initializeApp();
+
+const db = firestore();
+db.settings({ databaseId: "develop" });
+
+/**
+ * データパッチ実行
+ * firebase > runDataPatch({data:{name:"V060_MigrateToSubcollections",dryRun:false}})
+ */
+export const runDataPatch = onCall(async (request) => {
+  try {
+    const patchScript = getDataPatchScript({ ...request.data, db });
+
+    if (!patchScript) {
+      throw new HttpsError("not-found", "Patch script not found");
+    }
+
+    return await patchScript.exec();
+  } catch (error) {
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+
+    throw new HttpsError(
+      "internal",
+      JSON.stringify(error, Object.getOwnPropertyNames(error))
+    );
+  }
+});
+
+export const addData = onCall(async (request) => {
+  try {
+    const data = request.data; // クライアントから送られるデータを取得
+    const docRef = await db.collection("data").add(data); // Firestore にデータを追加
+    return { message: "Data added successfully", id: docRef.id };
+  } catch (error) {
+    throw new HttpsError(
+      "internal",
+      JSON.stringify(error, Object.getOwnPropertyNames(error))
+    );
+  }
+});
 
 // export const helloWorld = onRequest((request, response) => {
 //   logger.info("Hello logs!", {structuredData: true});
