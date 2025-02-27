@@ -13,6 +13,8 @@ class Creator {
     required this.products,
     required this.exhibits,
   }) {
+    highlightProduct?.creator = this;
+
     for (final product in products) {
       product.creator = this;
     }

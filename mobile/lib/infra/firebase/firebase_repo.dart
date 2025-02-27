@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:mobile/infra/firebase/converter_extensions.dart';
 import 'package:mobile/models/creator.dart';
-import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/models/gallery.dart';
 import 'package:mobile/models/product.dart';
 import 'package:mobile/providers/config_provider.dart';
@@ -25,41 +25,22 @@ class FirebaseRepo implements DataRepoBase {
           ((data['profileHashtags'] ?? <String>[]) as List<dynamic>)
               .cast<String>();
 
-      final exhibitsMaps = (docSnap.get('exhibits') as List<dynamic>)
-          .cast<Map<String, dynamic>>();
-      final exhibitTasks = exhibitsMaps.map(
-        (exhibit) async => Exhibit(
-          id: toStr(exhibit['id']),
-          title: toStr(exhibit['title']),
-          location: toStr(exhibit['location']),
-          galleryId: toStr(exhibit['galleryId']),
-          image: toStr(exhibit['image']),
-          fetchThumbUrl: getThumbUrl,
-          startDate: toDateTime(exhibit['startDate']),
-          endDate: toDateTime(exhibit['endDate']),
-        ),
-      );
-      final exhibits = await Future.wait(exhibitTasks);
+      final exhibitsSnap = await docSnap.reference
+          .collection('exhibits')
+          .withExhibitConverter(this)
+          .get();
+      final exhibits =
+          exhibitsSnap.docs.map((docSnap) => docSnap.data()).toList();
 
-      final productMaps = (docSnap.get('products') as List<dynamic>)
-          .cast<Map<String, dynamic>>();
-      final productsTasks = productMaps.map(
-        (product) async => Product(
-          id: toStr(product['id']),
-          title: toStr(product['title']),
-          detail: toStr(product['detail']),
-          image: toStr(product['image']),
-          fetchThumbUrl: getThumbUrl,
-        ),
-      );
-      final products = await Future.wait(productsTasks);
+      final productsSnap = await docSnap.reference
+          .collection('products')
+          .orderBy('order')
+          .withProductConverter(this)
+          .get();
+      final products =
+          productsSnap.docs.map((docSnap) => docSnap.data()).toList();
 
-      final highlightProduct = products.isNotEmpty
-          ? products.firstWhere(
-              (product) => product.id == data['highlightProductId'],
-              orElse: () => products.first,
-            )
-          : null;
+      final highlightProduct = await _getHighlightProduct(docSnap);
 
       return Creator(
         id: docSnap.id,
@@ -114,19 +95,31 @@ class FirebaseRepo implements DataRepoBase {
     }
   }
 
-  DateTime toDateTime(dynamic value, {DateTime? defaultValue}) {
-    if (value is! Timestamp) {
-      return defaultValue ?? DateTime(1970);
+  Future<Product?> _getHighlightProduct(
+    DocumentSnapshot<Map<String, dynamic>> docSnap,
+  ) async {
+    final productsCollectionRef = docSnap.reference.collection('products');
+    final data = docSnap.data();
+
+    final highlightProductId = toStr(data?['highlightProductId']);
+    if (highlightProductId.isNotEmpty) {
+      final highlightProductSnap = await productsCollectionRef
+          .doc(highlightProductId)
+          .withProductConverter(this)
+          .get();
+      return highlightProductSnap.data();
     }
 
-    return value.toDate();
-  }
+    final firstProduct = await productsCollectionRef
+        .orderBy('order')
+        .limit(1)
+        .withProductConverter(this)
+        .get();
 
-  String toStr(dynamic value) {
-    if (value == null) {
-      return '';
+    if (firstProduct.docs.isEmpty) {
+      return null;
     }
 
-    return value.toString();
+    return firstProduct.docs.first.data();
   }
 }
