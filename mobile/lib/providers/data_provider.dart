@@ -1,3 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/application/usecases/creator_usecase.dart';
+import 'package:mobile/application/usecases/exhibit_usecase.dart';
 import 'package:mobile/infra/factory.dart';
 import 'package:mobile/infra/fake/fake_repo.dart';
 import 'package:mobile/models/book.dart';
@@ -35,3 +38,11 @@ class DataProvider {
     _books = await FakeRepo.fetchBooks();
   }
 }
+
+final dataRepoProvider = Provider((ref) => Factory.getDataRepo());
+
+final creatorUsecaseProvider =
+    Provider((ref) => CreatorUsecase(ref.read(dataRepoProvider)));
+
+final exhibitUsecaseProvider =
+    Provider((ref) => ExhibitUsecase(ref.read(dataRepoProvider)));
