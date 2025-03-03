@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobile/infra/firebase/converter_extensions.dart';
 import 'package:mobile/models/creator.dart';
+import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/models/gallery.dart';
 import 'package:mobile/models/product.dart';
 import 'package:mobile/providers/config_provider.dart';
@@ -25,21 +26,6 @@ class FirebaseRepo implements DataRepoBase {
           ((data['profileHashtags'] ?? <String>[]) as List<dynamic>)
               .cast<String>();
 
-      final exhibitsSnap = await docSnap.reference
-          .collection('exhibits')
-          .withExhibitConverter(this)
-          .get();
-      final exhibits =
-          exhibitsSnap.docs.map((docSnap) => docSnap.data()).toList();
-
-      final productsSnap = await docSnap.reference
-          .collection('products')
-          .orderBy('order')
-          .withProductConverter(this)
-          .get();
-      final products =
-          productsSnap.docs.map((docSnap) => docSnap.data()).toList();
-
       final highlightProduct = await _getHighlightProduct(docSnap);
 
       return Creator(
@@ -50,8 +36,6 @@ class FirebaseRepo implements DataRepoBase {
         profileHashtags: profileHashtags,
         links: ((data['links'] ?? <String>[]) as List<dynamic>).cast<String>(),
         highlightProduct: highlightProduct,
-        products: products,
-        exhibits: exhibits,
       );
     });
 
@@ -121,5 +105,38 @@ class FirebaseRepo implements DataRepoBase {
     }
 
     return firstProduct.docs.first.data();
+  }
+
+  @override
+  Future<List<Product>> fetchCreatorProducts(Creator creator) async {
+    final db = FirebaseFirestore.instance;
+
+    final productsSnap = await db
+        .collection('creators')
+        .doc(creator.id)
+        .collection('products')
+        .orderBy('order')
+        .withProductConverter(this)
+        .get();
+
+    return productsSnap.docs
+        .map((docSnap) => docSnap.data()..creator = creator)
+        .toList();
+  }
+
+  @override
+  Future<List<Exhibit>> fetchCreatorExhibits(Creator creator) async {
+    final db = FirebaseFirestore.instance;
+
+    final exhibitsSnap = await db
+        .collection('creators')
+        .doc(creator.id)
+        .collection('exhibits')
+        .withExhibitConverter(this)
+        .get();
+
+    return exhibitsSnap.docs
+        .map((docSnap) => docSnap.data()..creator = creator)
+        .toList();
   }
 }

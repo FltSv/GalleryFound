@@ -1,4 +1,3 @@
-import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/models/product.dart';
 
 class Creator {
@@ -10,17 +9,8 @@ class Creator {
     required this.profileHashtags,
     required this.links,
     required this.highlightProduct,
-    required this.products,
-    required this.exhibits,
   }) {
     highlightProduct?.creator = this;
-
-    for (final product in products) {
-      product.creator = this;
-    }
-    for (final exhibit in exhibits) {
-      exhibit.creator = this;
-    }
   }
 
   final String id;
@@ -42,10 +32,4 @@ class Creator {
 
   /// 代表作品
   final Product? highlightProduct;
-
-  /// 作品一覧
-  final List<Product> products;
-
-  /// 展示歴一覧
-  final List<Exhibit> exhibits;
 }
