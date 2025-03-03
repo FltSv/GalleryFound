@@ -28,7 +28,8 @@ class CreatorDetailScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final iconSize = theme.textTheme.bodyMedium?.fontSize ?? 16;
 
-    final usecase = ref.watch(creatorUsecaseProvider);
+    final creatorUsecase = ref.watch(creatorUsecaseProvider);
+    final productUsecase = ref.watch(productUsecaseProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -94,7 +95,7 @@ class CreatorDetailScreen extends ConsumerWidget {
             style: theme.textTheme.headlineMedium,
           ),
           FutureBuilder<List<Exhibit>>(
-            future: usecase.fetchCreatorExhibits(creator),
+            future: creatorUsecase.fetchCreatorExhibits(creator),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -130,7 +131,7 @@ class CreatorDetailScreen extends ConsumerWidget {
             style: theme.textTheme.headlineMedium,
           ),
           FutureBuilder(
-            future: usecase.fetchCreatorProducts(creator),
+            future: creatorUsecase.fetchCreatorProducts(creator),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -154,7 +155,10 @@ class CreatorDetailScreen extends ConsumerWidget {
                       (item) => GestureDetector(
                         onTap: () => NavigateProvider.push(
                           context,
-                          ProductDetailScreen(product: item.product),
+                          ProductDetailScreen(
+                            product: item.product,
+                            usecase: productUsecase,
+                          ),
                         ),
                         child: item,
                       ),

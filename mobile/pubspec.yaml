@@ -51,6 +51,7 @@ dependencies:
   cached_network_image: ^3.4.1
   firebase_storage: ^12.3.7
   package_info_plus: ^8.1.2
+  shared_preferences: ^2.3.5
   flutter_svg: ^2.0.17
   flutter_riverpod: ^2.6.1
 
