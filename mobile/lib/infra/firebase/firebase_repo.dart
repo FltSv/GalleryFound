@@ -45,17 +45,26 @@ class FirebaseRepo implements DataRepoBase {
   @override
   Future<List<Gallery>> fetchGalleries() async {
     final db = FirebaseFirestore.instance;
-    final querySnap = await db.collection('galleries').get();
+    final querySnap =
+        await db.collection('galleries').withGalleryConverter(this).get();
 
-    return querySnap.docs.map((docSnap) {
-      final data = docSnap.data();
+    return querySnap.docs.map((docSnap) => docSnap.data()).toList();
+  }
 
-      return Gallery(
-        id: docSnap.id,
-        name: toStr(data['name']),
-        location: toStr(data['location']),
-      );
-    }).toList();
+  @override
+  Future<Gallery> fetchGalleryById(String galleryId) async {
+    final db = FirebaseFirestore.instance;
+    final docSnap = await db
+        .collection('galleries')
+        .doc(galleryId)
+        .withGalleryConverter(this)
+        .get();
+
+    if (!docSnap.exists) {
+      throw Exception('GalleryId"$galleryId" is not found.');
+    }
+
+    return docSnap.data()!;
   }
 
   @override
@@ -138,5 +147,25 @@ class FirebaseRepo implements DataRepoBase {
     return exhibitsSnap.docs
         .map((docSnap) => docSnap.data()..creator = creator)
         .toList();
+  }
+
+  @override
+  Future<List<Exhibit>> fetchExhibitsAfterDate(
+    DateTime date,
+    List<Creator> creators,
+  ) async {
+    final db = FirebaseFirestore.instance;
+    final exhibitsSnap = await db
+        .collectionGroup('exhibits')
+        .where('endDate', isGreaterThanOrEqualTo: date)
+        .withExhibitConverter(this)
+        .get();
+
+    return exhibitsSnap.docs.map((docSnap) {
+      final creatorId = docSnap.reference.parent.parent!.id;
+      final creator = creators.firstWhere((creator) => creator.id == creatorId);
+
+      return docSnap.data()..creator = creator;
+    }).toList();
   }
 }

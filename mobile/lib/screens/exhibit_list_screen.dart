@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
-import 'package:mobile/application/usecases/creator_usecase.dart';
 import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/exhibit_detail_screen.dart';
@@ -17,19 +16,14 @@ class ExhibitListScreen extends ConsumerStatefulWidget {
 }
 
 class _ExhibitListScreenState extends ConsumerState<ExhibitListScreen> {
-  final creators = DataProvider().creators;
-  final galleries = DataProvider().galleries;
-
   @override
   Widget build(BuildContext context) {
-    final usecase = ref.watch(creatorUsecaseProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('展示一覧'),
       ),
       body: FutureBuilder(
-        future: _getResults(usecase),
+        future: _getResults(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -49,17 +43,14 @@ class _ExhibitListScreenState extends ConsumerState<ExhibitListScreen> {
     );
   }
 
-  Future<List<Widget>> _getResults(CreatorUsecase usecase) async {
-    final fetchExhibitsTasks =
-        creators.map((creator) => usecase.fetchCreatorExhibits(creator));
-    final creatorsExhibits = await Future.wait(fetchExhibitsTasks);
+  Future<List<Widget>> _getResults() async {
+    final usecase = ref.watch(exhibitUsecaseProvider);
+    final items = await usecase.fetchExhibits(DateTime.now());
 
-    final results = creatorsExhibits
-        .expand((element) => element)
-        .where((exhibit) => exhibit.endDate.isAfter(DateTime.now()))
-        .map((exhibit) {
-          final gallery = galleries
-              .firstWhere((gallery) => gallery.id == exhibit.galleryId);
+    final results = items
+        .map((item) {
+          final exhibit = item.$1;
+          final gallery = item.$2;
           final galleryAddress = gallery.location;
 
           return ExhibitItem(

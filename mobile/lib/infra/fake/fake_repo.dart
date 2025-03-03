@@ -111,6 +111,12 @@ class FakeRepo implements DataRepoBase {
   }
 
   @override
+  Future<Gallery> fetchGalleryById(String galleryId) async {
+    final galleries = await fetchGalleries();
+    return galleries.firstWhere((gallery) => gallery.id == galleryId);
+  }
+
+  @override
   Future<String?> getThumbUrl(String userId, String image) async {
     const domain =
         'firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com';
@@ -192,5 +198,17 @@ class FakeRepo implements DataRepoBase {
         fetchThumbUrl: getThumbUrl,
       )..creator = creator,
     ];
+  }
+
+  @override
+  Future<List<Exhibit>> fetchExhibitsAfterDate(
+    DateTime date,
+    List<Creator> creators,
+  ) async {
+    final creators = await fetchCreators();
+    final creator = creators[0];
+
+    final exhibits = await fetchCreatorExhibits(creator);
+    return exhibits.where((exhibit) => exhibit.endDate.isAfter(date)).toList();
   }
 }
