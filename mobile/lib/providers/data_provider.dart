@@ -56,3 +56,8 @@ final productUsecaseProvider = Provider(
     userDataRepo: ref.read(userDataRepoProvider),
   ),
 );
+
+final isFavoriteProvider = FutureProvider.family<bool, String>((ref, id) async {
+  final usecase = ref.watch(productUsecaseProvider);
+  return usecase.isFavorite(id);
+});

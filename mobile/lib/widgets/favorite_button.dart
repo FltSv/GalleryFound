@@ -1,49 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mobile/application/usecases/product_usecase.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/providers/data_provider.dart';
 
-class FavoriteButton extends StatefulWidget {
+class FavoriteButton extends ConsumerStatefulWidget {
   const FavoriteButton({
     super.key,
     required this.id,
-    required this.productUsecase,
   });
 
   final String id;
-  final ProductUsecase productUsecase;
 
   @override
-  State<FavoriteButton> createState() => _FavoriteButtonState();
+  ConsumerState createState() => _FavoriteButtonState();
 }
 
-class _FavoriteButtonState extends State<FavoriteButton> {
+class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: FutureBuilder<bool>(
-        future: widget.productUsecase.isFavorite(widget.id),
-        builder: (context, snapshot) {
-          final isFavorite = snapshot.data == true;
+    final usecase = ref.watch(productUsecaseProvider);
+    final isFavorite = ref.watch(isFavoriteProvider(widget.id));
 
-          return AnimatedScale(
-            scale: isFavorite ? 1.1 : 1.0,
-            duration: const Duration(milliseconds: 100),
-            child: AnimatedOpacity(
-              opacity: isFavorite ? 0.9 : 0.5,
-              duration: const Duration(milliseconds: 100),
-              child: Icon(
-                Icons.favorite,
-                color: isFavorite ? Colors.red : Colors.grey,
-              ),
-            ),
-          );
-        },
+    return IconButton(
+      icon: isFavorite.when(
+        data: _buildFavoriteIcon,
+        loading: () => const CircularProgressIndicator(), // ローディング時
+        error: (_, __) => _buildFavoriteIcon(false), // エラー時はお気に入り解除扱い
       ),
       onPressed: () async {
         await HapticFeedback.lightImpact();
-        await widget.productUsecase.toggleFavorite(widget.id);
-        setState(() {});
+        await usecase.toggleFavorite(widget.id);
+        ref.invalidate(isFavoriteProvider(widget.id)); // Providerを更新
       },
+    );
+  }
+
+  Widget _buildFavoriteIcon(bool isFavorite) {
+    return AnimatedScale(
+      scale: isFavorite ? 1.1 : 1.0,
+      duration: const Duration(milliseconds: 100),
+      child: AnimatedOpacity(
+        opacity: isFavorite ? 0.9 : 0.5,
+        duration: const Duration(milliseconds: 100),
+        child: Icon(
+          Icons.favorite,
+          color: isFavorite ? Colors.red : Colors.grey,
+        ),
+      ),
     );
   }
 }
