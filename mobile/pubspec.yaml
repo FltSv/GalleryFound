@@ -54,6 +54,7 @@ dependencies:
   shared_preferences: ^2.3.5
   flutter_svg: ^2.0.17
   flutter_riverpod: ^2.6.1
+  infinite_scroll_pagination: ^5.0.0
 
 dev_dependencies:
   flutter_test:

@@ -211,4 +211,14 @@ class FakeRepo implements DataRepoBase {
     final exhibits = await fetchCreatorExhibits(creator);
     return exhibits.where((exhibit) => exhibit.endDate.isAfter(date)).toList();
   }
+
+  @override
+  Future<List<Product>> fetchProducts({
+    required List<Creator> creators,
+    required int limit,
+    Product? lastProduct,
+  }) {
+    // TODO(suna): implement fetchProducts
+    throw UnimplementedError();
+  }
 }
