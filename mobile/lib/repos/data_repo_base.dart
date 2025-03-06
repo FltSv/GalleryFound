@@ -30,4 +30,11 @@ abstract class DataRepoBase {
     DateTime date,
     List<Creator> creators,
   );
+
+  /// 作品一覧を取得
+  Future<List<Product>> fetchProducts({
+    required List<Creator> creators,
+    required int limit,
+    Product? lastProduct,
+  });
 }

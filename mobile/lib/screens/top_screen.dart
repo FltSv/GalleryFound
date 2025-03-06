@@ -5,6 +5,7 @@ import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_list_screen.dart';
 import 'package:mobile/screens/exhibit_list_screen.dart';
 import 'package:mobile/screens/map_screen.dart';
+import 'package:mobile/screens/product_list_screen.dart';
 
 class TopScreen extends StatelessWidget {
   const TopScreen({super.key});
@@ -18,7 +19,7 @@ class TopScreen extends StatelessWidget {
     final radius = screenSize.width * 0.28; // ボタンの配置半径
 
     final props = <_ButtonProp>[
-      _ButtonProp(Icons.menu_book, Colors.green, null),
+      _ButtonProp(Icons.collections, Colors.green, const ProductListScreen()),
       _ButtonProp(Icons.location_on, Colors.blue, const MapScreen()),
       _ButtonProp(Icons.brush, Colors.red, const ExhibitListScreen()),
       _ButtonProp(Icons.person, Colors.purple, const CreatorListScreen()),

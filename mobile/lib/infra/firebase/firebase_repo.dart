@@ -168,4 +168,49 @@ class FirebaseRepo implements DataRepoBase {
       return docSnap.data()..creator = creator;
     }).toList();
   }
+
+  @override
+  Future<List<Product>> fetchProducts({
+    required List<Creator> creators,
+    required int limit,
+    Product? lastProduct,
+  }) async {
+    final db = FirebaseFirestore.instance;
+    final productsQuery = db
+        .collectionGroup('products')
+        .orderBy('id', descending: true)
+        .withProductConverter(this);
+
+    if (lastProduct != null) {
+      final lastDocQuerySnap = await productsQuery
+          .where('id', isEqualTo: lastProduct.id)
+          .limit(1)
+          .get();
+
+      final lastDocSnap = lastDocQuerySnap.docs.first;
+
+      if (lastDocSnap.exists) {
+        final querySnap = await productsQuery
+            .startAfterDocument(lastDocSnap)
+            .limit(limit)
+            .get();
+
+        return querySnap.docs.map((docSnap) {
+          final creatorId = docSnap.reference.parent.parent!.id;
+          final creator =
+              creators.firstWhere((creator) => creator.id == creatorId);
+
+          return docSnap.data()..creator = creator;
+        }).toList();
+      }
+    }
+
+    final querySnap = await productsQuery.limit(limit).get();
+    return querySnap.docs.map((docSnap) {
+      final creatorId = docSnap.reference.parent.parent!.id;
+      final creator = creators.firstWhere((creator) => creator.id == creatorId);
+
+      return docSnap.data()..creator = creator;
+    }).toList();
+  }
 }

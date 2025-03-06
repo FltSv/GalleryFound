@@ -14,6 +14,7 @@ import 'package:mobile/screens/word_search_screen.dart';
 import 'package:mobile/widgets/action_text.dart';
 import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
+import 'package:mobile/widgets/favorite_button.dart';
 import 'package:mobile/widgets/linkable_text.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,7 +29,7 @@ class CreatorDetailScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final iconSize = theme.textTheme.bodyMedium?.fontSize ?? 16;
 
-    final usecase = ref.watch(creatorUsecaseProvider);
+    final creatorUsecase = ref.watch(creatorUsecaseProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -94,7 +95,7 @@ class CreatorDetailScreen extends ConsumerWidget {
             style: theme.textTheme.headlineMedium,
           ),
           FutureBuilder<List<Exhibit>>(
-            future: usecase.fetchCreatorExhibits(creator),
+            future: creatorUsecase.fetchCreatorExhibits(creator),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -130,7 +131,7 @@ class CreatorDetailScreen extends ConsumerWidget {
             style: theme.textTheme.headlineMedium,
           ),
           FutureBuilder(
-            future: usecase.fetchCreatorProducts(creator),
+            future: creatorUsecase.fetchCreatorProducts(creator),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -187,6 +188,15 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ThumbImage(imageBase: product);
+    return Stack(
+      children: [
+        Center(child: ThumbImage(imageBase: product)),
+        Positioned(
+          top: 0,
+          right: 0,
+          child: FavoriteButton(id: product.id),
+        )
+      ],
+    );
   }
 }

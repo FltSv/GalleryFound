@@ -199,24 +199,43 @@ class _CreatorListScreenState extends State<CreatorListScreen> {
                 itemCount: results.length,
                 itemBuilder: (context, index) {
                   final creator = results.elementAt(index);
-
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (context) =>
-                              CreatorDetailScreen(creator: creator),
-                        ),
-                      );
-                    },
-                    child: CreatorItem(creator: creator),
-                  );
+                  return _KeepAliveItem(creator);
                 },
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _KeepAliveItem extends StatefulWidget {
+  const _KeepAliveItem(this.creator);
+
+  final Creator creator;
+
+  @override
+  State<_KeepAliveItem> createState() => _KeepAliveItemState();
+}
+
+class _KeepAliveItemState extends State<_KeepAliveItem>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    return GestureDetector(
+      onTap: () {
+        NavigateProvider.push(
+          context,
+          CreatorDetailScreen(creator: widget.creator),
+        );
+      },
+      child: CreatorItem(creator: widget.creator),
     );
   }
 }
