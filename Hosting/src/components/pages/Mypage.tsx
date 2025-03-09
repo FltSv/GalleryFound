@@ -44,6 +44,7 @@ import { getConfig } from 'src/infra/firebase/firebaseConfig';
 import { UserName } from 'src/domains/UserName';
 import { getCreatorData, setCreatorData } from 'src/infra/firebase/CreatorRepo';
 import { addGallery, getGalleries } from 'src/infra/firebase/GalleryRepo';
+import FeedbackButton from 'components/ui/FeedbackButton';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -516,6 +517,8 @@ export const Mypage = () => {
       <Popup setVisible={setVisibleExhibitPopup} visible={visibleExhibitPopup}>
         <ExhibitForm exhibit={editExhibit} onSubmit={onSubmitExhibitPopup} />
       </Popup>
+
+      <FeedbackButton />
     </>
   );
 };
