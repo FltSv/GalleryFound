@@ -6,6 +6,7 @@ import 'package:mobile/screens/creator_list_screen.dart';
 import 'package:mobile/screens/exhibit_list_screen.dart';
 import 'package:mobile/screens/map_screen.dart';
 import 'package:mobile/screens/product_list_screen.dart';
+import 'package:mobile/widgets/feedback_button.dart';
 
 class TopScreen extends StatelessWidget {
   const TopScreen({super.key});
@@ -38,16 +39,19 @@ class TopScreen extends StatelessWidget {
           ),
         ),
         child: Stack(
-          children: props.asMap().entries.map((entry) {
-            final index = entry.key;
-            final prop = entry.value;
+          children: [
+            ...props.asMap().entries.map((entry) {
+              final index = entry.key;
+              final prop = entry.value;
 
-            final angle = (2 * pi * index) / props.length;
-            final x = centerX + radius * cos(angle);
-            final y = centerY + radius * sin(angle);
+              final angle = (2 * pi * index) / props.length;
+              final x = centerX + radius * cos(angle);
+              final y = centerY + radius * sin(angle);
 
-            return _iconButton(context, prop, x, y, buttonSize);
-          }).toList(),
+              return _iconButton(context, prop, x, y, buttonSize);
+            }),
+            const FeedbackButton(),
+          ],
         ),
       ),
     );
@@ -92,7 +96,7 @@ class TopScreen extends StatelessWidget {
             top: y + size / 2,
             child: Container(
               padding: const EdgeInsets.all(4),
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               child: const Text(
                 '準備中...',
                 style: TextStyle(color: Colors.white),
