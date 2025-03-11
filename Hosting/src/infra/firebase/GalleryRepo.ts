@@ -7,7 +7,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import { getLatLngFromAddress } from 'src/Data';
-import { Gallery } from 'src/domains/entities';
+import { Gallery } from 'src/domain/entities';
 import {
   collectionNames,
   db,

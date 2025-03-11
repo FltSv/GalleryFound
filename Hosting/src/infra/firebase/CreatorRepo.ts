@@ -19,7 +19,7 @@ import {
   fbCreatorConverter,
   getConfig,
 } from 'src/infra/firebase/firebaseConfig';
-import { Creator, Exhibit, ImageStatus, Product } from 'src/domains/entities';
+import { Creator, Exhibit, ImageStatus, Product } from 'src/domain/entities';
 import { uploadImageData } from 'src/Data';
 
 export const getCreatorStorageUrl = (userId: string) =>

@@ -3,7 +3,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import imageCompression, { Options } from 'browser-image-compression';
 import { collectionNames } from 'src/infra/firebase/firebaseConfig';
 import { getUlid } from 'src/ULID';
-import { ImageStatus } from 'src/domains/entities';
+import { ImageStatus } from 'src/domain/entities';
 
 const imageCompOptions: Options = {
   fileType: 'image/png',

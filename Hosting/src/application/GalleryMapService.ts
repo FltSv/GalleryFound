@@ -1,4 +1,4 @@
-import { Exhibit, Gallery } from 'src/domains/entities';
+import { Exhibit, Gallery } from 'src/domain/entities';
 import {
   getActiveExhibits,
   getAllExhibits,

@@ -37,11 +37,11 @@ import {
 } from 'components/ui/Input';
 import { Popup } from 'components/ui/Popup';
 import { getDatePeriodString } from 'src/Data';
-import { Gallery, Creator, Product, Exhibit } from 'src/domains/entities';
+import { Gallery, Creator, Product, Exhibit } from 'src/domain/entities';
 import { getUlid } from 'src/ULID';
 import { DraggableList, SortableProps } from 'components/ui/DraggableList';
 import { getConfig } from 'src/infra/firebase/firebaseConfig';
-import { UserName } from 'src/domains/UserName';
+import { UserName } from 'src/domain/UserName';
 import { getCreatorData, setCreatorData } from 'src/infra/firebase/CreatorRepo';
 import { addGallery, getGalleries } from 'src/infra/firebase/GalleryRepo';
 
