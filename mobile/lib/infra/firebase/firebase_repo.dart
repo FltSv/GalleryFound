@@ -155,13 +155,18 @@ class FirebaseRepo implements DataRepoBase {
     List<Creator> creators,
   ) async {
     final db = FirebaseFirestore.instance;
+    final ignoreCreatorIds = ConfigProvider().config.debugUserIds;
+
     final exhibitsSnap = await db
         .collectionGroup('exhibits')
         .where('endDate', isGreaterThanOrEqualTo: date)
         .withExhibitConverter(this)
         .get();
 
-    return exhibitsSnap.docs.map((docSnap) {
+    return exhibitsSnap.docs.where((docSnap) {
+      final id = docSnap.reference.parent.parent!.id;
+      return !ignoreCreatorIds.contains(id);
+    }).map((docSnap) {
       final creatorId = docSnap.reference.parent.parent!.id;
       final creator = creators.firstWhere((creator) => creator.id == creatorId);
 
@@ -176,6 +181,8 @@ class FirebaseRepo implements DataRepoBase {
     Product? lastProduct,
   }) async {
     final db = FirebaseFirestore.instance;
+    final ignoreCreatorIds = ConfigProvider().config.debugUserIds;
+
     final productsQuery = db
         .collectionGroup('products')
         .orderBy('id', descending: true)
@@ -195,7 +202,10 @@ class FirebaseRepo implements DataRepoBase {
             .limit(limit)
             .get();
 
-        return querySnap.docs.map((docSnap) {
+        return querySnap.docs.where((docSnap) {
+          final id = docSnap.reference.parent.parent!.id;
+          return !ignoreCreatorIds.contains(id);
+        }).map((docSnap) {
           final creatorId = docSnap.reference.parent.parent!.id;
           final creator =
               creators.firstWhere((creator) => creator.id == creatorId);
