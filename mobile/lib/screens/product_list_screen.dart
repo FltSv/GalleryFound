@@ -30,7 +30,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
       return (state.keys?.last ?? 0) + 1;
     },
     fetchPage: (pageKey) async {
-      final lastProduct = pageKey == 0 ? null : productsIndex[pageKey - 1];
+      final lastProduct = pageKey <= 1 ? null : productsIndex[pageKey - 1];
       final items = await usecase.fetch(
         limit: pageSize,
         lastProduct: lastProduct,
