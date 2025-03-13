@@ -20,7 +20,7 @@ import {
   getConfig,
 } from 'src/infra/firebase/firebaseConfig';
 import { Creator, Exhibit, ImageStatus, Product } from 'src/domain/entities';
-import { uploadImageData } from 'src/Data';
+import { uploadImages } from 'src/application/MediaService';
 
 export const getCreatorStorageUrl = (userId: string) =>
   `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${userId}%2F`;
@@ -151,8 +151,8 @@ export const setCreatorData = async (user: User, data: Creator) => {
   const batch = writeBatch(db);
 
   // 画像のアップロード
-  const products = await uploadImageData(user, data.products);
-  const exhibits = await uploadImageData(user, data.exhibits);
+  const products = await uploadImages(user, data.products);
+  const exhibits = await uploadImages(user, data.exhibits);
 
   // DB更新
   const docRef = doc(db, collectionNames.creators, userId).withConverter(
