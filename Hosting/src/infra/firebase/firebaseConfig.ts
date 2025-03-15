@@ -37,9 +37,13 @@ export const collectionNames = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = initializeFirestore(app, {
-  ignoreUndefinedProperties: true, // undefinedを無視してFirestoreに書き込む
-});
+export const db = initializeFirestore(
+  app,
+  {
+    ignoreUndefinedProperties: true, // undefinedを無視してFirestoreに書き込む
+  },
+  'develop',
+);
 
 // Remote Config
 // 最小フェッチ時間: dev1分、prod1時間
@@ -107,11 +111,12 @@ export interface Creator {
 }
 
 /** firestore Product */
-export interface Product {
+export interface Product extends ImageObject {
   id: string;
   title?: string;
   detail?: string;
   image: string;
+  order: number;
 }
 
 /** firestore Exhibit */
@@ -123,6 +128,14 @@ export interface Exhibit {
   startDate?: Timestamp;
   endDate?: Timestamp;
   image: string;
+}
+
+interface ImageObject {
+  /**
+   * Storageのcreators/以下を格納
+   * 例: {creatorId}%2F{imageId}.png?alt=media&token={token}
+   */
+  imagePath?: string;
 }
 
 /** firestore Gallery */

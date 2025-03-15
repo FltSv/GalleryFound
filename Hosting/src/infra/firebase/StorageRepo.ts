@@ -1,42 +1,84 @@
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import {
+  getStorage,
+  ref,
+  getDownloadURL,
+  uploadBytesResumable,
+} from 'firebase/storage';
 import { collectionNames } from 'src/infra/firebase/firebaseConfig';
-import { getUlid } from 'src/ULID';
 import { ImageRepo } from 'src/domain/services/ImageService';
 
 type uploadImageType = ImageRepo['uploadImage'];
 type uploadThumbnailType = ImageRepo['uploadThumbnail'];
 
+export const storageCreatorsBaseUrl =
+  'https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F';
+
 const storage = getStorage();
 
-const uploadImage: uploadImageType = async (userId, file) => {
-  const fileId = getUlid();
-  const path = `${collectionNames.creators}/${userId}/${fileId}.png`;
-  const storageRef = ref(storage, path);
+/**
+ * 画像をアップロードする
+ * @returns アップロードした画像のURL
+ */
+const uploadImage: uploadImageType = async props => {
+  const { userId, file, documentId, progressCallback } = props;
+  const path = `${collectionNames.creators}/${userId}/${documentId}.png`;
 
   try {
-    const result = await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(result.ref);
-    const name = result.metadata.name;
-
-    return url.match(`${name}.*`)?.[0] ?? '';
+    return await uploadFile(file, path, progressCallback);
   } catch (error) {
     console.error('画像のアップロードに失敗しました', error);
     throw new Error('画像のアップロードに失敗しました');
   }
 };
 
-const uploadThumbnail: uploadThumbnailType = async (userId, file) => {
-  const fileId = getUlid();
-  const path = `${collectionNames.creators}/${userId}/thumbs/${fileId}.webp`;
-  const storageRef = ref(storage, path);
+/**
+ * サムネイル画像をアップロードする
+ */
+const uploadThumbnail: uploadThumbnailType = async props => {
+  const { userId, file, documentId, progressCallback } = props;
+  const path = `${collectionNames.creators}/${userId}/thumbs/${documentId}.webp`;
 
   try {
-    await uploadBytes(storageRef, file);
+    return await uploadFile(file, path, progressCallback);
   } catch (error) {
     console.error('サムネイルのアップロードに失敗しました', error);
     throw new Error('サムネイルのアップロードに失敗しました');
   }
 };
+
+export const uploadFile = async (
+  file: File,
+  path: string,
+  progressCallback?: (progress: number) => void,
+): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const storageRef = ref(storage, path);
+
+    // アップロード開始
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      'state_changed',
+      snapshot => {
+        // アップロードの進行状況
+        const transferred = snapshot.bytesTransferred;
+        const total = snapshot.totalBytes;
+        const progress = (transferred / total) * 100;
+
+        progressCallback?.(progress);
+      },
+      error => {
+        console.error('Upload failed', error);
+        reject(error);
+      },
+      async () => {
+        // アップロード成功後にダウンロードURLを取得
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        console.log('File available at', downloadURL);
+        resolve(downloadURL);
+      },
+    );
+  });
 
 export const FireStorageImageRepo: ImageRepo = {
   uploadImage,

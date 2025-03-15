@@ -1,4 +1,5 @@
 import {
+  addDoc,
   collection,
   collectionGroup,
   doc,
@@ -21,6 +22,7 @@ import {
 } from 'src/infra/firebase/firebaseConfig';
 import { Creator, Exhibit, ImageStatus, Product } from 'src/domain/entities';
 import { uploadImages } from 'src/application/MediaService';
+import { productConverter } from 'src/infra/firebase/converter';
 
 export const getCreatorStorageUrl = (userId: string) =>
   `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${userId}%2F`;
@@ -73,6 +75,7 @@ export const getCreatorData = async (user: User) => {
       title: data.title,
       isHighlight: data.id === highlightProductId,
       detail: data.detail,
+      order: data.order,
       srcImage: data.image,
       imageUrl: creatorUrl + (data.image as string),
       tmpImageData: '',
@@ -83,11 +86,12 @@ export const getCreatorData = async (user: User) => {
 
   // todo: 次バージョンで削除
   const fbProducts = data.products ?? [];
-  const products_old = fbProducts.map(x => ({
+  const products_old = fbProducts.map((x, i) => ({
     id: x.id,
     title: x.title ?? '',
     isHighlight: x.id === highlightProductId,
     detail: x.detail ?? '',
+    order: i,
     srcImage: x.image,
     imageUrl: creatorUrl + x.image,
     tmpImageData: '',
@@ -151,7 +155,11 @@ export const setCreatorData = async (user: User, data: Creator) => {
   const batch = writeBatch(db);
 
   // 画像のアップロード
-  const products = await uploadImages(user, data.products);
+  const updateProductTasks = data.products.map((product, i) =>
+    updateProduct(userId, { ...product, order: i }),
+  );
+  await Promise.all(updateProductTasks);
+  const products = data.products;
   const exhibits = await uploadImages(user, data.exhibits);
 
   // DB更新
@@ -363,4 +371,39 @@ export const getActiveExhibits = async (date: Date): Promise<Exhibit[]> => {
       };
     })
     .filter(x => x !== undefined);
+};
+
+/**
+ * 画像アップロード前の、空の作品情報を作成する
+ * @returns 作成されたドキュメントのID
+ */
+const createEmptyProduct = async (userId: string): Promise<string> => {
+  const collectionRef = collection(
+    db,
+    collectionNames.creators,
+    userId,
+    collectionNames.products,
+  );
+
+  const docRef = await addDoc(collectionRef, {});
+  return docRef.id;
+};
+
+/**
+ * 作品情報を更新する
+ */
+const updateProduct = async (userId: string, product: Product) => {
+  const docRef = doc(
+    db,
+    collectionNames.creators,
+    userId,
+    collectionNames.products,
+    product.id,
+  ).withConverter(productConverter);
+  await setDoc(docRef, product, { merge: true });
+};
+
+export const FirestoreCreatorRepo = {
+  createEmptyProduct,
+  updateProduct,
 };

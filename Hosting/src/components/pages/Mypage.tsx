@@ -44,6 +44,7 @@ import { getConfig } from 'src/infra/firebase/firebaseConfig';
 import { UserName } from 'src/domain/UserName';
 import { getCreatorData, setCreatorData } from 'src/infra/firebase/CreatorRepo';
 import { addGallery, getGalleries } from 'src/infra/firebase/GalleryRepo';
+import { createProduct } from 'src/application/CreatorService';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -144,29 +145,26 @@ export const Mypage = () => {
    * `creator.Products` を更新
    */
   const onChangeProductFileInput = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
+    async (e: ChangeEvent<HTMLInputElement>) => {
+      if (user === null) return;
       if (creator === undefined) return;
 
       const files = e.currentTarget.files;
       if (files === null) return;
       if (files.length === 0) return;
 
-      const newProducts: Product[] = Array.from(files).map(file => ({
-        id: getUlid(),
-        title: '',
-        isHighlight: false,
-        detail: '',
-        tmpImageData: URL.createObjectURL(file),
-        srcImage: '',
-        imageUrl: '',
-      }));
+      const tasks = Array.from(files).map((file, i) => {
+        const order = creator.products.length + i + 1;
+        return createProduct(user.uid, file, order);
+      });
+      const newProducts = await Promise.all(tasks);
 
       setCreator({
         ...creator,
         products: [...creator.products, ...newProducts],
       });
     },
-    [creator],
+    [creator, user],
   );
 
   /**

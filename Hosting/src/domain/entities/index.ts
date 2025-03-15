@@ -32,6 +32,9 @@ export interface Product extends ImageStatus {
 
   /** 作品説明、他 */
   detail: string;
+
+  /** 並び順 */
+  order: number;
 }
 
 /** 展示 */
