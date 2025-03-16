@@ -120,7 +120,7 @@ export interface Product extends ImageObject {
 }
 
 /** firestore Exhibit */
-export interface Exhibit {
+export interface Exhibit extends ImageObject {
   id: string;
   title: string;
   location: string;

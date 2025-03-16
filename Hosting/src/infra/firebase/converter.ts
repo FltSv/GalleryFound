@@ -1,6 +1,9 @@
-import { FirestoreDataConverter } from 'firebase/firestore';
-import { Product } from 'src/domain/entities';
-import { Product as FirebaseProduct } from 'src/infra/firebase/firebaseConfig';
+import { FirestoreDataConverter, Timestamp } from 'firebase/firestore';
+import { Exhibit, Product } from 'src/domain/entities';
+import {
+  Product as FirebaseProduct,
+  Exhibit as FirebaseExhibit,
+} from 'src/infra/firebase/firebaseConfig';
 import { getCreatorStorageUrl } from 'src/infra/firebase/CreatorRepo';
 import { storageCreatorsBaseUrl } from 'src/infra/firebase/StorageRepo';
 
@@ -49,5 +52,37 @@ export const productConverter: FirestoreDataConverter<Product> = {
       imagePath: toFirestoreImageUrl(product.imageUrl),
       order: product.order,
     } satisfies FirebaseProduct;
+  },
+};
+export const exhibitConverter: FirestoreDataConverter<Exhibit> = {
+  fromFirestore(snapshot, options?) {
+    const data = snapshot.data(options) as FirebaseExhibit;
+    const userId = snapshot.ref.parent.parent?.id;
+    const epochDate = new Date(0);
+
+    return {
+      id: data.id,
+      title: data.title,
+      location: data.location,
+      galleryId: data.galleryId,
+      startDate: data.startDate?.toDate() ?? epochDate,
+      endDate: data.endDate?.toDate() ?? epochDate,
+      srcImage: data.image,
+      imageUrl: fromFirestoreImageUrl(data.image, data.imagePath, userId),
+      tmpImageData: '',
+    } satisfies Exhibit;
+  },
+
+  toFirestore(exhibit: Exhibit) {
+    return {
+      id: exhibit.id,
+      title: exhibit.title,
+      location: exhibit.location,
+      galleryId: exhibit.galleryId,
+      startDate: Timestamp.fromDate(exhibit.startDate),
+      endDate: Timestamp.fromDate(exhibit.endDate),
+      image: exhibit.srcImage,
+      imagePath: toFirestoreImageUrl(exhibit.imageUrl),
+    } satisfies FirebaseExhibit;
   },
 };

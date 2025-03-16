@@ -38,13 +38,16 @@ import {
 import { Popup } from 'components/ui/Popup';
 import { getDatePeriodString } from 'src/Data';
 import { Gallery, Creator, Product, Exhibit } from 'src/domain/entities';
-import { getUlid } from 'src/ULID';
 import { DraggableList, SortableProps } from 'components/ui/DraggableList';
 import { getConfig } from 'src/infra/firebase/firebaseConfig';
 import { UserName } from 'src/domain/UserName';
 import { getCreatorData, setCreatorData } from 'src/infra/firebase/CreatorRepo';
 import { addGallery, getGalleries } from 'src/infra/firebase/GalleryRepo';
-import { createProduct } from 'src/application/CreatorService';
+import {
+  createExhibit,
+  createProduct,
+  updateExhibit,
+} from 'src/application/CreatorService';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -771,14 +774,20 @@ interface ExhibitFormValues extends Exhibit {
 }
 
 const ExhibitForm = (props: ExhibitFormProps) => {
+  const { user } = useAuthContext();
   const { exhibit, onSubmit } = props;
   const [galleries, setGalleries] = useState<Gallery[] | undefined>(undefined);
+  const [previewImage, setPreviewImage] = useState<string>(
+    exhibit?.imageUrl ?? '',
+  );
+  const [selectedFile, setSelectedFile] = useState<File>();
   const {
     control,
     getValues,
     register,
     handleSubmit,
     setError,
+    clearErrors,
     watch,
     formState: { errors },
   } = useForm<ExhibitFormValues>({ defaultValues: exhibit });
@@ -798,11 +807,25 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const invalidDateMsg = '有効な日付を入力してください。';
   const isAdd = exhibit === undefined;
 
-  const selectedFiles = watch('selectedFiles');
-  const tmpImage =
-    selectedFiles !== undefined && selectedFiles.length > 0
-      ? URL.createObjectURL(selectedFiles[0])
-      : (exhibit?.tmpImageData ?? '');
+  // 画像選択時の処理
+  const onFileChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+
+      if (file === undefined) {
+        return;
+      }
+
+      setSelectedFile(file);
+      clearErrors('selectedFiles');
+
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewImage(objectUrl);
+
+      return () => URL.revokeObjectURL(objectUrl);
+    },
+    [clearErrors],
+  );
 
   const location = watch('location');
   const matchGallery = galleries?.find(x => x.name === location);
@@ -864,7 +887,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   }, [setError, fetchGalleries]);
 
   const onValid: SubmitHandler<ExhibitFormValues> = useCallback(
-    data => {
+    async data => {
       if (!isMatchGallery) {
         setError('location', {
           message: 'ギャラリー情報の指定または入力が必要です。',
@@ -872,28 +895,50 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         return;
       }
 
-      const submitData: Exhibit = {
-        id: exhibit?.id ?? getUlid(),
+      if (user === null) return;
+
+      const exhibitData = {
         title: data.title,
         location: data.location,
         galleryId: matchGallery.id,
         startDate: new Date(data.startDateString + 'T00:00:00'),
         endDate: new Date(data.endDateString + 'T23:59:59'),
-        srcImage: data.srcImage,
-        tmpImageData: tmpImage,
-        imageUrl: exhibit?.imageUrl ?? '',
       };
 
-      onSubmit(submitData);
+      if (exhibit === undefined) {
+        // 新規登録
+        if (!selectedFile) {
+          setError('selectedFiles', {
+            message: 'ファイルを選択してください。',
+          });
+          return;
+        }
+
+        const createdExhibit = await createExhibit(
+          user.uid,
+          exhibitData,
+          selectedFile,
+        );
+
+        onSubmit(createdExhibit);
+      } else {
+        // 編集
+        const editedExhibit = {
+          ...exhibit,
+          ...exhibitData,
+        };
+        await updateExhibit(user.uid, editedExhibit, selectedFile);
+        onSubmit(editedExhibit);
+      }
     },
     [
-      exhibit?.id,
-      exhibit?.imageUrl,
+      exhibit,
       isMatchGallery,
       matchGallery?.id,
       onSubmit,
+      selectedFile,
       setError,
-      tmpImage,
+      user,
     ],
   );
 
@@ -916,27 +961,11 @@ const ExhibitForm = (props: ExhibitFormProps) => {
           md:flex-row
         `}>
         <div className="flex max-w-max basis-1/2 flex-col gap-2 p-2">
-          <FileInput
-            accept="image/*"
-            {...register('selectedFiles', {
-              validate: value => {
-                if (!isAdd) {
-                  return true;
-                }
-                if (value === undefined) {
-                  return false;
-                }
-                return value.length > 0 || 'ファイルを選択してください。';
-              },
-            })}
-          />
+          <FileInput accept="image/*" onChange={onFileChange} />
           <p className="text-xs text-red-600">
             {errors.selectedFiles?.message}
           </p>
-          <img
-            className="w-full max-w-xs"
-            src={tmpImage || exhibit?.imageUrl}
-          />
+          <img className="w-full max-w-xs" src={previewImage} />
         </div>
         <div
           className={`

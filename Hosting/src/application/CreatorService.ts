@@ -1,4 +1,4 @@
-import { Product } from 'src/domain/entities';
+import { Exhibit, Product } from 'src/domain/entities';
 import { ImageService } from 'src/domain/services/ImageService';
 import { BrowserImageCompressor } from 'src/infra/image/BrowserImageCompressor';
 import { FireStorageImageRepo } from 'src/infra/firebase/StorageRepo';
@@ -8,6 +8,14 @@ const imageService = new ImageService(
   BrowserImageCompressor,
   FireStorageImageRepo,
 );
+
+interface ExhibitData {
+  title: string;
+  location: string;
+  galleryId: string;
+  startDate: Date;
+  endDate: Date;
+}
 
 export const createProduct = async (
   userId: string,
@@ -37,6 +45,51 @@ export const updateProduct = async (
   product: Product,
 ): Promise<void> => {
   await FirestoreCreatorRepo.updateProduct(userId, product);
+};
+
+export const createExhibit = async (
+  userId: string,
+  exhibitData: ExhibitData,
+  file: File,
+): Promise<Exhibit> => {
+  const exhibitId = await FirestoreCreatorRepo.createEmptyExhibit(userId);
+  const result = await imageService.uploadImage(userId, file, exhibitId);
+
+  const uploadedExhibit: Exhibit = {
+    id: exhibitId,
+    title: exhibitData.title,
+    tmpImageData: '',
+    srcImage: parseSrcImage(result.imageUrl),
+    imageUrl: result.imageUrl,
+    location: exhibitData.location,
+    galleryId: exhibitData.galleryId,
+    startDate: exhibitData.startDate,
+    endDate: exhibitData.endDate,
+  };
+
+  await FirestoreCreatorRepo.updateExhibit(userId, uploadedExhibit);
+  return uploadedExhibit;
+};
+
+export const updateExhibit = async (
+  userId: string,
+  exhibit: Exhibit,
+  file?: File,
+): Promise<void> => {
+  if (file === undefined) {
+    // 画像の更新がない場合
+    await FirestoreCreatorRepo.updateExhibit(userId, exhibit);
+    return;
+  }
+
+  // 画像の更新がある場合
+  const result = await imageService.uploadImage(userId, file, exhibit.id);
+  const imageUpdatedExhibit = {
+    ...exhibit,
+    srcImage: parseSrcImage(result.imageUrl),
+    imageUrl: result.imageUrl,
+  };
+  await FirestoreCreatorRepo.updateExhibit(userId, imageUpdatedExhibit);
 };
 
 const parseSrcImage = (imageUrl: string) =>
