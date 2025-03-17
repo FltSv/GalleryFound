@@ -9,6 +9,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  useMemo,
 } from 'react';
 import {
   useForm,
@@ -62,6 +63,10 @@ export const Mypage = () => {
   const [editProduct, setEditProduct] = useState<Product>();
   const [genres, setGenres] = useState<string[]>([]);
   const [profileHashtags, setProfileHashtags] = useState<string[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{
+    totalFiles: number;
+    fileProgresses: number[];
+  } | null>(null);
 
   useEffect(() => {
     if (user === null) {
@@ -156,19 +161,53 @@ export const Mypage = () => {
       if (files === null) return;
       if (files.length === 0) return;
 
-      const tasks = Array.from(files).map((file, i) => {
-        const order = creator.products.length + i + 1;
-        return createProduct(user.uid, file, order);
+      setUploadProgress({
+        totalFiles: files.length,
+        fileProgresses: new Array(files.length).fill(0),
       });
+
+      const tasks = Array.from(files).map(async (file, i) => {
+        const order = creator.products.length + i + 1;
+        const result = await createProduct(
+          user.uid,
+          file,
+          order,
+          (progress: number) => {
+            setUploadProgress(prev => {
+              if (!prev) return null;
+              return {
+                ...prev,
+                fileProgresses: prev.fileProgresses.map((p, index) =>
+                  index === i ? progress : p,
+                ),
+              };
+            });
+          },
+        );
+        return result;
+      });
+
       const newProducts = await Promise.all(tasks);
 
       setCreator({
         ...creator,
         products: [...creator.products, ...newProducts],
       });
+
+      setUploadProgress(null);
     },
     [creator, user],
   );
+
+  const uploadProgressPercent = useMemo(() => {
+    if (!uploadProgress) return 0;
+
+    const { totalFiles, fileProgresses } = uploadProgress;
+    const progress =
+      fileProgresses.reduce((sum, progress) => sum + progress, 0) / totalFiles;
+
+    return Math.round(progress);
+  }, [uploadProgress]);
 
   /**
    * `DraggableList` で並び替え後のアイテムを設定するコールバック関数
@@ -457,11 +496,27 @@ export const Mypage = () => {
             <FileInput
               accept="image/*"
               className="min-w-fit"
+              disabled={uploadProgress !== null}
               multiple
               onChange={onChangeProductFileInput}
             />
           </div>
-
+          {uploadProgress && (
+            <div className="mb-4">
+              <div className="mb-1 flex justify-between text-sm text-gray-600">
+                <span>アップロード進捗</span>
+                <span>{uploadProgressPercent}%</span>
+              </div>
+              <div className="h-2 w-full rounded-full bg-gray-200">
+                <div
+                  className={`
+                    h-2 rounded-full bg-blue-600 transition-all duration-200
+                  `}
+                  style={{ width: `${uploadProgressPercent}%` }}
+                />
+              </div>
+            </div>
+          )}
           {creator && (
             <DraggableList
               items={creator.products}

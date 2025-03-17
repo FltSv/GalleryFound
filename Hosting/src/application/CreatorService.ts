@@ -21,9 +21,15 @@ export const createProduct = async (
   userId: string,
   file: File,
   order: number,
+  progressCallback?: (progress: number) => void,
 ): Promise<Product> => {
   const productId = await FirestoreCreatorRepo.createEmptyProduct(userId);
-  const result = await imageService.uploadImage(userId, file, productId);
+  const result = await imageService.uploadImage(
+    userId,
+    file,
+    productId,
+    progressCallback,
+  );
 
   const uploadedProduct: Product = {
     id: productId,

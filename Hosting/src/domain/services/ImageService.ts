@@ -1,5 +1,3 @@
-import { Exhibit } from 'src/domain/entities';
-
 export interface ImageCompressor {
   compressImage: (imageData: Blob) => Promise<File>;
   createThumbnail: (imageData: Blob) => Promise<File>;
@@ -9,6 +7,8 @@ export interface UploadImageProps {
   userId: string;
   file: File;
   documentId: string;
+
+  /** 0～100%の数値で進捗を通知する */
   progressCallback?: (progress: number) => void;
 }
 
@@ -28,42 +28,6 @@ export class ImageService {
     private imageRepo: ImageRepo,
   ) {}
 
-  async uploadImages(userId: string, images: Exhibit[]): Promise<Exhibit[]> {
-    const tasks = images.map(image => this.uploadImage_legacy(userId, image));
-    return await Promise.all(tasks);
-  }
-
-  private async uploadImage_legacy(
-    userId: string,
-    image: Exhibit,
-  ): Promise<Exhibit> {
-    // イメージの更新が無ければスキップ
-    if (image.tmpImageData === '') {
-      return image;
-    }
-
-    // blobURL→blobオブジェクトへ変換
-    const blob = await this.fetchImageBlob(image.tmpImageData);
-
-    // 圧縮処理
-    const compressedFile = await this.imageCompressor.compressImage(blob);
-    const thumbnailFile = await this.imageCompressor.createThumbnail(blob);
-
-    // アップロード
-    const srcImage = await this.imageRepo.uploadImage({
-      userId,
-      file: compressedFile,
-      documentId: image.id,
-    });
-    await this.imageRepo.uploadThumbnail({
-      userId,
-      file: thumbnailFile,
-      documentId: image.id,
-    });
-
-    return { ...image, srcImage };
-  }
-
   async uploadImage(
     userId: string,
     imageFile: File,
@@ -75,20 +39,27 @@ export class ImageService {
 
     // 圧縮処理
     const compressedFile = await this.imageCompressor.compressImage(blob);
+    progressCallback?.(10);
+
     const thumbnailFile = await this.imageCompressor.createThumbnail(blob);
+    progressCallback?.(20);
 
     // アップロード
     const imageUrl = await this.imageRepo.uploadImage({
       userId,
       file: compressedFile,
       documentId: imageId,
-      progressCallback,
+      progressCallback: progressCallback
+        ? progress => progressCallback(20 + progress * 0.4)
+        : undefined,
     });
     const thumbUrl = await this.imageRepo.uploadThumbnail({
       userId,
       file: thumbnailFile,
       documentId: imageId,
-      progressCallback,
+      progressCallback: progressCallback
+        ? progress => progressCallback(60 + progress * 0.4)
+        : undefined,
     });
 
     return { imageUrl, thumbUrl };
