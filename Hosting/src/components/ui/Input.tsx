@@ -121,6 +121,7 @@ export const FileInput = forwardRef<HTMLInputElement, FileInputProps>(
       className="min-w-fit bg-white"
       color="neutral"
       component="label"
+      disabled={props.disabled}
       startDecorator={<FaCloudUploadAlt />}
       variant="outlined">
       ファイルを選択

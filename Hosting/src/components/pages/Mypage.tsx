@@ -49,6 +49,7 @@ import {
   createProduct,
   updateExhibit,
 } from 'src/application/CreatorService';
+import { ProgressBar } from 'components/ui/ProgressBar';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -203,10 +204,9 @@ export const Mypage = () => {
     if (!uploadProgress) return 0;
 
     const { totalFiles, fileProgresses } = uploadProgress;
-    const progress =
-      fileProgresses.reduce((sum, progress) => sum + progress, 0) / totalFiles;
-
-    return Math.round(progress);
+    return (
+      fileProgresses.reduce((sum, progress) => sum + progress, 0) / totalFiles
+    );
   }, [uploadProgress]);
 
   /**
@@ -502,19 +502,8 @@ export const Mypage = () => {
             />
           </div>
           {uploadProgress && (
-            <div className="mb-4">
-              <div className="mb-1 flex justify-between text-sm text-gray-600">
-                <span>アップロード進捗</span>
-                <span>{uploadProgressPercent}%</span>
-              </div>
-              <div className="h-2 w-full rounded-full bg-gray-200">
-                <div
-                  className={`
-                    h-2 rounded-full bg-blue-600 transition-all duration-200
-                  `}
-                  style={{ width: `${uploadProgressPercent}%` }}
-                />
-              </div>
+            <div className="pb-4">
+              <ProgressBar value={uploadProgressPercent / 100} />
             </div>
           )}
           {creator && (
