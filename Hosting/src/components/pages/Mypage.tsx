@@ -825,6 +825,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     exhibit?.imageUrl ?? '',
   );
   const [selectedFile, setSelectedFile] = useState<File>();
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const {
     control,
     getValues,
@@ -941,6 +942,9 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
       if (user === null) return;
 
+      // 処理開始
+      setUploadProgress(0);
+
       const exhibitData = {
         title: data.title,
         location: data.location,
@@ -962,6 +966,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
           user.uid,
           exhibitData,
           selectedFile,
+          (progress: number) => setUploadProgress(progress),
         );
 
         onSubmit(createdExhibit);
@@ -971,9 +976,17 @@ const ExhibitForm = (props: ExhibitFormProps) => {
           ...exhibit,
           ...exhibitData,
         };
-        await updateExhibit(user.uid, editedExhibit, selectedFile);
-        onSubmit(editedExhibit);
+        const updatedExhibit = await updateExhibit(
+          user.uid,
+          editedExhibit,
+          selectedFile,
+          (progress: number) => setUploadProgress(progress),
+        );
+
+        onSubmit(updatedExhibit);
       }
+
+      setUploadProgress(null);
     },
     [
       exhibit,
@@ -1076,18 +1089,23 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         </div>
       </div>
 
-      <button>
-        <i
-          className={`
-            fa-solid
-
-            ${isAdd ? 'fa-add' : 'fa-check'}
-
-            m-0 mr-2
-          `}
-        />
+      <MuiJoyButton
+        className={`
+          border border-solid border-neutral-300 bg-neutral-50 text-neutral-900
+        `}
+        disabled={uploadProgress !== null}
+        loading={uploadProgress !== null}
+        loadingPosition="start"
+        startDecorator={isAdd ? <FaPlus /> : <FaCheck />}
+        style={{ opacity: uploadProgress !== null ? 0.4 : 1 }}
+        type="submit">
         {isAdd ? '追加' : '変更'}
-      </button>
+      </MuiJoyButton>
+      {uploadProgress !== null && (
+        <div className="pt-4">
+          <ProgressBar value={uploadProgress / 100} />
+        </div>
+      )}
     </form>
   );
 };

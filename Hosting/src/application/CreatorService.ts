@@ -57,9 +57,15 @@ export const createExhibit = async (
   userId: string,
   exhibitData: ExhibitData,
   file: File,
+  progressCallback?: (progress: number) => void,
 ): Promise<Exhibit> => {
   const exhibitId = await FirestoreCreatorRepo.createEmptyExhibit(userId);
-  const result = await imageService.uploadImage(userId, file, exhibitId);
+  const result = await imageService.uploadImage(
+    userId,
+    file,
+    exhibitId,
+    progressCallback,
+  );
 
   const uploadedExhibit: Exhibit = {
     id: exhibitId,
@@ -81,21 +87,28 @@ export const updateExhibit = async (
   userId: string,
   exhibit: Exhibit,
   file?: File,
-): Promise<void> => {
+  progressCallback?: (progress: number) => void,
+): Promise<Exhibit> => {
   if (file === undefined) {
     // 画像の更新がない場合
     await FirestoreCreatorRepo.updateExhibit(userId, exhibit);
-    return;
+    return exhibit;
   }
 
   // 画像の更新がある場合
-  const result = await imageService.uploadImage(userId, file, exhibit.id);
+  const result = await imageService.uploadImage(
+    userId,
+    file,
+    exhibit.id,
+    progressCallback,
+  );
   const imageUpdatedExhibit = {
     ...exhibit,
     srcImage: parseSrcImage(result.imageUrl),
     imageUrl: result.imageUrl,
   };
   await FirestoreCreatorRepo.updateExhibit(userId, imageUpdatedExhibit);
+  return imageUpdatedExhibit;
 };
 
 const parseSrcImage = (imageUrl: string) =>
