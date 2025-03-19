@@ -13,6 +13,9 @@ export interface Creator {
   /** SNSリンク */
   links: string[];
 
+  /** 代表作品のサムネイルURL */
+  highlightThumbUrl: string | null;
+
   /** 発表作品一覧 */
   products: Product[];
 

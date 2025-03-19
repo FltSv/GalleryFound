@@ -55,6 +55,7 @@ export const getCreatorData = async (user: User) => {
       profile: '',
       profileHashtags: [],
       links: [],
+      highlightThumbUrl: null,
       products: [],
       exhibits: [],
     };
@@ -71,6 +72,10 @@ export const getCreatorData = async (user: User) => {
   const profileHashtags = data.profileHashtags ?? [];
   const links = data.links ?? [];
   const highlightProductId = data.highlightProductId ?? '';
+  const highlightThumbUrl =
+    data.highlightProductThumbPath === undefined
+      ? null
+      : storageCreatorsBaseUrl + data.highlightProductThumbPath;
 
   // 発表作品
   const productsRef = getProductsCollectionRef(userId);
@@ -124,6 +129,7 @@ export const getCreatorData = async (user: User) => {
     profile: profile,
     profileHashtags: profileHashtags,
     links: links,
+    highlightThumbUrl: highlightThumbUrl,
     products: products.length === 0 ? products_old : products,
     exhibits: exhibits.length === 0 ? exhibits_old : exhibits,
   };
@@ -166,6 +172,9 @@ export const setCreatorData = async (user: User, data: Creator) => {
       profileHashtags: data.profileHashtags,
       links: data.links,
       highlightProductId: data.products.find(x => x.isHighlight)?.id,
+      highlightProductThumbPath: getHighlightThumbUrl(data.products)?.match(
+        /.*creators%2F(.*)$/,
+      )?.[1],
       // todo: 次バージョンで削除
       products: products.map(x => ({
         id: x.id,
@@ -272,6 +281,20 @@ export const setCreatorData = async (user: User, data: Creator) => {
 
   // 処理完了
   console.debug('complete setCreatorData');
+};
+
+const getHighlightThumbUrl = (products: Product[]): string | null => {
+  if (products.length === 0) {
+    return null;
+  }
+
+  const highlightProduct = products.find(x => x.isHighlight);
+
+  if (highlightProduct) {
+    return highlightProduct.thumbUrl;
+  }
+
+  return products[0].thumbUrl;
 };
 
 const getProductsCollectionRef = (userId: string) =>

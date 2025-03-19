@@ -102,6 +102,14 @@ export interface Creator {
   profileHashtags?: string[];
   links?: string[];
   highlightProductId?: string;
+
+  /**
+   * Storageのcreators/以下を格納
+   * @example `{creatorId}%2F{imageId}.png?alt=media&token={token}`
+   */
+  //todo: v0.6.1で必須にする
+  highlightProductThumbPath?: string;
+
   products?: Product[];
   exhibits?: Exhibit[];
 }
