@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useState } from 'react';
 import ReactGA from 'react-ga4';
 
 import { Button } from 'components/ui/Input';
+import { ProgressBar } from 'components/ui/ProgressBar';
 
 export const ErrorScreen: FC<{ error: unknown }> = ({ error }) => {
   const errorInstance = error instanceof Error ? error : undefined;
@@ -93,21 +94,4 @@ ${additionalDetails ? `\nAdditional Details:\n${additionalDetails}` : ''}
     // Error型ではない場合
     return `Unknown error: ${JSON.stringify(error, null, 2)}`;
   }
-};
-
-const ProgressBar: FC<{ value: number }> = ({ value }) => {
-  const progress = value * 100;
-
-  return (
-    <div className="w-full rounded-full bg-gray-300">
-      <div
-        className={`
-          rounded-full bg-green-500 p-0.5 text-center text-xs text-white
-          transition-all duration-500 ease-out
-        `}
-        style={{ width: `${progress}%` }}>
-        {progress}%
-      </div>
-    </div>
-  );
 };

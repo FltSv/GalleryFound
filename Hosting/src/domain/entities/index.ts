@@ -32,6 +32,9 @@ export interface Product extends ImageStatus {
 
   /** 作品説明、他 */
   detail: string;
+
+  /** 並び順 */
+  order: number;
 }
 
 /** 展示 */
@@ -48,6 +51,7 @@ export interface Exhibit extends ImageStatus {
   /** 展示期間 */
   startDate: Date;
   endDate: Date;
+  getDatePeriod: () => string;
 }
 
 export interface ImageStatus {
@@ -59,6 +63,9 @@ export interface ImageStatus {
 
   /** イメージ(Upload後) */
   imageUrl: string;
+
+  /** サムネイルURL */
+  thumbUrl: string;
 }
 
 /** ギャラリー情報 */
@@ -68,3 +75,10 @@ export interface Gallery {
   location: string;
   latLng: google.maps.LatLngLiteral;
 }
+
+/** 日付の期間の表示値を返す */
+export const getDatePeriod = (start: Date, end: Date) => {
+  const startString = start.toLocaleDateString();
+  const endString = end.toLocaleDateString();
+  return `${startString} ～ ${endString}`;
+};

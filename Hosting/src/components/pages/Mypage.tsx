@@ -9,6 +9,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  useMemo,
 } from 'react';
 import {
   useForm,
@@ -36,14 +37,18 @@ import {
   Textbox,
 } from 'components/ui/Input';
 import { Popup } from 'components/ui/Popup';
-import { getDatePeriodString } from 'src/Data';
-import { Gallery, Creator, Product, Exhibit } from 'src/domains/entities';
-import { getUlid } from 'src/ULID';
+import { Gallery, Creator, Product, Exhibit } from 'src/domain/entities';
 import { DraggableList, SortableProps } from 'components/ui/DraggableList';
 import { getConfig } from 'src/infra/firebase/firebaseConfig';
-import { UserName } from 'src/domains/UserName';
+import { UserName } from 'src/domain/UserName';
 import { getCreatorData, setCreatorData } from 'src/infra/firebase/CreatorRepo';
-import { addGallery, getGalleries } from 'src/infra/firebase/GalleryRepo';
+import { addGallery, getGalleries } from 'src/application/GalleryMapService';
+import {
+  createExhibit,
+  createProduct,
+  updateExhibit,
+} from 'src/application/CreatorService';
+import { ProgressBar } from 'components/ui/ProgressBar';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -58,6 +63,10 @@ export const Mypage = () => {
   const [editProduct, setEditProduct] = useState<Product>();
   const [genres, setGenres] = useState<string[]>([]);
   const [profileHashtags, setProfileHashtags] = useState<string[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{
+    totalFiles: number;
+    fileProgresses: number[];
+  } | null>(null);
 
   useEffect(() => {
     if (user === null) {
@@ -144,30 +153,60 @@ export const Mypage = () => {
    * `creator.Products` を更新
    */
   const onChangeProductFileInput = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
+    async (e: ChangeEvent<HTMLInputElement>) => {
+      if (user === null) return;
       if (creator === undefined) return;
 
       const files = e.currentTarget.files;
       if (files === null) return;
       if (files.length === 0) return;
 
-      const newProducts: Product[] = Array.from(files).map(file => ({
-        id: getUlid(),
-        title: '',
-        isHighlight: false,
-        detail: '',
-        tmpImageData: URL.createObjectURL(file),
-        srcImage: '',
-        imageUrl: '',
-      }));
+      setUploadProgress({
+        totalFiles: files.length,
+        fileProgresses: new Array(files.length).fill(0),
+      });
+
+      const tasks = Array.from(files).map(async (file, i) => {
+        const order = creator.products.length + i + 1;
+        const result = await createProduct(
+          user.uid,
+          file,
+          order,
+          (progress: number) => {
+            setUploadProgress(prev => {
+              if (!prev) return null;
+              return {
+                ...prev,
+                fileProgresses: prev.fileProgresses.map((p, index) =>
+                  index === i ? progress : p,
+                ),
+              };
+            });
+          },
+        );
+        return result;
+      });
+
+      const newProducts = await Promise.all(tasks);
 
       setCreator({
         ...creator,
         products: [...creator.products, ...newProducts],
       });
+
+      setUploadProgress(null);
     },
-    [creator],
+    [creator, user],
   );
+
+  const uploadProgressPercent = useMemo(() => {
+    if (!uploadProgress) return 0;
+
+    const { totalFiles, fileProgresses } = uploadProgress;
+    return (
+      fileProgresses.reduce((sum, progress) => sum + progress, 0) / totalFiles
+    );
+  }, [uploadProgress]);
 
   /**
    * `DraggableList` で並び替え後のアイテムを設定するコールバック関数
@@ -456,11 +495,16 @@ export const Mypage = () => {
             <FileInput
               accept="image/*"
               className="min-w-fit"
+              disabled={uploadProgress !== null}
               multiple
               onChange={onChangeProductFileInput}
             />
           </div>
-
+          {uploadProgress && (
+            <div className="pb-4">
+              <ProgressBar value={uploadProgressPercent / 100} />
+            </div>
+          )}
           {creator && (
             <DraggableList
               items={creator.products}
@@ -629,7 +673,7 @@ const ExhibitRow = (props: ExhibitRowProps) => {
         <div className="flex w-full flex-col gap-1 align-top">
           <p>{data.title}</p>
           <p>{data.location}</p>
-          <p>{getDatePeriodString(data.startDate, data.endDate)}</p>
+          <p>{data.getDatePeriod()}</p>
         </div>
         {/* 編集/削除ボタン */}
         <div className="flex min-w-max flex-col gap-1 align-top">
@@ -773,14 +817,21 @@ interface ExhibitFormValues extends Exhibit {
 }
 
 const ExhibitForm = (props: ExhibitFormProps) => {
+  const { user } = useAuthContext();
   const { exhibit, onSubmit } = props;
   const [galleries, setGalleries] = useState<Gallery[] | undefined>(undefined);
+  const [previewImage, setPreviewImage] = useState<string>(
+    exhibit?.imageUrl ?? '',
+  );
+  const [selectedFile, setSelectedFile] = useState<File>();
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const {
     control,
     getValues,
     register,
     handleSubmit,
     setError,
+    clearErrors,
     watch,
     formState: { errors },
   } = useForm<ExhibitFormValues>({ defaultValues: exhibit });
@@ -800,11 +851,25 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const invalidDateMsg = '有効な日付を入力してください。';
   const isAdd = exhibit === undefined;
 
-  const selectedFiles = watch('selectedFiles');
-  const tmpImage =
-    selectedFiles !== undefined && selectedFiles.length > 0
-      ? URL.createObjectURL(selectedFiles[0])
-      : (exhibit?.tmpImageData ?? '');
+  // 画像選択時の処理
+  const onFileChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+
+      if (file === undefined) {
+        return;
+      }
+
+      setSelectedFile(file);
+      clearErrors('selectedFiles');
+
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewImage(objectUrl);
+
+      return () => URL.revokeObjectURL(objectUrl);
+    },
+    [clearErrors],
+  );
 
   const location = watch('location');
   const matchGallery = galleries?.find(x => x.name === location);
@@ -866,7 +931,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   }, [setError, fetchGalleries]);
 
   const onValid: SubmitHandler<ExhibitFormValues> = useCallback(
-    data => {
+    async data => {
       if (!isMatchGallery) {
         setError('location', {
           message: 'ギャラリー情報の指定または入力が必要です。',
@@ -874,28 +939,62 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         return;
       }
 
-      const submitData: Exhibit = {
-        id: exhibit?.id ?? getUlid(),
+      if (user === null) return;
+
+      // 処理開始
+      setUploadProgress(0);
+
+      const exhibitData = {
         title: data.title,
         location: data.location,
         galleryId: matchGallery.id,
         startDate: new Date(data.startDateString + 'T00:00:00'),
         endDate: new Date(data.endDateString + 'T23:59:59'),
-        srcImage: data.srcImage,
-        tmpImageData: tmpImage,
-        imageUrl: exhibit?.imageUrl ?? '',
       };
 
-      onSubmit(submitData);
+      if (exhibit === undefined) {
+        // 新規登録
+        if (!selectedFile) {
+          setError('selectedFiles', {
+            message: 'ファイルを選択してください。',
+          });
+          return;
+        }
+
+        const createdExhibit = await createExhibit(
+          user.uid,
+          exhibitData,
+          selectedFile,
+          (progress: number) => setUploadProgress(progress),
+        );
+
+        onSubmit(createdExhibit);
+      } else {
+        // 編集
+        const editedExhibit = {
+          ...exhibit,
+          ...exhibitData,
+        };
+        const updatedExhibit = await updateExhibit(
+          user.uid,
+          editedExhibit,
+          selectedFile,
+          (progress: number) => setUploadProgress(progress),
+        );
+
+        onSubmit(updatedExhibit);
+      }
+
+      setUploadProgress(null);
     },
     [
-      exhibit?.id,
-      exhibit?.imageUrl,
+      exhibit,
       isMatchGallery,
       matchGallery?.id,
       onSubmit,
+      selectedFile,
       setError,
-      tmpImage,
+      user,
     ],
   );
 
@@ -918,27 +1017,11 @@ const ExhibitForm = (props: ExhibitFormProps) => {
           md:flex-row
         `}>
         <div className="flex max-w-max basis-1/2 flex-col gap-2 p-2">
-          <FileInput
-            accept="image/*"
-            {...register('selectedFiles', {
-              validate: value => {
-                if (!isAdd) {
-                  return true;
-                }
-                if (value === undefined) {
-                  return false;
-                }
-                return value.length > 0 || 'ファイルを選択してください。';
-              },
-            })}
-          />
+          <FileInput accept="image/*" onChange={onFileChange} />
           <p className="text-xs text-red-600">
             {errors.selectedFiles?.message}
           </p>
-          <img
-            className="w-full max-w-xs"
-            src={tmpImage || exhibit?.imageUrl}
-          />
+          <img className="w-full max-w-xs" src={previewImage} />
         </div>
         <div
           className={`
@@ -1005,18 +1088,23 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         </div>
       </div>
 
-      <button>
-        <i
-          className={`
-            fa-solid
-
-            ${isAdd ? 'fa-add' : 'fa-check'}
-
-            m-0 mr-2
-          `}
-        />
+      <MuiJoyButton
+        className={`
+          border border-solid border-neutral-300 bg-neutral-50 text-neutral-900
+        `}
+        disabled={uploadProgress !== null}
+        loading={uploadProgress !== null}
+        loadingPosition="start"
+        startDecorator={isAdd ? <FaPlus /> : <FaCheck />}
+        style={{ opacity: uploadProgress !== null ? 0.4 : 1 }}
+        type="submit">
         {isAdd ? '追加' : '変更'}
-      </button>
+      </MuiJoyButton>
+      {uploadProgress !== null && (
+        <div className="pt-4">
+          <ProgressBar value={uploadProgress / 100} />
+        </div>
+      )}
     </form>
   );
 };

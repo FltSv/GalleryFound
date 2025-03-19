@@ -107,15 +107,16 @@ export interface Creator {
 }
 
 /** firestore Product */
-export interface Product {
+export interface Product extends ImageObject {
   id: string;
   title?: string;
   detail?: string;
   image: string;
+  order: number;
 }
 
 /** firestore Exhibit */
-export interface Exhibit {
+export interface Exhibit extends ImageObject {
   id: string;
   title: string;
   location: string;
@@ -123,6 +124,19 @@ export interface Exhibit {
   startDate?: Timestamp;
   endDate?: Timestamp;
   image: string;
+}
+
+interface ImageObject {
+  /**
+   * Storageのcreators/以下を格納
+   * @example `{creatorId}%2F{imageId}.png?alt=media&token={token}`
+   */
+  imagePath?: string;
+
+  /**
+   * Storageのcreators/thumbs/以下を格納
+   */
+  thumbPath?: string;
 }
 
 /** firestore Gallery */

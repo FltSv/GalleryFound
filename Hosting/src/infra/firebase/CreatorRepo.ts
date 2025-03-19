@@ -1,4 +1,5 @@
 import {
+  addDoc,
   collection,
   collectionGroup,
   doc,
@@ -19,11 +20,21 @@ import {
   fbCreatorConverter,
   getConfig,
 } from 'src/infra/firebase/firebaseConfig';
-import { Creator, Exhibit, ImageStatus, Product } from 'src/domains/entities';
-import { uploadImageData } from 'src/Data';
+import {
+  Creator,
+  Exhibit,
+  getDatePeriod,
+  ImageStatus,
+  Product,
+} from 'src/domain/entities';
+import {
+  exhibitConverter,
+  productConverter,
+} from 'src/infra/firebase/converter';
+import { getThumbnailUrl, storageCreatorsBaseUrl } from './StorageRepo';
 
 export const getCreatorStorageUrl = (userId: string) =>
-  `https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F${userId}%2F`;
+  `${storageCreatorsBaseUrl}${userId}%2F`;
 
 export const getCreatorData = async (user: User) => {
   const userId = user.uid;
@@ -65,54 +76,26 @@ export const getCreatorData = async (user: User) => {
   const productsRef = getProductsCollectionRef(userId);
   const productsQuery = query(productsRef, orderBy('order'));
   const productsSnap = await getDocs(productsQuery);
-  const products = productsSnap.docs.map(doc => {
-    const data = doc.data();
-
-    const product: Product = {
-      id: data.id,
-      title: data.title,
-      isHighlight: data.id === highlightProductId,
-      detail: data.detail,
-      srcImage: data.image,
-      imageUrl: creatorUrl + (data.image as string),
-      tmpImageData: '',
-    };
-
-    return product;
-  });
+  const products = productsSnap.docs.map(doc => doc.data());
 
   // todo: 次バージョンで削除
   const fbProducts = data.products ?? [];
-  const products_old = fbProducts.map(x => ({
+  const products_old = fbProducts.map((x, i) => ({
     id: x.id,
     title: x.title ?? '',
     isHighlight: x.id === highlightProductId,
     detail: x.detail ?? '',
+    order: i,
     srcImage: x.image,
     imageUrl: creatorUrl + x.image,
+    thumbUrl: '',
     tmpImageData: '',
   }));
 
   // 展示登録
   const exhibitsRef = getExhibitsCollectionRef(userId);
   const exhibitsSnap = await getDocs(exhibitsRef);
-  const exhibits = exhibitsSnap.docs.map(doc => {
-    const data = doc.data();
-
-    const exhibit: Exhibit = {
-      id: doc.id,
-      title: data.title,
-      location: data.location,
-      galleryId: data.galleryId,
-      startDate: data.startDate.toDate(),
-      endDate: data.endDate.toDate(),
-      srcImage: data.image,
-      imageUrl: creatorUrl + (data.image as string),
-      tmpImageData: '',
-    };
-
-    return exhibit;
-  });
+  const exhibits = exhibitsSnap.docs.map(doc => doc.data());
 
   // todo: 次バージョンで削除
   const fbExhibits = data.exhibits ?? [];
@@ -126,7 +109,11 @@ export const getCreatorData = async (user: User) => {
     galleryId: x.galleryId,
     srcImage: x.image,
     imageUrl: creatorUrl + x.image,
+    thumbUrl: '',
     tmpImageData: '',
+    getDatePeriod: function () {
+      return getDatePeriod(this.startDate, this.endDate);
+    },
   }));
 
   const creator: Creator = {
@@ -151,8 +138,16 @@ export const setCreatorData = async (user: User, data: Creator) => {
   const batch = writeBatch(db);
 
   // 画像のアップロード
-  const products = await uploadImageData(user, data.products);
-  const exhibits = await uploadImageData(user, data.exhibits);
+  const updateProductTasks = data.products.map((product, i) =>
+    updateProduct(userId, { ...product, order: i }),
+  );
+  const updateExhibitTasks = data.exhibits.map(exhibit =>
+    updateExhibit(userId, exhibit),
+  );
+  await Promise.all([...updateProductTasks, ...updateExhibitTasks]);
+
+  const products = data.products;
+  const exhibits = data.exhibits;
 
   // DB更新
   const docRef = doc(db, collectionNames.creators, userId).withConverter(
@@ -194,20 +189,21 @@ export const setCreatorData = async (user: User, data: Creator) => {
   const productsRef = getProductsCollectionRef(userId);
 
   // ドキュメントの作成・更新
-  products.forEach((product, i) => {
+  const productTasks = products.map(async (product, i) => {
     const productDocRef = doc(productsRef, product.id);
+
+    const thumbUrl =
+      product.thumbUrl === ''
+        ? await getThumbnailUrl(userId, product)
+        : product.thumbUrl;
+
     batch.set(
       productDocRef,
-      {
-        id: product.id,
-        title: product.title,
-        detail: product.detail,
-        image: product.srcImage,
-        order: i,
-      },
+      { ...product, thumbUrl, order: i },
       { merge: true },
     );
   });
+  await Promise.all(productTasks);
 
   // 削除された要素のドキュメント削除
   const productsSnap = await getDocs(productsRef);
@@ -219,22 +215,17 @@ export const setCreatorData = async (user: User, data: Creator) => {
   const exhibitsRef = getExhibitsCollectionRef(userId);
 
   // ドキュメントの作成・更新
-  exhibits.forEach(exhibit => {
+  const exhibitTasks = exhibits.map(async exhibit => {
     const exhibitDocRef = doc(exhibitsRef, exhibit.id);
-    batch.set(
-      exhibitDocRef,
-      {
-        id: exhibit.id,
-        title: exhibit.title,
-        location: exhibit.location,
-        galleryId: exhibit.galleryId,
-        startDate: Timestamp.fromDate(exhibit.startDate),
-        endDate: Timestamp.fromDate(exhibit.endDate),
-        image: exhibit.srcImage,
-      },
-      { merge: true },
-    );
+
+    const thumbUrl =
+      exhibit.thumbUrl === ''
+        ? await getThumbnailUrl(userId, exhibit)
+        : exhibit.thumbUrl;
+
+    batch.set(exhibitDocRef, { ...exhibit, thumbUrl }, { merge: true });
   });
+  await Promise.all(exhibitTasks);
 
   // 削除された要素のドキュメント削除
   const exhibitsSnap = await getDocs(exhibitsRef);
@@ -282,10 +273,20 @@ export const setCreatorData = async (user: User, data: Creator) => {
 };
 
 const getProductsCollectionRef = (userId: string) =>
-  collection(db, collectionNames.creators, userId, collectionNames.products);
+  collection(
+    db,
+    collectionNames.creators,
+    userId,
+    collectionNames.products,
+  ).withConverter(productConverter);
 
 const getExhibitsCollectionRef = (userId: string) =>
-  collection(db, collectionNames.creators, userId, collectionNames.exhibits);
+  collection(
+    db,
+    collectionNames.creators,
+    userId,
+    collectionNames.exhibits,
+  ).withConverter(exhibitConverter);
 
 // todo: 次バージョンで削除
 /** すべての展示情報の取得 */
@@ -303,6 +304,9 @@ export const getAllExhibits = async () => {
     .map(creatorDocSnap => {
       const data = creatorDocSnap.data();
       const today = new Date();
+      const creatorUrl = getCreatorStorageUrl(creatorDocSnap.id);
+      const thumbUrl = creatorUrl + 'thumbs%2F';
+
       const exhibits: Exhibit[] =
         data.exhibits?.map(x => ({
           ...x,
@@ -310,8 +314,12 @@ export const getAllExhibits = async () => {
           endDate: x.endDate?.toDate() ?? today,
           galleryId: x.galleryId,
           srcImage: x.image,
-          imageUrl: getCreatorStorageUrl(creatorDocSnap.id) + x.image,
+          imageUrl: creatorUrl + x.image,
+          thumbUrl: thumbUrl + x.image,
           tmpImageData: '',
+          getDatePeriod: function () {
+            return getDatePeriod(this.startDate, this.endDate);
+          },
         })) ?? [];
 
       return exhibits;
@@ -331,8 +339,8 @@ export const getActiveExhibits = async (date: Date): Promise<Exhibit[]> => {
 
   const exhibitsQuery = query(
     collectionGroup(db, collectionNames.exhibits),
-    where('startDate', '>=', date),
-  );
+    where('endDate', '>=', date),
+  ).withConverter(exhibitConverter);
   const exhibitsSnapshot = await getDocs(exhibitsQuery);
 
   return exhibitsSnapshot.docs
@@ -348,19 +356,71 @@ export const getActiveExhibits = async (date: Date): Promise<Exhibit[]> => {
         return;
       }
 
-      const creatorUrl = getCreatorStorageUrl(creatorId);
-
-      return {
-        id: data.id,
-        title: data.title,
-        location: data.location,
-        galleryId: data.galleryId,
-        startDate: data.startDate.toDate(),
-        endDate: data.endDate.toDate(),
-        srcImage: data.image,
-        imageUrl: creatorUrl + (data.image as string),
-        tmpImageData: '',
-      };
+      return data;
     })
     .filter(x => x !== undefined);
+};
+
+/**
+ * 画像アップロード前の、空の作品情報を作成する
+ * @returns 作成されたドキュメントのID
+ */
+const createEmptyProduct = async (userId: string): Promise<string> =>
+  createEmptyDocument(userId, collectionNames.products);
+
+/**
+ * 画像アップロード前の、空の展示情報を作成する
+ * @returns 作成されたドキュメントのID
+ */
+const createEmptyExhibit = async (userId: string): Promise<string> =>
+  createEmptyDocument(userId, collectionNames.exhibits);
+
+const createEmptyDocument = async (
+  userId: string,
+  subCollectionName: string,
+): Promise<string> => {
+  const collectionRef = collection(
+    db,
+    collectionNames.creators,
+    userId,
+    subCollectionName,
+  );
+
+  const docRef = await addDoc(collectionRef, {});
+  return docRef.id;
+};
+
+/**
+ * 作品情報を更新する
+ */
+const updateProduct = async (userId: string, product: Product) => {
+  const docRef = doc(
+    db,
+    collectionNames.creators,
+    userId,
+    collectionNames.products,
+    product.id,
+  ).withConverter(productConverter);
+  await setDoc(docRef, product, { merge: true });
+};
+
+/**
+ * 展示情報を更新する
+ */
+const updateExhibit = async (userId: string, exhibit: Exhibit) => {
+  const docRef = doc(
+    db,
+    collectionNames.creators,
+    userId,
+    collectionNames.exhibits,
+    exhibit.id,
+  ).withConverter(exhibitConverter);
+  await setDoc(docRef, exhibit, { merge: true });
+};
+
+export const FirestoreCreatorRepo = {
+  createEmptyProduct,
+  updateProduct,
+  createEmptyExhibit,
+  updateExhibit,
 };
