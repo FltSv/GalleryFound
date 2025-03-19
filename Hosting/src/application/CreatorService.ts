@@ -41,6 +41,8 @@ export const createProduct = async (
     srcImage: parseSrcImage(result.imageUrl),
     imageUrl: result.imageUrl,
     thumbUrl: result.thumbUrl,
+    createdAt: new Date(),
+    addedAt: new Date(),
   };
 
   await FirestoreCreatorRepo.updateProduct(userId, uploadedProduct);

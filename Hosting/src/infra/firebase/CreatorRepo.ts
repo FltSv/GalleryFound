@@ -86,6 +86,8 @@ export const getCreatorData = async (user: User) => {
     isHighlight: x.id === highlightProductId,
     detail: x.detail ?? '',
     order: i,
+    createdAt: x.createdAt?.toDate(),
+    addedAt: x.addedAt?.toDate(),
     srcImage: x.image,
     imageUrl: creatorUrl + x.image,
     thumbUrl: '',

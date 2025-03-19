@@ -49,6 +49,8 @@ export const productConverter: FirestoreDataConverter<Product> = {
       imageUrl: fromFirestoreImageUrl(data.image, data.imagePath, userId),
       thumbUrl: fromFirestoreThumbUrl(data.thumbPath),
       tmpImageData: '',
+      createdAt: data.createdAt?.toDate(),
+      addedAt: data.addedAt?.toDate(),
     } satisfies Product;
   },
 
@@ -61,6 +63,12 @@ export const productConverter: FirestoreDataConverter<Product> = {
       image: product.srcImage,
       imagePath: toFirestoreImageUrl(product.imageUrl),
       thumbPath: toFirestoreImageUrl(product.thumbUrl),
+      createdAt: product.createdAt
+        ? Timestamp.fromDate(product.createdAt)
+        : undefined,
+      addedAt: product.addedAt
+        ? Timestamp.fromDate(product.addedAt)
+        : undefined,
     } satisfies FirebaseProduct;
   },
 };

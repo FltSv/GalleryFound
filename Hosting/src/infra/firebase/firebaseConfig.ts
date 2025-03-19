@@ -113,6 +113,14 @@ export interface Product extends ImageObject {
   detail?: string;
   image: string;
   order: number;
+
+  /** 作品の作成日 */
+  //todo: v0.6.1で必須にする
+  createdAt?: Timestamp;
+
+  /** DBへの登録日 */
+  //todo: v0.6.1で必須にする
+  addedAt?: Timestamp;
 }
 
 /** firestore Exhibit */
