@@ -6,6 +6,7 @@ import {
 } from 'firebase/storage';
 import { collectionNames } from 'src/infra/firebase/firebaseConfig';
 import { ImageRepo } from 'src/domain/services/ImageService';
+import { Exhibit, Product } from 'src/domain/entities';
 
 type uploadImageType = ImageRepo['uploadImage'];
 type uploadThumbnailType = ImageRepo['uploadThumbnail'];
@@ -46,7 +47,7 @@ const uploadThumbnail: uploadThumbnailType = async props => {
   }
 };
 
-export const uploadFile = async (
+const uploadFile = async (
   file: File,
   path: string,
   progressCallback?: (progress: number) => void,
@@ -79,6 +80,17 @@ export const uploadFile = async (
       },
     );
   });
+
+// todo: v0.6.1で削除
+/** サムネイル画像のURLを取得する */
+export const getThumbnailUrl = async (
+  userId: string,
+  item: Product | Exhibit,
+) => {
+  const imageName = item.srcImage.replace(/\.png.*/, '.webp');
+  const path = `${collectionNames.creators}/${userId}/thumbs/${imageName}`;
+  return await getDownloadURL(ref(storage, path));
+};
 
 export const FireStorageImageRepo: ImageRepo = {
   uploadImage,

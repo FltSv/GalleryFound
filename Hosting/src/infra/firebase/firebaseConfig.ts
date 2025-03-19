@@ -133,9 +133,14 @@ export interface Exhibit extends ImageObject {
 interface ImageObject {
   /**
    * Storageのcreators/以下を格納
-   * 例: {creatorId}%2F{imageId}.png?alt=media&token={token}
+   * @example `{creatorId}%2F{imageId}.png?alt=media&token={token}`
    */
   imagePath?: string;
+
+  /**
+   * Storageのcreators/thumbs/以下を格納
+   */
+  thumbPath?: string;
 }
 
 /** firestore Gallery */

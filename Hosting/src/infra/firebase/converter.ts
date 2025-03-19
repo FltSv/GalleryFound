@@ -23,6 +23,14 @@ const fromFirestoreImageUrl = (
   return storageCreatorsBaseUrl + imageUrl;
 };
 
+const fromFirestoreThumbUrl = (thumbUrl?: string): string => {
+  if (thumbUrl === undefined || thumbUrl === '') {
+    return '';
+  }
+
+  return storageCreatorsBaseUrl + thumbUrl;
+};
+
 const toFirestoreImageUrl = (imageUrl: string): string =>
   imageUrl.match(/.*creators%2F(.*)$/)?.[1] ?? imageUrl;
 
@@ -39,6 +47,7 @@ export const productConverter: FirestoreDataConverter<Product> = {
       order: data.order,
       srcImage: data.image,
       imageUrl: fromFirestoreImageUrl(data.image, data.imagePath, userId),
+      thumbUrl: fromFirestoreThumbUrl(data.thumbPath),
       tmpImageData: '',
     } satisfies Product;
   },
@@ -48,9 +57,10 @@ export const productConverter: FirestoreDataConverter<Product> = {
       id: product.id,
       title: product.title,
       detail: product.detail,
+      order: product.order,
       image: product.srcImage,
       imagePath: toFirestoreImageUrl(product.imageUrl),
-      order: product.order,
+      thumbPath: toFirestoreImageUrl(product.thumbUrl),
     } satisfies FirebaseProduct;
   },
 };
@@ -69,6 +79,7 @@ export const exhibitConverter: FirestoreDataConverter<Exhibit> = {
       endDate: data.endDate?.toDate() ?? epochDate,
       srcImage: data.image,
       imageUrl: fromFirestoreImageUrl(data.image, data.imagePath, userId),
+      thumbUrl: fromFirestoreThumbUrl(data.thumbPath),
       tmpImageData: '',
     } satisfies Exhibit;
   },
@@ -83,6 +94,7 @@ export const exhibitConverter: FirestoreDataConverter<Exhibit> = {
       endDate: Timestamp.fromDate(exhibit.endDate),
       image: exhibit.srcImage,
       imagePath: toFirestoreImageUrl(exhibit.imageUrl),
+      thumbPath: toFirestoreImageUrl(exhibit.thumbUrl),
     } satisfies FirebaseExhibit;
   },
 };

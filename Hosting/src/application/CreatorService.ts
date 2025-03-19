@@ -40,6 +40,7 @@ export const createProduct = async (
     tmpImageData: '',
     srcImage: parseSrcImage(result.imageUrl),
     imageUrl: result.imageUrl,
+    thumbUrl: result.thumbUrl,
   };
 
   await FirestoreCreatorRepo.updateProduct(userId, uploadedProduct);
@@ -73,6 +74,7 @@ export const createExhibit = async (
     tmpImageData: '',
     srcImage: parseSrcImage(result.imageUrl),
     imageUrl: result.imageUrl,
+    thumbUrl: result.imageUrl,
     location: exhibitData.location,
     galleryId: exhibitData.galleryId,
     startDate: exhibitData.startDate,
@@ -106,6 +108,7 @@ export const updateExhibit = async (
     ...exhibit,
     srcImage: parseSrcImage(result.imageUrl),
     imageUrl: result.imageUrl,
+    thumbUrl: result.thumbUrl,
   };
   await FirestoreCreatorRepo.updateExhibit(userId, imageUpdatedExhibit);
   return imageUpdatedExhibit;

@@ -62,6 +62,9 @@ export interface ImageStatus {
 
   /** イメージ(Upload後) */
   imageUrl: string;
+
+  /** サムネイルURL */
+  thumbUrl: string;
 }
 
 /** ギャラリー情報 */
