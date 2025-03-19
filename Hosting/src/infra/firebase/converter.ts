@@ -1,5 +1,5 @@
 import { FirestoreDataConverter, Timestamp } from 'firebase/firestore';
-import { Exhibit, Product } from 'src/domain/entities';
+import { Exhibit, Product, getDatePeriod } from 'src/domain/entities';
 import {
   Product as FirebaseProduct,
   Exhibit as FirebaseExhibit,
@@ -81,6 +81,9 @@ export const exhibitConverter: FirestoreDataConverter<Exhibit> = {
       imageUrl: fromFirestoreImageUrl(data.image, data.imagePath, userId),
       thumbUrl: fromFirestoreThumbUrl(data.thumbPath),
       tmpImageData: '',
+      getDatePeriod: function () {
+        return getDatePeriod(this.startDate, this.endDate);
+      },
     } satisfies Exhibit;
   },
 

@@ -37,7 +37,6 @@ import {
   Textbox,
 } from 'components/ui/Input';
 import { Popup } from 'components/ui/Popup';
-import { getDatePeriodString } from 'src/Data';
 import { Gallery, Creator, Product, Exhibit } from 'src/domain/entities';
 import { DraggableList, SortableProps } from 'components/ui/DraggableList';
 import { getConfig } from 'src/infra/firebase/firebaseConfig';
@@ -674,7 +673,7 @@ const ExhibitRow = (props: ExhibitRowProps) => {
         <div className="flex w-full flex-col gap-1 align-top">
           <p>{data.title}</p>
           <p>{data.location}</p>
-          <p>{getDatePeriodString(data.startDate, data.endDate)}</p>
+          <p>{data.getDatePeriod()}</p>
         </div>
         {/* 編集/削除ボタン */}
         <div className="flex min-w-max flex-col gap-1 align-top">

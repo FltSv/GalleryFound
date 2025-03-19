@@ -1,4 +1,4 @@
-import { Exhibit, Product } from 'src/domain/entities';
+import { Exhibit, getDatePeriod, Product } from 'src/domain/entities';
 import { ImageService } from 'src/domain/services/ImageService';
 import { BrowserImageCompressor } from 'src/infra/image/BrowserImageCompressor';
 import { FireStorageImageRepo } from 'src/infra/firebase/StorageRepo';
@@ -79,6 +79,9 @@ export const createExhibit = async (
     galleryId: exhibitData.galleryId,
     startDate: exhibitData.startDate,
     endDate: exhibitData.endDate,
+    getDatePeriod: function () {
+      return getDatePeriod(this.startDate, this.endDate);
+    },
   };
 
   await FirestoreCreatorRepo.updateExhibit(userId, uploadedExhibit);

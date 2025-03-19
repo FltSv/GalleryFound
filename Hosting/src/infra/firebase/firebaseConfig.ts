@@ -37,13 +37,9 @@ export const collectionNames = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = initializeFirestore(
-  app,
-  {
-    ignoreUndefinedProperties: true, // undefinedを無視してFirestoreに書き込む
-  },
-  'develop',
-);
+export const db = initializeFirestore(app, {
+  ignoreUndefinedProperties: true, // undefinedを無視してFirestoreに書き込む
+});
 
 // Remote Config
 // 最小フェッチ時間: dev1分、prod1時間

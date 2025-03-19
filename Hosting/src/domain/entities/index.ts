@@ -51,6 +51,7 @@ export interface Exhibit extends ImageStatus {
   /** 展示期間 */
   startDate: Date;
   endDate: Date;
+  getDatePeriod: () => string;
 }
 
 export interface ImageStatus {
@@ -74,3 +75,10 @@ export interface Gallery {
   location: string;
   latLng: google.maps.LatLngLiteral;
 }
+
+/** 日付の期間の表示値を返す */
+export const getDatePeriod = (start: Date, end: Date) => {
+  const startString = start.toLocaleDateString();
+  const endString = end.toLocaleDateString();
+  return `${startString} ～ ${endString}`;
+};

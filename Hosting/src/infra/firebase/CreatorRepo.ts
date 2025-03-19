@@ -20,7 +20,13 @@ import {
   fbCreatorConverter,
   getConfig,
 } from 'src/infra/firebase/firebaseConfig';
-import { Creator, Exhibit, ImageStatus, Product } from 'src/domain/entities';
+import {
+  Creator,
+  Exhibit,
+  getDatePeriod,
+  ImageStatus,
+  Product,
+} from 'src/domain/entities';
 import {
   exhibitConverter,
   productConverter,
@@ -105,6 +111,9 @@ export const getCreatorData = async (user: User) => {
     imageUrl: creatorUrl + x.image,
     thumbUrl: '',
     tmpImageData: '',
+    getDatePeriod: function () {
+      return getDatePeriod(this.startDate, this.endDate);
+    },
   }));
 
   const creator: Creator = {
@@ -308,6 +317,9 @@ export const getAllExhibits = async () => {
           imageUrl: creatorUrl + x.image,
           thumbUrl: thumbUrl + x.image,
           tmpImageData: '',
+          getDatePeriod: function () {
+            return getDatePeriod(this.startDate, this.endDate);
+          },
         })) ?? [];
 
       return exhibits;
