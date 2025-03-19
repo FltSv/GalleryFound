@@ -43,7 +43,7 @@ import { DraggableList, SortableProps } from 'components/ui/DraggableList';
 import { getConfig } from 'src/infra/firebase/firebaseConfig';
 import { UserName } from 'src/domain/UserName';
 import { getCreatorData, setCreatorData } from 'src/infra/firebase/CreatorRepo';
-import { addGallery, getGalleries } from 'src/infra/firebase/GalleryRepo';
+import { addGallery, getGalleries } from 'src/application/GalleryMapService';
 import {
   createExhibit,
   createProduct,

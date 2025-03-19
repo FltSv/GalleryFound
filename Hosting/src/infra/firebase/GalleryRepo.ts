@@ -6,17 +6,30 @@ import {
   getDocs,
   setDoc,
 } from 'firebase/firestore';
-import { getLatLngFromAddress } from 'src/Data';
 import { Gallery } from 'src/domain/entities';
+import { LatLng } from 'src/domain/services/GeocodingService';
 import {
   collectionNames,
   db,
   fbGalleryConverter,
 } from 'src/infra/firebase/firebaseConfig';
-import { getUlid } from 'src/ULID';
+
+/**
+ * ギャラリーリポジトリの型定義
+ */
+export interface GalleryRepo {
+  /** ギャラリー情報の一覧を取得 */
+  getGalleries: () => Promise<Gallery[]>;
+
+  /** ギャラリー情報を追加 */
+  addGallery: (data: Gallery, latLng: LatLng) => Promise<void>;
+
+  /** galleryIdの配列に対応するギャラリー情報を取得 */
+  getGalleriesByIds: (galleryIds: string[]) => Promise<Gallery[]>;
+}
 
 /** ギャラリー情報の一覧を取得 */
-export const getGalleries = async () => {
+const getGalleries = async () => {
   const colRef = collection(db, collectionNames.galleries);
   const querySnap = await getDocs(colRef.withConverter(fbGalleryConverter));
 
@@ -28,21 +41,20 @@ export const getGalleries = async () => {
 };
 
 /** ギャラリー情報を追加 */
-export const addGallery = async (data: Gallery) => {
-  const { lat, lng } = await getLatLngFromAddress(data.location);
+const addGallery = async (data: Gallery, { lat, lng }: LatLng) => {
   const { id, ...firebaseData } = { ...data, latLng: new GeoPoint(lat, lng) };
   void id;
 
-  const docRef = doc(db, collectionNames.galleries, getUlid());
+  // Firestoreの自動採番を使用
+  const colRef = collection(db, collectionNames.galleries);
+  const docRef = doc(colRef);
   await setDoc(docRef.withConverter(fbGalleryConverter), firebaseData);
 };
 
 /**
  * galleryIdの配列に対応するギャラリー情報を取得
  */
-export const getGalleriesByIds = async (
-  galleryIds: string[],
-): Promise<Gallery[]> => {
+const getGalleriesByIds = async (galleryIds: string[]): Promise<Gallery[]> => {
   if (galleryIds.length === 0) {
     return [];
   }
@@ -67,4 +79,11 @@ export const getGalleriesByIds = async (
     });
 
   return galleries;
+};
+
+// Firebase実装のリポジトリをエクスポート
+export const galleryRepo: GalleryRepo = {
+  getGalleries,
+  addGallery,
+  getGalleriesByIds,
 };

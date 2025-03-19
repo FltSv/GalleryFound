@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card } from '@mui/joy';
 import { Gallery } from 'src/domain/entities';
-import { getGalleries } from 'src/infra/firebase/GalleryRepo';
+import { getGalleries } from 'src/application/GalleryMapService';
 
 export const Galleries = () => {
   const [galleries, setGalleries] = useState<Gallery[] | undefined>(undefined);
