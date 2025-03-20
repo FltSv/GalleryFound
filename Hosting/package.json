@@ -57,7 +57,7 @@
     "eslint-plugin-unicorn": "^55.0.0",
     "favicons": "^7.2.0",
     "favicons-webpack-plugin": "^6.0.1",
-    "firebase-tools": "^13.29.1",
+    "firebase-tools": "^13.34.0",
     "globals": "^15.13.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.11",
