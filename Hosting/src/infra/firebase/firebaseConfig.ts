@@ -57,15 +57,6 @@ export const getConfig = async (): Promise<Config> => {
   };
 };
 
-export const fbCreatorConverter: FirestoreDataConverter<Creator> = {
-  toFirestore: modelObject => modelObject,
-
-  fromFirestore: (snapshot, options?) => {
-    const data = snapshot.data(options);
-    return data as Creator;
-  },
-};
-
 declare global {
   interface Window {
     FIREBASE_APPCHECK_DEBUG_TOKEN: boolean;

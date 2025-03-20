@@ -8,7 +8,6 @@ import {
   orderBy,
   query,
   setDoc,
-  Timestamp,
   where,
   writeBatch,
 } from 'firebase/firestore';
@@ -17,17 +16,11 @@ import { getStorage, ref, listAll, deleteObject } from 'firebase/storage';
 import {
   collectionNames,
   db,
-  fbCreatorConverter,
   getConfig,
 } from 'src/infra/firebase/firebaseConfig';
+import { Creator, Exhibit, ImageStatus, Product } from 'src/domain/entities';
 import {
-  Creator,
-  Exhibit,
-  getDatePeriod,
-  ImageStatus,
-  Product,
-} from 'src/domain/entities';
-import {
+  creatorConverter,
   exhibitConverter,
   productConverter,
 } from 'src/infra/firebase/converter';
@@ -38,11 +31,10 @@ export const getCreatorStorageUrl = (userId: string) =>
 
 export const getCreatorData = async (user: User) => {
   const userId = user.uid;
-  const creatorUrl = getCreatorStorageUrl(userId);
 
   // Firestoreからユーザーデータを取得
   const docRef = doc(db, collectionNames.creators, userId).withConverter(
-    fbCreatorConverter,
+    creatorConverter,
   );
   const docSnap = await getDoc(docRef);
 
@@ -55,6 +47,7 @@ export const getCreatorData = async (user: User) => {
       profile: '',
       profileHashtags: [],
       links: [],
+      highlightProductId: null,
       highlightThumbUrl: null,
       products: [],
       exhibits: [],
@@ -66,72 +59,21 @@ export const getCreatorData = async (user: User) => {
   // ドキュメントが存在する場合、詳細を取得
   const data = docSnap.data();
 
-  const name = data.name ?? '';
-  const genre = data.genre ?? '';
-  const profile = data.profile ?? '';
-  const profileHashtags = data.profileHashtags ?? [];
-  const links = data.links ?? [];
-  const highlightProductId = data.highlightProductId ?? '';
-  const highlightThumbUrl =
-    data.highlightProductThumbPath === undefined
-      ? null
-      : storageCreatorsBaseUrl + data.highlightProductThumbPath;
-
   // 発表作品
   const productsRef = getProductsCollectionRef(userId);
   const productsQuery = query(productsRef, orderBy('order'));
   const productsSnap = await getDocs(productsQuery);
   const products = productsSnap.docs.map(doc => doc.data());
 
-  // todo: 次バージョンで削除
-  const fbProducts = data.products ?? [];
-  const products_old = fbProducts.map((x, i) => ({
-    id: x.id,
-    title: x.title ?? '',
-    isHighlight: x.id === highlightProductId,
-    detail: x.detail ?? '',
-    order: i,
-    createdAt: x.createdAt?.toDate(),
-    addedAt: x.addedAt?.toDate(),
-    srcImage: x.image,
-    imageUrl: creatorUrl + x.image,
-    thumbUrl: '',
-    tmpImageData: '',
-  }));
-
   // 展示登録
   const exhibitsRef = getExhibitsCollectionRef(userId);
   const exhibitsSnap = await getDocs(exhibitsRef);
   const exhibits = exhibitsSnap.docs.map(doc => doc.data());
 
-  // todo: 次バージョンで削除
-  const fbExhibits = data.exhibits ?? [];
-  const today = new Date();
-  const exhibits_old = fbExhibits.map(x => ({
-    id: x.id,
-    title: x.title,
-    location: x.location,
-    startDate: x.startDate?.toDate() ?? today,
-    endDate: x.endDate?.toDate() ?? today,
-    galleryId: x.galleryId,
-    srcImage: x.image,
-    imageUrl: creatorUrl + x.image,
-    thumbUrl: '',
-    tmpImageData: '',
-    getDatePeriod: function () {
-      return getDatePeriod(this.startDate, this.endDate);
-    },
-  }));
-
   const creator: Creator = {
-    name: name,
-    genre: genre,
-    profile: profile,
-    profileHashtags: profileHashtags,
-    links: links,
-    highlightThumbUrl: highlightThumbUrl,
-    products: products.length === 0 ? products_old : products,
-    exhibits: exhibits.length === 0 ? exhibits_old : exhibits,
+    ...data,
+    products: products.length === 0 ? data.products : products,
+    exhibits: exhibits.length === 0 ? data.exhibits : exhibits,
   };
 
   console.debug('creator:', creator);
@@ -159,42 +101,11 @@ export const setCreatorData = async (user: User, data: Creator) => {
 
   // DB更新
   const docRef = doc(db, collectionNames.creators, userId).withConverter(
-    fbCreatorConverter,
+    creatorConverter,
   );
 
   // メインドキュメント更新
-  await setDoc(
-    docRef,
-    {
-      name: data.name,
-      genre: data.genre,
-      profile: data.profile,
-      profileHashtags: data.profileHashtags,
-      links: data.links,
-      highlightProductId: data.products.find(x => x.isHighlight)?.id,
-      highlightProductThumbPath: getHighlightThumbUrl(data.products)?.match(
-        /.*creators%2F(.*)$/,
-      )?.[1],
-      // todo: 次バージョンで削除
-      products: products.map(x => ({
-        id: x.id,
-        title: x.title,
-        detail: x.detail,
-        image: x.srcImage,
-      })),
-      // todo: 次バージョンで削除
-      exhibits: exhibits.map(x => ({
-        id: x.id,
-        title: x.title,
-        location: x.location,
-        galleryId: x.galleryId,
-        startDate: Timestamp.fromDate(x.startDate),
-        endDate: Timestamp.fromDate(x.endDate),
-        image: x.srcImage,
-      })),
-    },
-    { merge: true },
-  );
+  await setDoc(docRef, data, { merge: true });
 
   // 発表作品サブコレクション更新
   const productsRef = getProductsCollectionRef(userId);
@@ -283,20 +194,6 @@ export const setCreatorData = async (user: User, data: Creator) => {
   console.debug('complete setCreatorData');
 };
 
-const getHighlightThumbUrl = (products: Product[]): string | null => {
-  if (products.length === 0) {
-    return null;
-  }
-
-  const highlightProduct = products.find(x => x.isHighlight);
-
-  if (highlightProduct) {
-    return highlightProduct.thumbUrl;
-  }
-
-  return products[0].thumbUrl;
-};
-
 const getProductsCollectionRef = (userId: string) =>
   collection(
     db,
@@ -317,7 +214,7 @@ const getExhibitsCollectionRef = (userId: string) =>
 /** すべての展示情報の取得 */
 export const getAllExhibits = async () => {
   const creatorsSnap = await getDocs(
-    collection(db, collectionNames.creators).withConverter(fbCreatorConverter),
+    collection(db, collectionNames.creators).withConverter(creatorConverter),
   );
 
   const config = await getConfig();
@@ -328,26 +225,7 @@ export const getAllExhibits = async () => {
     .filter(d => isDebug || !ignoreIds.includes(d.id))
     .map(creatorDocSnap => {
       const data = creatorDocSnap.data();
-      const today = new Date();
-      const creatorUrl = getCreatorStorageUrl(creatorDocSnap.id);
-      const thumbUrl = creatorUrl + 'thumbs%2F';
-
-      const exhibits: Exhibit[] =
-        data.exhibits?.map(x => ({
-          ...x,
-          startDate: x.startDate?.toDate() ?? today,
-          endDate: x.endDate?.toDate() ?? today,
-          galleryId: x.galleryId,
-          srcImage: x.image,
-          imageUrl: creatorUrl + x.image,
-          thumbUrl: thumbUrl + x.image,
-          tmpImageData: '',
-          getDatePeriod: function () {
-            return getDatePeriod(this.startDate, this.endDate);
-          },
-        })) ?? [];
-
-      return exhibits;
+      return data.exhibits;
     });
 
   const resolvedExhibits = await Promise.all(exhibitsPromises);
