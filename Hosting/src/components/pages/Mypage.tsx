@@ -49,6 +49,7 @@ import {
   updateExhibit,
 } from 'src/application/CreatorService';
 import { ProgressBar } from 'components/ui/ProgressBar';
+import FeedbackButton from 'components/ui/FeedbackButton';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -560,6 +561,8 @@ export const Mypage = () => {
       <Popup setVisible={setVisibleExhibitPopup} visible={visibleExhibitPopup}>
         <ExhibitForm exhibit={editExhibit} onSubmit={onSubmitExhibitPopup} />
       </Popup>
+
+      <FeedbackButton />
     </>
   );
 };
