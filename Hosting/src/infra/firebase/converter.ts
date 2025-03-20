@@ -1,9 +1,20 @@
-import { FirestoreDataConverter, Timestamp } from 'firebase/firestore';
-import { Creator, Exhibit, Product, getDatePeriod } from 'src/domain/entities';
+import {
+  FirestoreDataConverter,
+  Timestamp,
+  GeoPoint,
+} from 'firebase/firestore';
+import {
+  Creator,
+  Exhibit,
+  Gallery,
+  Product,
+  getDatePeriod,
+} from 'src/domain/entities';
 import {
   Creator as FirebaseCreator,
   Product as FirebaseProduct,
   Exhibit as FirebaseExhibit,
+  Gallery as FirebaseGallery,
 } from 'src/infra/firebase/firebaseConfig';
 import { getCreatorStorageUrl } from 'src/infra/firebase/CreatorRepo';
 import { storageCreatorsBaseUrl } from 'src/infra/firebase/StorageRepo';
@@ -38,7 +49,7 @@ const toFirestoreImageUrl = (imageUrl: string): string =>
   imageUrl.match(/.*creators%2F(.*)$/)?.[1] ?? imageUrl;
 
 export const creatorConverter: FirestoreDataConverter<Creator> = {
-  fromFirestore: (snapshot, options?) => {
+  fromFirestore(snapshot, options?) {
     const data = snapshot.data(options) as FirebaseCreator;
 
     // todo: v0.6.1で削除
@@ -97,7 +108,7 @@ export const creatorConverter: FirestoreDataConverter<Creator> = {
     } satisfies Creator;
   },
 
-  toFirestore: (creator: Creator) => {
+  toFirestore(creator: Creator) {
     const highlightProduct = creator.products.find(x => x.isHighlight);
 
     const highlightProductThumbUrl =
@@ -221,5 +232,26 @@ export const exhibitConverter: FirestoreDataConverter<Exhibit> = {
       imagePath: toFirestoreImageUrl(exhibit.imageUrl),
       thumbPath: toFirestoreImageUrl(exhibit.thumbUrl),
     } satisfies FirebaseExhibit;
+  },
+};
+
+export const galleryConverter: FirestoreDataConverter<Gallery> = {
+  fromFirestore(snapshot, options?) {
+    const data = snapshot.data(options) as FirebaseGallery;
+    const { latitude, longitude } = data.latLng.toJSON();
+
+    return {
+      ...data,
+      id: snapshot.id,
+      latLng: { lat: latitude, lng: longitude },
+    } satisfies Gallery;
+  },
+
+  toFirestore(gallery: Gallery) {
+    const { lat, lng } = gallery.latLng;
+    return {
+      ...gallery,
+      latLng: new GeoPoint(lat, lng),
+    } satisfies FirebaseGallery;
   },
 };

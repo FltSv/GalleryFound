@@ -5,12 +5,7 @@ import {
   getToken,
 } from 'firebase/app-check';
 import { getAuth } from 'firebase/auth';
-import {
-  FirestoreDataConverter,
-  Timestamp,
-  GeoPoint,
-  initializeFirestore,
-} from 'firebase/firestore';
+import { Timestamp, GeoPoint, initializeFirestore } from 'firebase/firestore';
 import {
   fetchAndActivate,
   getRemoteConfig,
@@ -79,11 +74,6 @@ getToken(appCheck)
   .catch((e: unknown) => {
     console.error(e);
   });
-
-export const fbGalleryConverter: FirestoreDataConverter<Gallery> = {
-  toFirestore: obj => obj,
-  fromFirestore: (snapshot, options?) => snapshot.data(options) as Gallery,
-};
 
 /** firestore Creator */
 export interface Creator {
