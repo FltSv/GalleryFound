@@ -22,7 +22,7 @@ import { Creator, Exhibit, ImageStatus, Product } from 'src/domain/entities';
 import {
   creatorConverter,
   exhibitConverter,
-  productConverter,
+  getProductConverter,
 } from 'src/infra/firebase/converter';
 import { getThumbnailUrl, storageCreatorsBaseUrl } from './StorageRepo';
 
@@ -60,7 +60,10 @@ export const getCreatorData = async (user: User) => {
   const data = docSnap.data();
 
   // 発表作品
-  const productsRef = getProductsCollectionRef(userId);
+  const productsRef = getProductsCollectionRef(
+    userId,
+    data.highlightProductId ?? null,
+  );
   const productsQuery = query(productsRef, orderBy('order'));
   const productsSnap = await getDocs(productsQuery);
   const products = productsSnap.docs.map(doc => doc.data());
@@ -108,7 +111,7 @@ export const setCreatorData = async (user: User, data: Creator) => {
   await setDoc(docRef, data, { merge: true });
 
   // 発表作品サブコレクション更新
-  const productsRef = getProductsCollectionRef(userId);
+  const productsRef = getProductsCollectionRef(userId, null);
 
   // ドキュメントの作成・更新
   const productTasks = products.map(async (product, i) => {
@@ -194,13 +197,16 @@ export const setCreatorData = async (user: User, data: Creator) => {
   console.debug('complete setCreatorData');
 };
 
-const getProductsCollectionRef = (userId: string) =>
+const getProductsCollectionRef = (
+  userId: string,
+  highlightProductId: string | null,
+) =>
   collection(
     db,
     collectionNames.creators,
     userId,
     collectionNames.products,
-  ).withConverter(productConverter);
+  ).withConverter(getProductConverter(highlightProductId));
 
 const getExhibitsCollectionRef = (userId: string) =>
   collection(
@@ -297,6 +303,10 @@ const createEmptyDocument = async (
  * 作品情報を更新する
  */
 const updateProduct = async (userId: string, product: Product) => {
+  const productConverter = getProductConverter(
+    product.isHighlight ? product.id : null,
+  );
+
   const docRef = doc(
     db,
     collectionNames.creators,

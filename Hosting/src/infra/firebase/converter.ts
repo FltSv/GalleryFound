@@ -155,20 +155,17 @@ export const creatorConverter: FirestoreDataConverter<Creator> = {
   },
 };
 
-export const productConverter: FirestoreDataConverter<Product> = {
-  fromFirestore(snapshot, options?, highlightProductId?: string) {
+export const getProductConverter = (
+  highlightProductId: string | null,
+): FirestoreDataConverter<Product> => ({
+  fromFirestore(snapshot, options?) {
     const data = snapshot.data(options) as FirebaseProduct;
     const userId = snapshot.ref.parent.parent?.id;
-
-    const isHighlight =
-      highlightProductId !== undefined && highlightProductId !== ''
-        ? data.id === highlightProductId
-        : false;
 
     return {
       id: data.id,
       title: data.title ?? '',
-      isHighlight,
+      isHighlight: data.id === highlightProductId,
       detail: data.detail ?? '',
       order: data.order,
       srcImage: data.image,
@@ -197,7 +194,8 @@ export const productConverter: FirestoreDataConverter<Product> = {
         : undefined,
     } satisfies FirebaseProduct;
   },
-};
+});
+
 export const exhibitConverter: FirestoreDataConverter<Exhibit> = {
   fromFirestore(snapshot, options?) {
     const data = snapshot.data(options) as FirebaseExhibit;
