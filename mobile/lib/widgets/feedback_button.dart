@@ -7,7 +7,7 @@ class FeedbackButton extends StatelessWidget {
   static const String feedbackUrl = 'https://forms.gle/1NQouur9PhdSyf1z5';
 
   Future<void> _launchFeedbackForm() async {
-    final Uri url = Uri.parse(feedbackUrl);
+    final url = Uri.parse(feedbackUrl);
     if (!await launchUrl(url)) {
       throw ArgumentError('Could not launch $url');
     }
