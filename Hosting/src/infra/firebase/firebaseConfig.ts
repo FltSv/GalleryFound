@@ -5,12 +5,7 @@ import {
   getToken,
 } from 'firebase/app-check';
 import { getAuth } from 'firebase/auth';
-import {
-  FirestoreDataConverter,
-  Timestamp,
-  GeoPoint,
-  initializeFirestore,
-} from 'firebase/firestore';
+import { Timestamp, GeoPoint, initializeFirestore } from 'firebase/firestore';
 import {
   fetchAndActivate,
   getRemoteConfig,
@@ -57,15 +52,6 @@ export const getConfig = async (): Promise<Config> => {
   };
 };
 
-export const fbCreatorConverter: FirestoreDataConverter<Creator> = {
-  toFirestore: modelObject => modelObject,
-
-  fromFirestore: (snapshot, options?) => {
-    const data = snapshot.data(options);
-    return data as Creator;
-  },
-};
-
 declare global {
   interface Window {
     FIREBASE_APPCHECK_DEBUG_TOKEN: boolean;
@@ -89,11 +75,6 @@ getToken(appCheck)
     console.error(e);
   });
 
-export const fbGalleryConverter: FirestoreDataConverter<Gallery> = {
-  toFirestore: obj => obj,
-  fromFirestore: (snapshot, options?) => snapshot.data(options) as Gallery,
-};
-
 /** firestore Creator */
 export interface Creator {
   name?: string;
@@ -102,6 +83,14 @@ export interface Creator {
   profileHashtags?: string[];
   links?: string[];
   highlightProductId?: string;
+
+  /**
+   * Storageのcreators/以下を格納
+   * @example `{creatorId}%2F{imageId}.png?alt=media&token={token}`
+   */
+  //todo: v0.6.1で必須にする
+  highlightProductThumbPath?: string;
+
   products?: Product[];
   exhibits?: Exhibit[];
 }
@@ -113,6 +102,14 @@ export interface Product extends ImageObject {
   detail?: string;
   image: string;
   order: number;
+
+  /** 作品の作成日 */
+  //todo: v0.6.1で必須にする
+  createdAt?: Timestamp;
+
+  /** DBへの登録日 */
+  //todo: v0.6.1で必須にする
+  addedAt?: Timestamp;
 }
 
 /** firestore Exhibit */

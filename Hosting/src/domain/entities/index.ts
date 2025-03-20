@@ -13,6 +13,12 @@ export interface Creator {
   /** SNSリンク */
   links: string[];
 
+  /** 代表作品ID */
+  highlightProductId: string | null;
+
+  /** 代表作品のサムネイルURL */
+  highlightThumbUrl: string | null;
+
   /** 発表作品一覧 */
   products: Product[];
 
@@ -35,6 +41,14 @@ export interface Product extends ImageStatus {
 
   /** 並び順 */
   order: number;
+
+  /** 作品の作成日 */
+  //todo: v0.6.1で必須にする
+  createdAt?: Date;
+
+  /** DBへの登録日 */
+  //todo: v0.6.1で必須にする
+  addedAt?: Date;
 }
 
 /** 展示 */
