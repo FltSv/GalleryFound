@@ -2,6 +2,8 @@ name: Auto Set PR Milestone
 
 on:
   pull_request:
+    branches-ignore:
+      - "master"
 
 jobs:
   set-milestone:

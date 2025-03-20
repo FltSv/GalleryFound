@@ -155,15 +155,22 @@ class FirebaseRepo implements DataRepoBase {
     List<Creator> creators,
   ) async {
     final db = FirebaseFirestore.instance;
+    final ignoreCreatorIds = ConfigProvider().config.debugUserIds;
+
     final exhibitsSnap = await db
         .collectionGroup('exhibits')
         .where('endDate', isGreaterThanOrEqualTo: date)
         .withExhibitConverter(this)
         .get();
 
-    return exhibitsSnap.docs.map((docSnap) {
+    return exhibitsSnap.docs.where((docSnap) {
+      final id = docSnap.reference.parent.parent!.id;
+      return !ignoreCreatorIds.contains(id);
+    }).map((docSnap) {
       final creatorId = docSnap.reference.parent.parent!.id;
-      final creator = creators.firstWhere((creator) => creator.id == creatorId);
+      final creator = creators.firstWhere(
+        (creator) => creator.id == creatorId,
+      );
 
       return docSnap.data()..creator = creator;
     }).toList();
@@ -176,9 +183,12 @@ class FirebaseRepo implements DataRepoBase {
     Product? lastProduct,
   }) async {
     final db = FirebaseFirestore.instance;
+    final ignoreProductIds = await getIgnoreProductIds();
+
     final productsQuery = db
         .collectionGroup('products')
         .orderBy('id', descending: true)
+        .where('id', whereNotIn: ignoreProductIds)
         .withProductConverter(this);
 
     if (lastProduct != null) {
@@ -197,8 +207,9 @@ class FirebaseRepo implements DataRepoBase {
 
         return querySnap.docs.map((docSnap) {
           final creatorId = docSnap.reference.parent.parent!.id;
-          final creator =
-              creators.firstWhere((creator) => creator.id == creatorId);
+          final creator = creators.firstWhere(
+            (creator) => creator.id == creatorId,
+          );
 
           return docSnap.data()..creator = creator;
         }).toList();
@@ -212,5 +223,31 @@ class FirebaseRepo implements DataRepoBase {
 
       return docSnap.data()..creator = creator;
     }).toList();
+  }
+
+  List<String> _ignoreProductIds = [];
+  Future<List<String>?> getIgnoreProductIds() async {
+    if (kDebugMode) {
+      return null;
+    }
+
+    if (_ignoreProductIds.isNotEmpty) {
+      return _ignoreProductIds;
+    }
+
+    final db = FirebaseFirestore.instance;
+    final ignoreCreatorIds = ConfigProvider().config.debugUserIds;
+
+    final tasks = ignoreCreatorIds.map((creatorId) async {
+      final querySnap = await db
+          .collection('creators')
+          .doc(creatorId)
+          .collection('products')
+          .get();
+      return querySnap.docs.map((e) => e.id);
+    });
+
+    final productIds = await Future.wait(tasks);
+    return _ignoreProductIds = productIds.expand((element) => element).toList();
   }
 }

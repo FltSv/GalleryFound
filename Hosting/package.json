@@ -33,8 +33,7 @@
     "react-ga4": "^2.1.0",
     "react-hook-form": "^7.54.1",
     "react-icons": "^5.4.0",
-    "react-router-dom": "^6.28.0",
-    "ulidx": "^2.4.1"
+    "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
@@ -58,7 +57,7 @@
     "eslint-plugin-unicorn": "^55.0.0",
     "favicons": "^7.2.0",
     "favicons-webpack-plugin": "^6.0.1",
-    "firebase-tools": "^13.29.1",
+    "firebase-tools": "^13.34.0",
     "globals": "^15.13.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.11",
