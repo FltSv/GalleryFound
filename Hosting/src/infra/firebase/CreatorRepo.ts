@@ -216,28 +216,6 @@ const getExhibitsCollectionRef = (userId: string) =>
     collectionNames.exhibits,
   ).withConverter(exhibitConverter);
 
-// todo: 次バージョンで削除
-/** すべての展示情報の取得 */
-export const getAllExhibits = async () => {
-  const creatorsSnap = await getDocs(
-    collection(db, collectionNames.creators).withConverter(creatorConverter),
-  );
-
-  const config = await getConfig();
-  const ignoreIds = config.debugUserIds;
-  const isDebug = process.env.NODE_ENV === 'development';
-
-  const exhibitsPromises = creatorsSnap.docs
-    .filter(d => isDebug || !ignoreIds.includes(d.id))
-    .map(creatorDocSnap => {
-      const data = creatorDocSnap.data();
-      return data.exhibits;
-    });
-
-  const resolvedExhibits = await Promise.all(exhibitsPromises);
-  return resolvedExhibits.flat();
-};
-
 /**
  * 指定日時以降の展示を取得する
  */

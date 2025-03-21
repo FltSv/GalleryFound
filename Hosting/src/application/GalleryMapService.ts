@@ -1,8 +1,5 @@
 import { Exhibit, Gallery } from 'src/domain/entities';
-import {
-  getActiveExhibits,
-  getAllExhibits,
-} from 'src/infra/firebase/CreatorRepo';
+import { getActiveExhibits } from 'src/infra/firebase/CreatorRepo';
 import { galleryRepo } from 'src/infra/firebase/GalleryRepo';
 import { GeocodingService } from 'src/domain/services/GeocodingService';
 import { googleMapsGeocoder } from 'src/infra/gcp/GoogleMapsGeocoder';
@@ -15,7 +12,8 @@ export interface GalleryExhibits {
   exhibits: Exhibit[];
 }
 
-const new_getGalleryExhibits = async (date: Date) => {
+/** ギャラリー情報と関連する展示の配列を取得 */
+export const getGalleryExhibits = async (date: Date) => {
   const activeExhibits = await getActiveExhibits(date);
   const galleries = await galleryRepo.getGalleriesByIds(
     activeExhibits.map(x => x.galleryId),
@@ -35,32 +33,6 @@ const new_getGalleryExhibits = async (date: Date) => {
     .filter(x => x !== null)
     .toArray();
 };
-
-const legacy_getGalleryExhibits = async () => {
-  const galleries = await galleryRepo.getGalleries();
-  const exhibits = await getAllExhibits();
-
-  const groupedExhibits = Map.groupBy(exhibits, x => x.location);
-
-  const array = Array.from(groupedExhibits.entries())
-    .map(([key, value]) => {
-      const gallery = galleries.find(x => x.name === key);
-      if (gallery === undefined) return null;
-      return {
-        gallery: gallery,
-        exhibits: value,
-      };
-    })
-    .filter((x): x is GalleryExhibits => x !== null);
-
-  return array;
-};
-
-/** ギャラリー情報と関連する展示の配列を取得 */
-export const getGalleryExhibits = legacy_getGalleryExhibits;
-
-// todo: 移行完了後、統廃合
-void new_getGalleryExhibits;
 
 const geocodingService = new GeocodingService(googleMapsGeocoder);
 

@@ -69,7 +69,7 @@ const MapView = ({ coords, error }: MapViewProps) => {
 
   useEffect(() => {
     void (async () => {
-      const galleries = await getGalleryExhibits();
+      const galleries = await getGalleryExhibits(TODAY);
       if (exhibitId !== null) {
         // 一致するギャラリーを検索
         const gallery = galleries.find(x =>
