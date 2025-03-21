@@ -1,11 +1,4 @@
-import {
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FaLocationCrosshairs } from 'react-icons/fa6';
 import {
   APIProvider,
@@ -36,28 +29,19 @@ export const Map = () => {
   const exhibitId = urlParams.get('eid') ?? undefined;
   const skipGeolocation = exhibitId !== undefined;
 
-  const renderErrorView = useCallback(
-    (error: GeolocationPositionError) => <MapView error={error} />,
-    [],
-  );
-
-  const renderProcessView = useCallback(() => <p>現在位置取得中…</p>, []);
-
-  const renderSuccessView = useCallback(
-    (coords: GeolocationCoordinates) => <MapView coords={coords} />,
-    [],
-  );
+  // 位置情報を取得
+  const { coords, error, isLoading } = useGeolocation(skipGeolocation);
 
   return (
     <div className="h-svh w-svw bg-white">
-      {skipGeolocation ? (
-        <MapView exhibitId={exhibitId} />
-      ) : (
-        <GeolocationWrapper
-          renderErrorView={renderErrorView}
-          renderProcessView={renderProcessView}
-          renderSuccessView={renderSuccessView}
-        />
+      <MapView coords={coords} error={error} exhibitId={exhibitId} />
+      {isLoading && (
+        <div
+          className={`
+            absolute bottom-0 left-0 m-4 rounded bg-white/90 px-3 py-1 shadow
+          `}>
+          <p>現在位置取得中…</p>
+        </div>
       )}
     </div>
   );
@@ -203,38 +187,30 @@ const GalleryMarker = (props: GalleryMarkerProps) => {
   );
 };
 
-interface WrapperProps {
-  renderProcessView: () => ReactNode;
-  renderSuccessView: (coords: GeolocationCoordinates) => ReactNode;
-  renderErrorView: (error: GeolocationPositionError) => ReactNode;
-}
-
-const GeolocationWrapper = (props: WrapperProps) => {
+/** 位置情報を取得 */
+const useGeolocation = (skip: boolean = false) => {
   const [coords, setCoords] = useState<GeolocationCoordinates | null>(null);
   const [error, setError] = useState<GeolocationPositionError | null>(null);
+  const [isLoading, setIsLoading] = useState(!skip);
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(({ coords }) => {
-      setCoords(coords);
-    }, setError);
-  }, []);
+    if (skip) return;
 
-  return (
-    <>
-      {useMemo(() => {
-        if (coords === null) return;
-        return props.renderSuccessView(coords);
-      }, [coords, props])}
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        setCoords(position.coords);
+        setIsLoading(false);
+      },
+      err => {
+        setError(err);
+        setIsLoading(false);
+      },
+    );
+  }, [skip]);
 
-      {useMemo(() => {
-        if (error === null) return;
-        return props.renderErrorView(error);
-      }, [error, props])}
-
-      {useMemo(() => {
-        if (!(error === null && coords === null)) return;
-        return props.renderProcessView();
-      }, [coords, error, props])}
-    </>
-  );
+  return {
+    coords: coords ?? undefined,
+    error: error ?? undefined,
+    isLoading,
+  };
 };
