@@ -31,6 +31,11 @@ const TOKYO_POS = {
 const TODAY = new Date();
 
 export const Map = () => {
+  // 展示IDを取得
+  const urlParams = new URLSearchParams(window.location.search);
+  const exhibitId = urlParams.get('eid') ?? undefined;
+  const skipGeolocation = exhibitId !== undefined;
+
   const renderErrorView = useCallback(
     (error: GeolocationPositionError) => <MapView error={error} />,
     [],
@@ -45,11 +50,15 @@ export const Map = () => {
 
   return (
     <div className="h-svh w-svw bg-white">
-      <GeolocationWrapper
-        renderErrorView={renderErrorView}
-        renderProcessView={renderProcessView}
-        renderSuccessView={renderSuccessView}
-      />
+      {skipGeolocation ? (
+        <MapView exhibitId={exhibitId} />
+      ) : (
+        <GeolocationWrapper
+          renderErrorView={renderErrorView}
+          renderProcessView={renderProcessView}
+          renderSuccessView={renderSuccessView}
+        />
+      )}
     </div>
   );
 };
@@ -57,20 +66,18 @@ export const Map = () => {
 interface MapViewProps {
   coords?: GeolocationCoordinates;
   error?: GeolocationPositionError;
+  exhibitId?: string;
 }
 
-const MapView = ({ coords, error }: MapViewProps) => {
+const MapView = ({ coords, error, exhibitId }: MapViewProps) => {
   const [galleries, setGalleries] = useState<GalleryExhibits[]>([]);
   const [viewExhibit, setViewExhibit] = useState<GalleryExhibits | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const exhibitId = urlParams.get('eid');
-
   useEffect(() => {
     void (async () => {
       const galleries = await getGalleryExhibits(TODAY);
-      if (exhibitId !== null) {
+      if (exhibitId !== undefined) {
         // 一致するギャラリーを検索
         const gallery = galleries.find(x =>
           x.exhibits.find(x => x.id === exhibitId),
