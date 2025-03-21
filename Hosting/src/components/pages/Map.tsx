@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FaLocationCrosshairs } from 'react-icons/fa6';
+import { FaTimes } from 'react-icons/fa';
 import {
   APIProvider,
   Map as GoogleMap,
@@ -32,15 +33,28 @@ export const Map = () => {
   // 位置情報を取得
   const { coords, error, isLoading } = useGeolocation(skipGeolocation);
 
+  // エラーポップアップの表示状態を管理
+  const [showError, setShowError] = useState(true);
+  const handleCloseError = useCallback(() => {
+    setShowError(false);
+  }, []);
+
   return (
     <div className="h-svh w-svw bg-white">
-      <MapView coords={coords} error={error} exhibitId={exhibitId} />
-      {isLoading && (
+      <MapView coords={coords} exhibitId={exhibitId} />
+      {!isLoading && error && showError && (
         <div
           className={`
-            absolute bottom-0 left-0 m-4 rounded bg-white/90 px-3 py-1 shadow
+            absolute bottom-0 left-0 m-4 flex items-center rounded bg-red-100/90
+            px-3 py-1 shadow
           `}>
-          <p>現在位置取得中…</p>
+          <p>現在位置取得に失敗しました: {error.message}</p>
+          <button
+            aria-label="閉じる"
+            className="ml-2 p-1"
+            onClick={handleCloseError}>
+            <FaTimes />
+          </button>
         </div>
       )}
     </div>
@@ -49,11 +63,10 @@ export const Map = () => {
 
 interface MapViewProps {
   coords?: GeolocationCoordinates;
-  error?: GeolocationPositionError;
   exhibitId?: string;
 }
 
-const MapView = ({ coords, error, exhibitId }: MapViewProps) => {
+const MapView = ({ coords, exhibitId }: MapViewProps) => {
   const [galleries, setGalleries] = useState<GalleryExhibits[]>([]);
   const [viewExhibit, setViewExhibit] = useState<GalleryExhibits | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -108,11 +121,6 @@ const MapView = ({ coords, error, exhibitId }: MapViewProps) => {
 
   return (
     <APIProvider apiKey={Env.MAPS_JS_API}>
-      {error !== undefined && (
-        <p className="bg-red-100 p-1">
-          現在位置取得に失敗しました: {error.message}
-        </p>
-      )}
       <GoogleMap
         defaultCenter={centerPos}
         defaultZoom={12}
