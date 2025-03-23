@@ -17,8 +17,18 @@ void main() {
   final widgetBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetBinding);
 
+  // ProviderScopeを使用してアプリを実行
+  final container = ProviderContainer()..read(userDataRepoProvider);
+
   Future(() async {
+    final userData = await container.read(userDataRepoProvider).fetch();
+
+    // デバッグモードかつUserDataのisDevelopDBがtrueの場合、
+    // developインスタンスを使用
+    final dbName = (kDebugMode && userData.isDevelopDB) ? 'develop' : null;
+
     await Firebase.initializeApp(
+      name: dbName,
       options: DefaultFirebaseOptions.currentPlatform,
     );
 

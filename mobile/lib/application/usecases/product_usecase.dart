@@ -38,7 +38,7 @@ class ProductUsecase {
     }
 
     await userDataRepo.save(
-      UserData(favorites: favorites),
+      UserData(favorites: favorites, isDevelopDB: data.isDevelopDB),
     );
   }
 

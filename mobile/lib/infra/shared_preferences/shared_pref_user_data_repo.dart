@@ -12,7 +12,7 @@ class SharedPrefUserDataRepo implements UserDataRepoBase {
     final jsonString = prefs.getString(_key);
 
     if (jsonString == null) {
-      return UserData(favorites: []);
+      return UserData(favorites: [], isDevelopDB: false);
     }
 
     final map = json.decode(jsonString) as Map<String, dynamic>;
