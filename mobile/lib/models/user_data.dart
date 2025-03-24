@@ -5,10 +5,10 @@ class UserData {
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
-      favorites: (json['favorites'] as List<dynamic>)
+      favorites: (json['favorites'] as List<dynamic>? ?? [])
           .map((item) => FavoriteId.fromJson(item as Map<String, dynamic>))
           .toList(),
-      isDevelopDB: json['isDevelopDB'] as bool,
+      isDevelopDB: json['isDevelopDB'] as bool? ?? false,
     );
   }
 
