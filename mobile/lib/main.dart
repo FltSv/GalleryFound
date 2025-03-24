@@ -77,19 +77,29 @@ class MyApp extends StatelessWidget {
       title: 'Gallery Found',
       theme: materialTheme.light(),
       darkTheme: materialTheme.dark(),
-      home: Builder(
-        builder: (context) {
-          // アップデートが必要な場合、ポップアップを表示
-          if (VersionService.isUpdateRequired) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              VersionService.showUpdatePopup(context);
-            });
-          }
-
-          return const TopScreen();
-        },
+      home: const _UpdateCheckWrapper(
+        child: TopScreen(),
       ),
     );
+  }
+}
+
+class _UpdateCheckWrapper extends StatelessWidget {
+  const _UpdateCheckWrapper({
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (VersionService.isUpdateRequired) {
+        VersionService.showUpdatePopup(context);
+      }
+    });
+
+    return child;
   }
 }
 
