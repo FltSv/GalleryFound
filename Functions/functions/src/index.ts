@@ -12,11 +12,16 @@ import { getDataPatchScript } from "./data-patch/scripts";
 initializeApp();
 
 const db = firestore();
-db.settings({ databaseId: "develop" });
+db.settings({
+  databaseId: "develop",
+  ignoreUndefinedProperties: true,
+});
 
 /**
  * データパッチ実行
- * firebase > runDataPatch({data:{name:"V060_MigrateToSubcollections",dryRun:false}})
+ * 下記の <class_name> には、"V060_MigrateToSubcollections"など実行するクラス名を指定
+ *
+ * firebase > runDataPatch({data:{name:"<class_name>",dryRun:false}})
  */
 export const runDataPatch = onCall(async (request) => {
   try {
