@@ -30,6 +30,9 @@ class DataProvider {
   String getImageUrl(String userId, String image) =>
       _getImageUrl(userId, image);
 
+  late final String _storageImageBaseUrl;
+  String get storageImageBaseUrl => _storageImageBaseUrl;
+
   /// データの取得
   Future<void> fetchData() async {
     final repo = Factory.getDataRepo();
@@ -37,6 +40,7 @@ class DataProvider {
     _getImageUrl = repo.getImageUrl;
     _creators = await repo.fetchCreators();
     _galleries = await repo.fetchGalleries();
+    _storageImageBaseUrl = repo.storageImageBaseUrl;
     _books = await FakeRepo.fetchBooks();
   }
 }

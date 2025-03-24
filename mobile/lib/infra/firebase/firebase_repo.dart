@@ -68,6 +68,10 @@ class FirebaseRepo implements DataRepoBase {
   }
 
   @override
+  String get storageImageBaseUrl =>
+      'https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F';
+
+  @override
   String getImageUrl(String userId, String image) {
     const domain =
         'firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com';

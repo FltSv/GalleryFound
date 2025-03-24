@@ -24,6 +24,10 @@ class FakeRepo implements DataRepoBase {
           detail: 'ねこ説明',
           image:
               '9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f',
+          imagePath:
+              'nkRObVdYriU5AolyNxJy5pIDKEs2/9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f',
+          thumbPath:
+              'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
           fetchThumbUrl: getThumbUrl,
         ),
       ),
@@ -44,11 +48,19 @@ class FakeRepo implements DataRepoBase {
           detail: '',
           image:
               '46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.png?alt=media&token=f2f8f802-c85b-464e-8de8-8a29468c74c8',
+          imagePath:
+              'cWp162TEn9MrXVUqifEmRJ22nyx1/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.png?alt=media&token=f2f8f802-c85b-464e-8de8-8a29468c74c8',
+          thumbPath:
+              'cWp162TEn9MrXVUqifEmRJ22nyx1/thumbs/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.webp',
           fetchThumbUrl: getThumbUrl,
         ),
       ),
     ]);
   }
+
+  @override
+  String get storageImageBaseUrl =>
+      'https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F';
 
   @override
   String getImageUrl(String userId, String image) {
@@ -133,6 +145,10 @@ class FakeRepo implements DataRepoBase {
         galleryId: '2sBP7J67oggejHsPE4Z1',
         image:
             'e3f7f1f0-a302-4301-b13d-268b2253ff81.png?alt=media&token=dfa0ba77-4f30-4e1e-a662-09de94c93251',
+        imagePath:
+            'nkRObVdYriU5AolyNxJy5pIDKEs2/9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f',
+        thumbPath:
+            'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
         fetchThumbUrl: getThumbUrl,
         startDate: DateTime(2024, 7, 3),
         endDate: DateTime(2024, 7, 3, 23),
@@ -144,6 +160,10 @@ class FakeRepo implements DataRepoBase {
         galleryId: '01J1V23TZ35C5BRTJATJZRRMPH',
         image:
             '01J1E3G2KXZ79YWGX0B7Q3YRZV.png?alt=media&token=2f66e11e-ed02-4b39-b8ac-4676f0e00adb',
+        imagePath:
+            'nkRObVdYriU5AolyNxJy5pIDKEs2/9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f',
+        thumbPath:
+            'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
         fetchThumbUrl: getThumbUrl,
         startDate: DateTime(2024, 7, 2),
         endDate: DateTime(2024, 7, 4, 23),
@@ -155,6 +175,10 @@ class FakeRepo implements DataRepoBase {
         galleryId: '2sBP7J67oggejHsPE4Z1',
         image:
             '01J1ZQTRPS8JNCM8Z5SKB5NPBT.png?alt=media&token=46e1f8da-49ae-41cf-b6a7-e82fc06d0e0c',
+        imagePath:
+            'nkRObVdYriU5AolyNxJy5pIDKEs2/9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f',
+        thumbPath:
+            'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
         fetchThumbUrl: getThumbUrl,
         startDate: DateTime(2024, 3, 13),
         endDate: DateTime(2024, 3, 28),
@@ -171,6 +195,10 @@ class FakeRepo implements DataRepoBase {
         detail: 'ねこ説明',
         image:
             '9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f',
+        imagePath:
+            'nkRObVdYriU5AolyNxJy5pIDKEs2/9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f',
+        thumbPath:
+            'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
         fetchThumbUrl: getThumbUrl,
       )..creator = creator,
       Product(
@@ -179,6 +207,10 @@ class FakeRepo implements DataRepoBase {
         detail: '',
         image:
             'b6f6a0a2-7f23-4f66-9959-9c9ee7d8f521.png?alt=media&token=6760976d-be3a-4da3-a0a8-15e1adf596b9',
+        imagePath:
+            'cWp162TEn9MrXVUqifEmRJ22nyx1/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.png?alt=media&token=f2f8f802-c85b-464e-8de8-8a29468c74c8',
+        thumbPath:
+            'cWp162TEn9MrXVUqifEmRJ22nyx1/thumbs/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.webp',
         fetchThumbUrl: getThumbUrl,
       )..creator = creator,
       Product(
@@ -187,6 +219,10 @@ class FakeRepo implements DataRepoBase {
         detail: '',
         image:
             '46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.png?alt=media&token=f2f8f802-c85b-464e-8de8-8a29468c74c8',
+        imagePath:
+            'cWp162TEn9MrXVUqifEmRJ22nyx1/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.png?alt=media&token=f2f8f802-c85b-464e-8de8-8a29468c74c8',
+        thumbPath:
+            'cWp162TEn9MrXVUqifEmRJ22nyx1/thumbs/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.webp',
         fetchThumbUrl: getThumbUrl,
       )..creator = creator,
       Product(
@@ -195,6 +231,10 @@ class FakeRepo implements DataRepoBase {
         detail: '',
         image:
             '9ee21a8a-ff5c-4d1b-aaf5-25cc81905331.png?alt=media&token=4d143a04-e267-47de-b38e-4ad2ad318439',
+        imagePath:
+            'nkRObVdYriU5AolyNxJy5pIDKEs2/9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f',
+        thumbPath:
+            'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
         fetchThumbUrl: getThumbUrl,
       )..creator = creator,
     ];
