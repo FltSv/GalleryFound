@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -23,14 +24,15 @@ void main() {
   Future(() async {
     final userData = await container.read(userDataRepoProvider).fetch();
 
-    // デバッグモードかつUserDataのisDevelopDBがtrueの場合、
-    // developインスタンスを使用
-    final dbName = (kDebugMode && userData.isDevelopDB) ? 'develop' : null;
-
     await Firebase.initializeApp(
-      name: dbName,
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
+    // デバッグモードかつUserDataのisDevelopDBがtrueの場合、
+    // developインスタンスを使用
+    if (kDebugMode && userData.isDevelopDB) {
+      FirebaseFirestore.instance.databaseId = 'develop';
+    }
 
     // AppCheckの初期化
     if (kDebugMode) {
