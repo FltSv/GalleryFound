@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -17,10 +18,21 @@ void main() {
   final widgetBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetBinding);
 
+  // ProviderScopeを使用してアプリを実行
+  final container = ProviderContainer()..read(userDataRepoProvider);
+
   Future(() async {
+    final userData = await container.read(userDataRepoProvider).fetch();
+
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
+    // デバッグモードかつUserDataのisDevelopDBがtrueの場合、
+    // developインスタンスを使用
+    if (kDebugMode && userData.isDevelopDB) {
+      FirebaseFirestore.instance.databaseId = 'develop';
+    }
 
     // AppCheckの初期化
     if (kDebugMode) {
@@ -65,19 +77,29 @@ class MyApp extends StatelessWidget {
       title: 'Gallery Found',
       theme: materialTheme.light(),
       darkTheme: materialTheme.dark(),
-      home: Builder(
-        builder: (context) {
-          // アップデートが必要な場合、ポップアップを表示
-          if (VersionService.isUpdateRequired) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              VersionService.showUpdatePopup(context);
-            });
-          }
-
-          return const TopScreen();
-        },
+      home: const _UpdateCheckWrapper(
+        child: TopScreen(),
       ),
     );
+  }
+}
+
+class _UpdateCheckWrapper extends StatelessWidget {
+  const _UpdateCheckWrapper({
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (VersionService.isUpdateRequired) {
+        VersionService.showUpdatePopup(context);
+      }
+    });
+
+    return child;
   }
 }
 

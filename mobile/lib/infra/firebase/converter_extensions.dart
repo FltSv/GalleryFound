@@ -43,6 +43,8 @@ T _withProductConverter<T>(
         title: toStr(data['title']),
         detail: toStr(data['detail']),
         image: toStr(data['image']),
+        imagePath: data['imagePath']?.toString(),
+        thumbPath: data['thumbPath']?.toString(),
         fetchThumbUrl: repo.getThumbUrl,
       );
     },
@@ -63,6 +65,8 @@ T _withExhibitConverter<T>(
         location: toStr(data['location']),
         galleryId: toStr(data['galleryId']),
         image: toStr(data['image']),
+        imagePath: data['imagePath']?.toString(),
+        thumbPath: data['thumbPath']?.toString(),
         fetchThumbUrl: repo.getThumbUrl,
         startDate: toDateTime(data['startDate']),
         endDate: toDateTime(data['endDate']),

@@ -1,11 +1,13 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_list_screen.dart';
 import 'package:mobile/screens/exhibit_list_screen.dart';
 import 'package:mobile/screens/map_screen.dart';
 import 'package:mobile/screens/product_list_screen.dart';
+import 'package:mobile/widgets/debug_db_button.dart';
 import 'package:mobile/widgets/feedback_button.dart';
 
 class TopScreen extends StatelessWidget {
@@ -51,6 +53,8 @@ class TopScreen extends StatelessWidget {
               return _iconButton(context, prop, x, y, buttonSize);
             }),
             const FeedbackButton(),
+            // デバッグモードの場合のみDevelopDB切り替えボタンを表示
+            if (kDebugMode) const DebugDBButton(),
           ],
         ),
       ),

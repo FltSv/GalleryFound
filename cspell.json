@@ -5,6 +5,7 @@
     "galleryfound",
     "mypage",
     "reviewdog",
+    "riverpod",
     "schyler",
     "stefanzweifel",
     "suna",
@@ -32,8 +33,15 @@
     {
       // TailwindCSSのカスタムフォント名を無視
       "filename": "**/*.{js,ts,jsx,tsx}",
-      "ignoreRegExpList": ["font-.*"]
+      "ignoreRegExpList": [
+        "font-.*"
+      ]
     }
   ],
-  "dictionaries": ["google", "cpp", "html", "flutter"]
+  "dictionaries": [
+    "google",
+    "cpp",
+    "html",
+    "flutter"
+  ]
 }

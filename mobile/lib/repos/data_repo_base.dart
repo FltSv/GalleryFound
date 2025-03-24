@@ -13,6 +13,9 @@ abstract class DataRepoBase {
   /// 指定IDのギャラリーを取得
   Future<Gallery> fetchGalleryById(String galleryId);
 
+  /// Storageの画像パスの先頭共通部分
+  String get storageImageBaseUrl;
+
   /// 画像URLを取得する
   ///
   /// - [userId] : クリエイターのユーザーID
