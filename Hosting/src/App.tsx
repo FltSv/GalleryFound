@@ -1,5 +1,10 @@
 import { ReactNode } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+  Outlet,
+} from 'react-router-dom';
 import ReactGA from 'react-ga4';
 
 // page
@@ -37,35 +42,62 @@ const AuthRouting = (props: { page: ReactNode }) => {
   return props.page;
 };
 
+const Layout = () => (
+  <>
+    <Header />
+    <ErrorBoundaryProvider>
+      <div
+        className={`
+          mx-4 pb-8
+
+          md:mx-10
+        `}>
+        <Outlet />
+      </div>
+    </ErrorBoundaryProvider>
+  </>
+);
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <Top />,
+      },
+      {
+        path: 'login',
+        element: <Login />,
+      },
+      {
+        path: 'sendverify',
+        element: <SendVerify />,
+      },
+      {
+        path: 'mypage',
+        element: <AuthRouting page={<Mypage />} />,
+      },
+      {
+        path: 'galleries',
+        element: <AuthRouting page={<Galleries />} />,
+      },
+      {
+        path: 'policy',
+        element: <Policy />,
+      },
+      {
+        path: '*',
+        element: <NotFound />,
+      },
+    ],
+  },
+]);
+
 const App = () => {
   ReactGA.initialize('G-GLSP40W377');
-
-  return (
-    <BrowserRouter>
-      <Header />
-      <ErrorBoundaryProvider>
-        <div
-          className={`
-            mx-4 pb-8
-
-            md:mx-10
-          `}>
-          <Routes>
-            <Route element={<Top />} path="/" />
-            <Route element={<Login />} path="login" />
-            <Route element={<SendVerify />} path="sendverify" />
-            <Route element={<AuthRouting page={<Mypage />} />} path="mypage" />
-            <Route
-              element={<AuthRouting page={<Galleries />} />}
-              path="galleries"
-            />
-            <Route element={<Policy />} path="policy" />
-            <Route element={<NotFound />} path="*" />
-          </Routes>
-        </div>
-      </ErrorBoundaryProvider>
-    </BrowserRouter>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;
