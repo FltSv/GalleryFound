@@ -50,6 +50,7 @@ import {
 } from 'src/application/CreatorService';
 import { ProgressBar } from 'components/ui/ProgressBar';
 import FeedbackButton from 'components/ui/FeedbackButton';
+import { useFormGuard } from 'src/hooks/useFormGuard';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -68,6 +69,7 @@ export const Mypage = () => {
     totalFiles: number;
     fileProgresses: number[];
   } | null>(null);
+  const { markAsDirty, markAsClean } = useFormGuard();
 
   useEffect(() => {
     if (user === null) {
@@ -92,7 +94,14 @@ export const Mypage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<Creator>();
+
+  // フォームの変更を監視
+  useEffect(() => {
+    const subscription = watch(() => markAsDirty());
+    return () => subscription.unsubscribe();
+  }, [watch, markAsDirty]);
 
   // - - - - - - - -
   // SNSリンク関係の処理
@@ -116,7 +125,8 @@ export const Mypage = () => {
     const links = [...creator.links, addLink];
     setCreator({ ...creator, links });
     setAddLink('');
-  }, [creator, addLink, addLinkError]);
+    markAsDirty();
+  }, [creator, addLink, addLinkError, markAsDirty]);
 
   /** Linkの削除 */
   const handleRemoveLink = useCallback(
@@ -125,8 +135,9 @@ export const Mypage = () => {
 
       const links = creator.links.filter(x => x !== link);
       setCreator({ ...creator, links });
+      markAsDirty();
     },
-    [creator],
+    [creator, markAsDirty],
   );
 
   /** Linkの入力値変更時に、入力値の更新と検証を行う */
@@ -194,10 +205,11 @@ export const Mypage = () => {
         ...creator,
         products: [...creator.products, ...newProducts],
       });
+      markAsDirty();
 
       setUploadProgress(null);
     },
-    [creator, user],
+    [creator, user, markAsDirty],
   );
 
   const uploadProgressPercent = useMemo(() => {
@@ -221,8 +233,9 @@ export const Mypage = () => {
         .filter(x => x !== undefined);
 
       setCreator({ ...creator, products: newProducts });
+      markAsDirty();
     },
-    [creator],
+    [creator, markAsDirty],
   );
 
   /** 作品の削除 */
@@ -232,8 +245,9 @@ export const Mypage = () => {
 
       const newProducts = creator.products.filter(x => x.id !== product.id);
       setCreator({ ...creator, products: newProducts });
+      markAsDirty();
     },
-    [creator],
+    [creator, markAsDirty],
   );
 
   /** 作品の編集画面の表示 */
@@ -271,8 +285,9 @@ export const Mypage = () => {
 
       const newExhibits = creator.exhibits.filter(x => x.id !== exhibit.id);
       setCreator({ ...creator, exhibits: newExhibits });
+      markAsDirty();
     },
-    [creator],
+    [creator, markAsDirty],
   );
 
   /** 展示編集画面の表示 */
@@ -302,9 +317,10 @@ export const Mypage = () => {
       });
 
       setCreator({ ...creator, products: newProducts });
+      markAsDirty();
       setVisibleProductPopup(false);
     },
-    [creator, editProduct],
+    [creator, editProduct, markAsDirty],
   );
 
   const onSubmitExhibitPopup = useCallback(
@@ -323,9 +339,10 @@ export const Mypage = () => {
         setCreator({ ...creator, exhibits: newExhibits });
       }
 
+      markAsDirty();
       setVisibleExhibitPopup(false);
     },
-    [creator, editExhibit],
+    [creator, editExhibit, markAsDirty],
   );
 
   // - - - - - - - -
@@ -353,10 +370,13 @@ export const Mypage = () => {
       console.debug('submit: ', submitData);
       await setCreatorData(user, submitData);
 
+      // 変更状態をリセット
+      markAsClean();
+
       // リロード
       window.location.reload();
     },
-    [creator, profileHashtags, user],
+    [creator, profileHashtags, user, markAsClean],
   );
 
   const onSubmit = useCallback(
