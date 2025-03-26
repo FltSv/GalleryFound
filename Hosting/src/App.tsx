@@ -10,6 +10,7 @@ import ReactGA from 'react-ga4';
 // page
 import { Top } from './components/pages/Top';
 import { Login } from './components/pages/Login';
+import { Logout } from './components/pages/Logout';
 import { Mypage } from './components/pages/Mypage';
 import { Galleries } from './components/pages/Galleries';
 import { SendVerify, NoVerify } from './components/pages/Verify';
@@ -70,6 +71,10 @@ const router = createBrowserRouter([
       {
         path: 'login',
         element: <Login />,
+      },
+      {
+        path: 'logout',
+        element: <Logout />,
       },
       {
         path: 'sendverify',
