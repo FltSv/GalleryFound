@@ -370,11 +370,10 @@ export const Mypage = () => {
       console.debug('submit: ', submitData);
       await setCreatorData(user, submitData);
 
-      // 変更状態をリセット
-      markAsClean();
-
-      // リロード
-      window.location.reload();
+      // 変更状態をリセットしてからリロード
+      markAsClean(() => {
+        window.location.reload();
+      });
     },
     [creator, profileHashtags, user, markAsClean],
   );

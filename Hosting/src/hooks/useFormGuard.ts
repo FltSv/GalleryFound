@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { unstable_usePrompt, useBeforeUnload } from 'react-router-dom';
 
 /**
@@ -35,6 +35,7 @@ import { unstable_usePrompt, useBeforeUnload } from 'react-router-dom';
  */
 export const useFormGuard = () => {
   const [isDirty, setIsDirty] = useState(false);
+  const callbackRef = useRef<(() => void) | undefined>();
 
   // ブラウザの閉じる/更新時の処理
   useBeforeUnload(
@@ -55,11 +56,20 @@ export const useFormGuard = () => {
       isDirty && currentLocation.pathname !== nextLocation.pathname,
   });
 
+  // isDirtyがfalseになったときにコールバックを実行
+  useEffect(() => {
+    if (!isDirty && callbackRef.current) {
+      callbackRef.current();
+      callbackRef.current = undefined;
+    }
+  }, [isDirty]);
+
   const markAsDirty = useCallback(() => {
     setIsDirty(true);
   }, []);
 
-  const markAsClean = useCallback(() => {
+  const markAsClean = useCallback((callback?: () => void) => {
+    callbackRef.current = callback;
     setIsDirty(false);
   }, []);
 
