@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/creator.dart';
+import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/models/product.dart';
 import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/providers/navigate_provider.dart';
@@ -12,19 +14,22 @@ import 'package:mobile/screens/word_search_screen.dart';
 import 'package:mobile/widgets/action_text.dart';
 import 'package:mobile/widgets/empty_state.dart';
 import 'package:mobile/widgets/exhibit_item.dart';
+import 'package:mobile/widgets/favorite_button.dart';
 import 'package:mobile/widgets/linkable_text.dart';
 import 'package:mobile/widgets/thumb_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class CreatorDetailScreen extends StatelessWidget {
+class CreatorDetailScreen extends ConsumerWidget {
   const CreatorDetailScreen({super.key, required this.creator});
 
   final Creator creator;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final iconSize = theme.textTheme.bodyMedium?.fontSize ?? 16;
+
+    final creatorUsecase = ref.watch(creatorUsecaseProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -89,46 +94,75 @@ class CreatorDetailScreen extends StatelessWidget {
             '展示歴',
             style: theme.textTheme.headlineMedium,
           ),
-          if (creator.exhibits.isEmpty) const EmptyState(),
-          Column(
-            children: creator.exhibits
-                .map<ExhibitItem>((exhibit) => ExhibitItem(exhibit: exhibit))
-                .map<Widget>(
-                  (item) => GestureDetector(
-                    onTap: () => NavigateProvider.push(
-                      context,
-                      ExhibitDetailScreen(exhibit: item.exhibit),
-                    ),
-                    child: item,
-                  ),
-                )
-                .intersperse(const Gap(8))
-                .toList(),
+          FutureBuilder<List<Exhibit>>(
+            future: creatorUsecase.fetchCreatorExhibits(creator),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final exhibits = snapshot.data;
+              if (exhibits == null || exhibits.isEmpty) {
+                return const EmptyState();
+              }
+
+              return Column(
+                children: exhibits
+                    .map<ExhibitItem>(
+                      (exhibit) => ExhibitItem(exhibit: exhibit),
+                    )
+                    .map<Widget>(
+                      (item) => GestureDetector(
+                        onTap: () => NavigateProvider.push(
+                          context,
+                          ExhibitDetailScreen(exhibit: item.exhibit),
+                        ),
+                        child: item,
+                      ),
+                    )
+                    .intersperse(const Gap(8))
+                    .toList(),
+              );
+            },
           ),
           const Gap(8),
           Text(
             '発表作品',
             style: theme.textTheme.headlineMedium,
           ),
-          if (creator.products.isEmpty) const EmptyState(),
-          GridView.count(
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            physics: const NeverScrollableScrollPhysics(), // GridViewのスクロールを無効化
-            shrinkWrap: true, // GridViewの高さをコンテンツに合わせる
-            children: creator.products
-                .map((product) => ProductItem(product: product))
-                .map<Widget>(
-                  (item) => GestureDetector(
-                    onTap: () => NavigateProvider.push(
-                      context,
-                      ProductDetailScreen(product: item.product),
-                    ),
-                    child: item,
-                  ),
-                )
-                .toList(),
+          FutureBuilder(
+            future: creatorUsecase.fetchCreatorProducts(creator),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final products = snapshot.data;
+              if (products == null || products.isEmpty) {
+                return const EmptyState();
+              }
+
+              return GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                physics:
+                    const NeverScrollableScrollPhysics(), // GridViewのスクロールを無効化
+                shrinkWrap: true, // GridViewの高さをコンテンツに合わせる
+                children: products
+                    .map((product) => ProductItem(product: product))
+                    .map<Widget>(
+                      (item) => GestureDetector(
+                        onTap: () => NavigateProvider.push(
+                          context,
+                          ProductDetailScreen(product: item.product),
+                        ),
+                        child: item,
+                      ),
+                    )
+                    .toList(),
+              );
+            },
           ),
         ].intersperse(const Gap(16)).toList(),
       ),
@@ -154,6 +188,15 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ThumbImage(imageBase: product);
+    return Stack(
+      children: [
+        Center(child: ThumbImage(imageBase: product)),
+        Positioned(
+          top: 0,
+          right: 0,
+          child: FavoriteButton(id: product.id),
+        )
+      ],
+    );
   }
 }

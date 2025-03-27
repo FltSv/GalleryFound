@@ -1,21 +1,21 @@
-import { Exhibit, Gallery } from 'src/domains/entities';
-import {
-  getActiveExhibits,
-  getAllExhibits,
-} from 'src/infra/firebase/CreatorRepo';
-import {
-  getGalleries,
-  getGalleriesByIds,
-} from 'src/infra/firebase/GalleryRepo';
+import { Exhibit, Gallery } from 'src/domain/entities';
+import { getActiveExhibits } from 'src/infra/firebase/CreatorRepo';
+import { galleryRepo } from 'src/infra/firebase/GalleryRepo';
+import { GeocodingService } from 'src/domain/services/GeocodingService';
+import { googleMapsGeocoder } from 'src/infra/gcp/GoogleMapsGeocoder';
 
+/**
+ * ギャラリーと展示情報を集約したDTO
+ */
 export interface GalleryExhibits {
   gallery: Gallery;
   exhibits: Exhibit[];
 }
 
-const new_getGalleryExhibits = async (date: Date) => {
+/** ギャラリー情報と関連する展示の配列を取得 */
+export const getGalleryExhibits = async (date: Date) => {
   const activeExhibits = await getActiveExhibits(date);
-  const galleries = await getGalleriesByIds(
+  const galleries = await galleryRepo.getGalleriesByIds(
     activeExhibits.map(x => x.galleryId),
   );
 
@@ -34,28 +34,14 @@ const new_getGalleryExhibits = async (date: Date) => {
     .toArray();
 };
 
-const legacy_getGalleryExhibits = async () => {
-  const galleries = await getGalleries();
-  const exhibits = await getAllExhibits();
+const geocodingService = new GeocodingService(googleMapsGeocoder);
 
-  const groupedExhibits = Map.groupBy(exhibits, x => x.location);
-
-  const array = Array.from(groupedExhibits.entries())
-    .map(([key, value]) => {
-      const gallery = galleries.find(x => x.name === key);
-      if (gallery === undefined) return null;
-      return {
-        gallery: gallery,
-        exhibits: value,
-      };
-    })
-    .filter((x): x is GalleryExhibits => x !== null);
-
-  return array;
+/** ギャラリー情報を追加 */
+export const addGallery = async (data: Gallery): Promise<void> => {
+  const latLng = await geocodingService.getLatLngFromAddress(data.location);
+  await galleryRepo.addGallery(data, latLng);
 };
 
-/** ギャラリー情報と関連する展示の配列を取得 */
-export const getGalleryExhibits = legacy_getGalleryExhibits;
-
-// todo: 移行完了後、統廃合
-void new_getGalleryExhibits;
+/** ギャラリー情報の一覧を取得 */
+export const getGalleries = async (): Promise<Gallery[]> =>
+  await galleryRepo.getGalleries();

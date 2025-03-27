@@ -1,9 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, MenuButton, MenuItem, Dropdown, IconButton } from '@mui/joy';
 import { FaBars } from 'react-icons/fa';
-import { signOut } from '../../Auth';
 import { useAuthContext } from '../AuthContext';
-import { useCallback } from 'react';
 
 const Header = () => {
   const styles = `
@@ -23,10 +21,6 @@ const Header = () => {
   const visibleLogout = isLogged;
 
   const visibleMenu = visibleLogin || visibleMypage || visibleLogout;
-
-  const onSignOut = useCallback(() => {
-    void signOut();
-  }, []);
 
   return (
     <header className="mb-4 flex gap-4 p-4">
@@ -73,9 +67,7 @@ const Header = () => {
                 )}
                 {visibleLogout && (
                   <MenuItem>
-                    <Link onClick={onSignOut} to="/">
-                      Logout
-                    </Link>
+                    <Link to="/logout">Logout</Link>
                   </MenuItem>
                 )}
               </Menu>
@@ -100,7 +92,7 @@ const Header = () => {
               </Link>
             )}
             {visibleLogout && (
-              <Link className={styles} onClick={onSignOut} to="/">
+              <Link className={styles} to="/logout">
                 Logout
               </Link>
             )}

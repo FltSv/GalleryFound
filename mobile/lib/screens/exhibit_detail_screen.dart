@@ -3,12 +3,12 @@ import 'package:gap/gap.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/providers/navigate_provider.dart';
-import 'package:mobile/screens/creator_detail_screen.dart';
 import 'package:mobile/screens/map_screen.dart';
 import 'package:mobile/widgets/action_text.dart';
+import 'package:mobile/widgets/creator_link.dart';
 import 'package:mobile/widgets/thumb_interlace_image.dart';
 
-class ExhibitDetailScreen extends StatefulWidget {
+class ExhibitDetailScreen extends StatelessWidget {
   const ExhibitDetailScreen({
     super.key,
     required this.exhibit,
@@ -17,13 +17,7 @@ class ExhibitDetailScreen extends StatefulWidget {
   final Exhibit exhibit;
 
   @override
-  State<ExhibitDetailScreen> createState() => _ExhibitDetailScreenState();
-}
-
-class _ExhibitDetailScreenState extends State<ExhibitDetailScreen> {
-  @override
   Widget build(BuildContext context) {
-    final exhibit = widget.exhibit;
     final creator = exhibit.creator;
 
     return Scaffold(
@@ -47,13 +41,7 @@ class _ExhibitDetailScreenState extends State<ExhibitDetailScreen> {
                   MapScreen(exhibit: exhibit),
                 ),
               ),
-              ActionText(
-                text: creator.name,
-                onTap: () => NavigateProvider.push(
-                  context,
-                  CreatorDetailScreen(creator: creator),
-                ),
-              ),
+              CreatorLink(creator: creator),
             ].intersperse(const Gap(8)).toList(),
           ),
         ],

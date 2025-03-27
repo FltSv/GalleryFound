@@ -1,5 +1,10 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/application/usecases/creator_usecase.dart';
+import 'package:mobile/application/usecases/exhibit_usecase.dart';
+import 'package:mobile/application/usecases/product_usecase.dart';
 import 'package:mobile/infra/factory.dart';
 import 'package:mobile/infra/fake/fake_repo.dart';
+import 'package:mobile/infra/shared_preferences/shared_pref_user_data_repo.dart';
 import 'package:mobile/models/book.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/gallery.dart';
@@ -25,6 +30,9 @@ class DataProvider {
   String getImageUrl(String userId, String image) =>
       _getImageUrl(userId, image);
 
+  late final String _storageImageBaseUrl;
+  String get storageImageBaseUrl => _storageImageBaseUrl;
+
   /// データの取得
   Future<void> fetchData() async {
     final repo = Factory.getDataRepo();
@@ -32,6 +40,28 @@ class DataProvider {
     _getImageUrl = repo.getImageUrl;
     _creators = await repo.fetchCreators();
     _galleries = await repo.fetchGalleries();
+    _storageImageBaseUrl = repo.storageImageBaseUrl;
     _books = await FakeRepo.fetchBooks();
   }
 }
+
+final dataRepoProvider = Provider((ref) => Factory.getDataRepo());
+final userDataRepoProvider = Provider((ref) => SharedPrefUserDataRepo());
+
+final creatorUsecaseProvider =
+    Provider((ref) => CreatorUsecase(ref.read(dataRepoProvider)));
+
+final exhibitUsecaseProvider =
+    Provider((ref) => ExhibitUsecase(ref.read(dataRepoProvider)));
+
+final productUsecaseProvider = Provider(
+  (ref) => ProductUsecase(
+    dataRepo: ref.read(dataRepoProvider),
+    userDataRepo: ref.read(userDataRepoProvider),
+  ),
+);
+
+final isFavoriteProvider = FutureProvider.family<bool, String>((ref, id) async {
+  final usecase = ref.watch(productUsecaseProvider);
+  return usecase.isFavorite(id);
+});

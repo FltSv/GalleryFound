@@ -1,12 +1,6 @@
-import {
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FaLocationCrosshairs } from 'react-icons/fa6';
+import { FaTimes } from 'react-icons/fa';
 import {
   APIProvider,
   Map as GoogleMap,
@@ -17,7 +11,6 @@ import {
   MapEvent,
 } from '@vis.gl/react-google-maps';
 import { Env } from 'src/Env';
-import { getDatePeriodString } from 'src/Data';
 import {
   GalleryExhibits,
   getGalleryExhibits,
@@ -32,46 +25,56 @@ const TOKYO_POS = {
 const TODAY = new Date();
 
 export const Map = () => {
-  const renderErrorView = useCallback(
-    (error: GeolocationPositionError) => <MapView error={error} />,
-    [],
-  );
+  // 展示IDを取得
+  const urlParams = new URLSearchParams(window.location.search);
+  const exhibitId = urlParams.get('eid') ?? undefined;
+  const skipGeolocation = exhibitId !== undefined;
 
-  const renderProcessView = useCallback(() => <p>現在位置取得中…</p>, []);
+  // 位置情報を取得
+  const { coords, error, isLoading } = useGeolocation(skipGeolocation);
 
-  const renderSuccessView = useCallback(
-    (coords: GeolocationCoordinates) => <MapView coords={coords} />,
-    [],
-  );
+  // エラーポップアップの表示状態を管理
+  const [showError, setShowError] = useState(true);
+  const handleCloseError = useCallback(() => {
+    setShowError(false);
+  }, []);
 
   return (
     <div className="h-svh w-svw bg-white">
-      <GeolocationWrapper
-        renderErrorView={renderErrorView}
-        renderProcessView={renderProcessView}
-        renderSuccessView={renderSuccessView}
-      />
+      <MapView coords={coords} exhibitId={exhibitId} />
+      {!isLoading && error && showError && (
+        <div
+          className={`
+            absolute bottom-0 left-0 m-4 flex items-center rounded bg-red-100/90
+            px-3 py-1 shadow
+          `}>
+          <p>現在位置取得に失敗しました: {error.message}</p>
+          <button
+            aria-label="閉じる"
+            className="ml-2 p-1"
+            onClick={handleCloseError}>
+            <FaTimes />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
 interface MapViewProps {
   coords?: GeolocationCoordinates;
-  error?: GeolocationPositionError;
+  exhibitId?: string;
 }
 
-const MapView = ({ coords, error }: MapViewProps) => {
+const MapView = ({ coords, exhibitId }: MapViewProps) => {
   const [galleries, setGalleries] = useState<GalleryExhibits[]>([]);
   const [viewExhibit, setViewExhibit] = useState<GalleryExhibits | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const exhibitId = urlParams.get('eid');
-
   useEffect(() => {
     void (async () => {
-      const galleries = await getGalleryExhibits();
-      if (exhibitId !== null) {
+      const galleries = await getGalleryExhibits(TODAY);
+      if (exhibitId !== undefined) {
         // 一致するギャラリーを検索
         const gallery = galleries.find(x =>
           x.exhibits.find(x => x.id === exhibitId),
@@ -118,11 +121,6 @@ const MapView = ({ coords, error }: MapViewProps) => {
 
   return (
     <APIProvider apiKey={Env.MAPS_JS_API}>
-      {error !== undefined && (
-        <p className="bg-red-100 p-1">
-          現在位置取得に失敗しました: {error.message}
-        </p>
-      )}
       <GoogleMap
         defaultCenter={centerPos}
         defaultZoom={12}
@@ -187,7 +185,7 @@ const GalleryMarker = (props: GalleryMarkerProps) => {
               <img className="inline w-16" src={x.imageUrl} />
               <div>
                 <p className="text-base font-bold">{x.title}</p>
-                <p>{getDatePeriodString(x.startDate, x.endDate)}</p>
+                <p>{x.getDatePeriod()}</p>
               </div>
             </div>
           ))}
@@ -197,38 +195,30 @@ const GalleryMarker = (props: GalleryMarkerProps) => {
   );
 };
 
-interface WrapperProps {
-  renderProcessView: () => ReactNode;
-  renderSuccessView: (coords: GeolocationCoordinates) => ReactNode;
-  renderErrorView: (error: GeolocationPositionError) => ReactNode;
-}
-
-const GeolocationWrapper = (props: WrapperProps) => {
+/** 位置情報を取得 */
+const useGeolocation = (skip: boolean = false) => {
   const [coords, setCoords] = useState<GeolocationCoordinates | null>(null);
   const [error, setError] = useState<GeolocationPositionError | null>(null);
+  const [isLoading, setIsLoading] = useState(!skip);
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(({ coords }) => {
-      setCoords(coords);
-    }, setError);
-  }, []);
+    if (skip) return;
 
-  return (
-    <>
-      {useMemo(() => {
-        if (coords === null) return;
-        return props.renderSuccessView(coords);
-      }, [coords, props])}
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        setCoords(position.coords);
+        setIsLoading(false);
+      },
+      err => {
+        setError(err);
+        setIsLoading(false);
+      },
+    );
+  }, [skip]);
 
-      {useMemo(() => {
-        if (error === null) return;
-        return props.renderErrorView(error);
-      }, [error, props])}
-
-      {useMemo(() => {
-        if (!(error === null && coords === null)) return;
-        return props.renderProcessView();
-      }, [coords, error, props])}
-    </>
-  );
+  return {
+    coords: coords ?? undefined,
+    error: error ?? undefined,
+    isLoading,
+  };
 };

@@ -1,10 +1,14 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_list_screen.dart';
 import 'package:mobile/screens/exhibit_list_screen.dart';
 import 'package:mobile/screens/map_screen.dart';
+import 'package:mobile/screens/product_list_screen.dart';
+import 'package:mobile/widgets/debug_db_button.dart';
+import 'package:mobile/widgets/feedback_button.dart';
 
 class TopScreen extends StatelessWidget {
   const TopScreen({super.key});
@@ -18,7 +22,7 @@ class TopScreen extends StatelessWidget {
     final radius = screenSize.width * 0.28; // ボタンの配置半径
 
     final props = <_ButtonProp>[
-      _ButtonProp(Icons.menu_book, Colors.green, null),
+      _ButtonProp(Icons.collections, Colors.green, const ProductListScreen()),
       _ButtonProp(Icons.location_on, Colors.blue, const MapScreen()),
       _ButtonProp(Icons.brush, Colors.red, const ExhibitListScreen()),
       _ButtonProp(Icons.person, Colors.purple, const CreatorListScreen()),
@@ -37,16 +41,21 @@ class TopScreen extends StatelessWidget {
           ),
         ),
         child: Stack(
-          children: props.asMap().entries.map((entry) {
-            final index = entry.key;
-            final prop = entry.value;
+          children: [
+            ...props.asMap().entries.map((entry) {
+              final index = entry.key;
+              final prop = entry.value;
 
-            final angle = (2 * pi * index) / props.length;
-            final x = centerX + radius * cos(angle);
-            final y = centerY + radius * sin(angle);
+              final angle = (2 * pi * index) / props.length;
+              final x = centerX + radius * cos(angle);
+              final y = centerY + radius * sin(angle);
 
-            return _iconButton(context, prop, x, y, buttonSize);
-          }).toList(),
+              return _iconButton(context, prop, x, y, buttonSize);
+            }),
+            const FeedbackButton(),
+            // デバッグモードの場合のみDevelopDB切り替えボタンを表示
+            if (kDebugMode) const DebugDBButton(),
+          ],
         ),
       ),
     );
@@ -91,7 +100,7 @@ class TopScreen extends StatelessWidget {
             top: y + size / 2,
             child: Container(
               padding: const EdgeInsets.all(4),
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               child: const Text(
                 '準備中...',
                 style: TextStyle(color: Colors.white),
