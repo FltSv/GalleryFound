@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, MouseEvent } from 'react';
 import { FaRegCommentDots } from 'react-icons/fa';
 
-const FeedbackButton = () => {
+export const FeedbackButton = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -86,5 +86,3 @@ const FeedbackButton = () => {
     </div>
   );
 };
-
-export default FeedbackButton;
