@@ -17,13 +17,7 @@ import {
   Controller,
   ControllerRenderProps,
 } from 'react-hook-form';
-import {
-  Button as MuiJoyButton,
-  IconButton,
-  Card,
-  Input,
-  Textarea,
-} from '@mui/joy';
+import { Button as MuiJoyButton, IconButton, Card, Input } from '@mui/joy';
 import { Autocomplete, AutocompleteRenderInputParams } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { RiDraggable } from 'react-icons/ri';
@@ -34,6 +28,7 @@ import {
   HashtagTextarea,
   Switch,
   SubmitButton,
+  Textarea,
   Textbox,
 } from 'components/ui/Input';
 import { Popup } from 'components/ui/Popup';
@@ -807,11 +802,7 @@ const ProductPopup = (props: ProductPopupProps) => {
             </div>
             <div>
               <p>詳細</p>
-              <Textarea
-                minRows={3}
-                sx={{ border: 1, borderColor: 'black', marginY: '0.25rem' }}
-                {...register('detail')}
-              />
+              <Textarea rows={3} {...register('detail')} />
             </div>
           </div>
         </div>
