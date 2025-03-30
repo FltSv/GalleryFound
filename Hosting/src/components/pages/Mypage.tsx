@@ -44,7 +44,7 @@ import {
   updateExhibit,
 } from 'src/application/CreatorService';
 import { ProgressBar } from 'components/ui/ProgressBar';
-import FeedbackButton from 'components/ui/FeedbackButton';
+import { FeedbackButton } from 'components/ui/FeedbackButton';
 import { useFormGuard } from 'src/hooks/useFormGuard';
 
 export const Mypage = () => {
@@ -509,7 +509,6 @@ export const Mypage = () => {
             <p className="mt-auto w-full">発表作品</p>
             <FileInput
               accept="image/*"
-              className="min-w-fit"
               disabled={uploadProgress !== null}
               multiple
               onChange={onChangeProductFileInput}

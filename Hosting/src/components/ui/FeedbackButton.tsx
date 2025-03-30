@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, MouseEvent } from 'react';
 import { FaRegCommentDots } from 'react-icons/fa';
 
-const FeedbackButton = () => {
+export const FeedbackButton = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -44,11 +44,16 @@ const FeedbackButton = () => {
   // フィードバックページへ移動
   const goToFeedback = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // バブリング防止
-    window.location.href = 'https://forms.gle/1NQouur9PhdSyf1z5';
+    window.open('https://forms.gle/1NQouur9PhdSyf1z5');
   }, []);
 
   return (
-    <div className="fixed bottom-8 right-8 z-50">
+    <div
+      className={`
+        fixed bottom-4 right-4 z-50
+
+        md:bottom-8 md:right-8
+      `}>
       <div className="flex flex-col items-end gap-2">
         {/* 展開時に表示されるフィードバックボタン（モバイルのみ） */}
         {isMobile && isExpanded && (
@@ -67,14 +72,10 @@ const FeedbackButton = () => {
         <button
           aria-label="フィードバックを送る"
           className={`
-            flex items-center justify-center gap-2 rounded-full font-medium
-            shadow-lg transition-all duration-300
+            flex items-center justify-center gap-2 rounded-full bg-purple-900
+            font-medium text-white shadow-lg transition-all duration-300
 
-            ${
-              isExpanded && !isMobile
-                ? 'bg-purple-900 px-6 py-3 text-white'
-                : 'bg-purple-900 p-3 text-white'
-            }
+            ${isExpanded && !isMobile ? 'px-6 py-3' : 'p-3'}
           `}
           onClick={isMobile ? toggleButton : goToFeedback}
           onMouseEnter={handleMouseEnter}
@@ -86,5 +87,3 @@ const FeedbackButton = () => {
     </div>
   );
 };
-
-export default FeedbackButton;
