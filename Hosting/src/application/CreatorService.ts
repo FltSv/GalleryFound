@@ -84,7 +84,7 @@ export const createExhibit = async (
     tmpImageData: '',
     srcImage: parseSrcImage(result.imageUrl),
     imageUrl: result.imageUrl,
-    thumbUrl: result.imageUrl,
+    thumbUrl: result.thumbUrl,
     location: exhibitData.location,
     galleryId: exhibitData.galleryId,
     startDate: exhibitData.startDate,
