@@ -41,11 +41,15 @@ import { addGallery, getGalleries } from 'src/application/GalleryMapService';
 import {
   createExhibit,
   createProduct,
+  deleteExhibit,
+  deleteProduct,
   updateExhibit,
 } from 'src/application/CreatorService';
 import { ProgressBar } from 'components/ui/ProgressBar';
 import { FeedbackButton } from 'components/ui/FeedbackButton';
 import { useFormGuard } from 'src/hooks/useFormGuard';
+import { ConfirmDelete } from 'components/ui/ConfirmDelete';
+import { Spinner } from 'components/ui/Spinner';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -235,14 +239,17 @@ export const Mypage = () => {
 
   /** 作品の削除 */
   const onDeleteRenderProduct = useCallback(
-    (product: Product) => {
+    async (product: Product) => {
+      if (user === null) return;
       if (creator === undefined) return;
+
+      await deleteProduct(user.uid, product);
 
       const newProducts = creator.products.filter(x => x.id !== product.id);
       setCreator({ ...creator, products: newProducts });
       markAsDirty();
     },
-    [creator, markAsDirty],
+    [creator, markAsDirty, user],
   );
 
   /** 作品の編集画面の表示 */
@@ -275,14 +282,17 @@ export const Mypage = () => {
 
   /** 展示削除 */
   const onDeleteExhibit = useCallback(
-    (exhibit: Exhibit) => {
+    async (exhibit: Exhibit) => {
+      if (user === null) return;
       if (creator === undefined) return;
+
+      await deleteExhibit(user.uid, exhibit);
 
       const newExhibits = creator.exhibits.filter(x => x.id !== exhibit.id);
       setCreator({ ...creator, exhibits: newExhibits });
       markAsDirty();
     },
-    [creator, markAsDirty],
+    [creator, markAsDirty, user],
   );
 
   /** 展示編集画面の表示 */
@@ -576,6 +586,7 @@ export const Mypage = () => {
       </Popup>
 
       <FeedbackButton />
+      <ConfirmDelete.Root />
     </>
   );
 };
@@ -590,11 +601,23 @@ interface ProductCellProps {
 const ProductCell = (props: ProductCellProps) => {
   const { data, onEdit, onDelete, sortableProps } = props;
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const onEditClick = useCallback(() => {
     onEdit(data);
   }, [data, onEdit]);
 
-  const onDeleteClick = useCallback(() => {
+  const onDeleteClick = useCallback(async () => {
+    const isAccepted = await ConfirmDelete.call({
+      title: 'この項目を削除しますか？',
+      message: 'この操作は元に戻せません。',
+    });
+
+    if (!isAccepted) {
+      return;
+    }
+
+    setLoading(true);
     onDelete(data);
   }, [data, onDelete]);
 
@@ -612,15 +635,27 @@ const ProductCell = (props: ProductCellProps) => {
         <div className="max-w-min content-center" {...sortableProps}>
           <RiDraggable />
         </div>
-        <img
-          className={`
-            h-28 p-2
+        <div className="relative inline-block">
+          {loading && (
+            <div
+              className={`
+                absolute inset-0 z-10 flex items-center justify-center
+              `}>
+              <Spinner />
+            </div>
+          )}
+          <img
+            className={`
+              h-28 p-2 transition-opacity duration-300
 
-            md:h-40
-          `}
-          key={data.id}
-          src={data.tmpImageData || data.imageUrl}
-        />
+              ${loading ? 'opacity-50' : ''}
+
+              md:h-40
+            `}
+            key={data.id}
+            src={data.tmpImageData || data.imageUrl}
+          />
+        </div>
         <p
           className={`
             absolute bottom-0 w-fit bg-black bg-opacity-50 px-2 text-white
@@ -659,11 +694,23 @@ interface ExhibitRowProps {
 const ExhibitRow = (props: ExhibitRowProps) => {
   const { data, onEdit, onDelete } = props;
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const onEditClick = useCallback(() => {
     onEdit(data);
   }, [data, onEdit]);
 
-  const onDeleteClick = useCallback(() => {
+  const onDeleteClick = useCallback(async () => {
+    const isAccepted = await ConfirmDelete.call({
+      title: 'この項目を削除しますか？',
+      message: 'この操作は元に戻せません。',
+    });
+
+    if (!isAccepted) {
+      return;
+    }
+
+    setLoading(true);
     onDelete(data);
   }, [data, onDelete]);
 
@@ -674,7 +721,16 @@ const ExhibitRow = (props: ExhibitRowProps) => {
 
         odd:bg-neutral-200
       `}>
-      <td className="flex gap-4 p-2">
+      <td className="relative flex gap-4 p-2">
+        {loading && (
+          <div
+            className={`
+              absolute inset-0 z-10 flex items-center justify-center bg-white
+              bg-opacity-60
+            `}>
+            <Spinner />
+          </div>
+        )}
         {/* 画像 */}
         <img
           alt={data.title}
