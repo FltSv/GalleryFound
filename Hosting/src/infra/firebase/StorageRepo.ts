@@ -3,10 +3,10 @@ import {
   ref,
   getDownloadURL,
   uploadBytesResumable,
+  deleteObject,
 } from 'firebase/storage';
 import { collectionNames } from 'src/infra/firebase/firebaseConfig';
 import { ImageRepo } from 'src/domain/services/ImageService';
-import { Exhibit, Product } from 'src/domain/entities';
 
 type uploadImageType = ImageRepo['uploadImage'];
 type uploadThumbnailType = ImageRepo['uploadThumbnail'];
@@ -81,18 +81,27 @@ const uploadFile = async (
     );
   });
 
-// todo: v0.6.1で削除
-/** サムネイル画像のURLを取得する */
-export const getThumbnailUrl = async (
-  userId: string,
-  item: Product | Exhibit,
-) => {
-  const imageName = item.srcImage.replace(/\.png.*/, '.webp');
-  const path = `${collectionNames.creators}/${userId}/thumbs/${imageName}`;
-  return await getDownloadURL(ref(storage, path));
+const deleteImage: ImageRepo['deleteImage'] = async image => {
+  const imagePath = parseUrlToPath(image.imageUrl);
+  const thumbPath = parseUrlToPath(image.thumbUrl);
+
+  // 画像の削除
+  const deleteTasks = [
+    await deleteObject(ref(storage, imagePath)),
+    await deleteObject(ref(storage, thumbPath)),
+  ];
+  await Promise.all(deleteTasks);
 };
+
+/** FireStorageのURLをPathに変換 */
+const parseUrlToPath = (url: string): string =>
+  url
+    .replace(storageCreatorsBaseUrl, 'creators/')
+    .replaceAll('%2F', '/')
+    .replace(/\?.*/, '');
 
 export const FireStorageImageRepo: ImageRepo = {
   uploadImage,
   uploadThumbnail,
+  deleteImage,
 };
