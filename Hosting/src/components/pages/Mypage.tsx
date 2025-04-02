@@ -68,7 +68,7 @@ export const Mypage = () => {
     totalFiles: number;
     fileProgresses: number[];
   } | null>(null);
-  const { markAsDirty, markAsClean } = useFormGuard();
+  const { isDirty, markAsDirty, markAsClean } = useFormGuard();
 
   useEffect(() => {
     if (user === null) {
@@ -564,6 +564,7 @@ export const Mypage = () => {
 
         <SubmitButton
           className="w-fit rounded-md border bg-white text-black"
+          disabled={!isDirty}
           loading={isSubmitting}
           startDecorator={<FaCheck />}>
           確定
