@@ -56,6 +56,14 @@ export const updateProduct = async (
   await FirestoreCreatorRepo.updateProduct(userId, product);
 };
 
+export const deleteProduct = async (userId: string, product: Product) => {
+  const deleteTasks = [
+    FirestoreCreatorRepo.deleteProduct(userId, product),
+    imageService.deleteImage(product),
+  ];
+  await Promise.all(deleteTasks);
+};
+
 export const createExhibit = async (
   userId: string,
   exhibitData: ExhibitData,
@@ -76,7 +84,7 @@ export const createExhibit = async (
     tmpImageData: '',
     srcImage: parseSrcImage(result.imageUrl),
     imageUrl: result.imageUrl,
-    thumbUrl: result.imageUrl,
+    thumbUrl: result.thumbUrl,
     location: exhibitData.location,
     galleryId: exhibitData.galleryId,
     startDate: exhibitData.startDate,
@@ -117,6 +125,14 @@ export const updateExhibit = async (
   };
   await FirestoreCreatorRepo.updateExhibit(userId, imageUpdatedExhibit);
   return imageUpdatedExhibit;
+};
+
+export const deleteExhibit = async (userId: string, exhibit: Exhibit) => {
+  const deleteTasks = [
+    FirestoreCreatorRepo.deleteExhibit(userId, exhibit),
+    imageService.deleteImage(exhibit),
+  ];
+  await Promise.all(deleteTasks);
 };
 
 const parseSrcImage = (imageUrl: string) =>

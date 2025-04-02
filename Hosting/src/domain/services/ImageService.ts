@@ -1,3 +1,5 @@
+import { ImageStatus } from 'src/domain/entities';
+
 export interface ImageCompressor {
   compressImage: (imageData: Blob) => Promise<File>;
   createThumbnail: (imageData: Blob) => Promise<File>;
@@ -20,6 +22,9 @@ export interface UploadImageResult {
 export interface ImageRepo {
   uploadImage: (props: UploadImageProps) => Promise<string>;
   uploadThumbnail: (props: UploadImageProps) => Promise<string>;
+
+  /** 指定された画像とサムネイル画像を削除 */
+  deleteImage: (image: ImageStatus) => Promise<void>;
 }
 
 export class ImageService {
@@ -68,5 +73,9 @@ export class ImageService {
   private async fetchImageBlob(dataUrl: string): Promise<Blob> {
     const response = await fetch(dataUrl);
     return await response.blob();
+  }
+
+  async deleteImage(image: ImageStatus) {
+    this.imageRepo.deleteImage(image);
   }
 }
