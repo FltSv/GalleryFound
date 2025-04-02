@@ -9,6 +9,7 @@ import { unstable_usePrompt, useBeforeUnload } from 'react-router-dom';
  * 4. フォーム送信後の状態リセット
  *
  * @returns {Object} フォームの状態とその更新関数を含むオブジェクト
+ * @property isDirty - フォームに未保存の変更があるかを示す
  * @property markAsDirty - フォームに未保存の変更があることを示す関数
  * @property markAsClean - フォームの変更が保存されたことを示す関数
  *
@@ -73,5 +74,5 @@ export const useFormGuard = () => {
     setIsDirty(false);
   }, []);
 
-  return { markAsDirty, markAsClean };
+  return { isDirty, markAsDirty, markAsClean };
 };
