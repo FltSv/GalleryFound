@@ -151,6 +151,7 @@ export const creatorConverter: FirestoreDataConverter<Creator> = {
             image: x.srcImage,
           }) satisfies FirebaseExhibit,
       ),
+      updateAt: Timestamp.fromDate(new Date()),
     } satisfies FirebaseCreator;
   },
 };
