@@ -72,11 +72,7 @@ export const getCreatorData = async (user: User) => {
   const exhibitsSnap = await getDocs(exhibitsRef);
   const exhibits = exhibitsSnap.docs.map(doc => doc.data());
 
-  const creator: Creator = {
-    ...data,
-    products: products.length === 0 ? data.products : products,
-    exhibits: exhibits.length === 0 ? data.exhibits : exhibits,
-  };
+  const creator: Creator = { ...data, products, exhibits };
 
   console.debug('creator:', creator);
   return creator;
@@ -88,21 +84,18 @@ export const getCreatorData = async (user: User) => {
 export const setCreatorData = async (user: User, data: Creator) => {
   const userId = user.uid;
 
-  // 画像のアップロード
+  // 作品の並び順更新
   const updateProductTasks = data.products.map((product, i) =>
     updateProduct(userId, { ...product, order: i }),
   );
-  const updateExhibitTasks = data.exhibits.map(exhibit =>
-    updateExhibit(userId, exhibit),
-  );
-  await Promise.all([...updateProductTasks, ...updateExhibitTasks]);
 
-  // DB更新
+  await Promise.all(updateProductTasks);
+
+  // Creatorドキュメント更新
   const docRef = doc(db, collectionNames.creators, userId).withConverter(
     creatorConverter,
   );
 
-  // メインドキュメント更新
   await setDoc(docRef, data, { merge: true });
 };
 

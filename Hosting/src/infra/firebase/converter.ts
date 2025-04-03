@@ -52,46 +52,6 @@ export const creatorConverter: FirestoreDataConverter<Creator> = {
   fromFirestore(snapshot, options?) {
     const data = snapshot.data(options) as FirebaseCreator;
 
-    // todo: v0.6.1で削除
-    const products_old =
-      data.products?.map(
-        (x, i) =>
-          ({
-            id: x.id,
-            title: x.title ?? '',
-            isHighlight: x.id === data.highlightProductId,
-            detail: x.detail ?? '',
-            order: i,
-            createdAt: x.createdAt?.toDate(),
-            addedAt: x.addedAt?.toDate(),
-            srcImage: x.image,
-            imageUrl: fromFirestoreImageUrl(x.image, undefined, snapshot.id),
-            thumbUrl: '',
-            tmpImageData: '',
-          }) satisfies Product,
-      ) ?? [];
-
-    // todo: v0.6.1で削除
-    const exhibits_old =
-      data.exhibits?.map(
-        x =>
-          ({
-            id: x.id,
-            title: x.title,
-            location: x.location,
-            startDate: x.startDate?.toDate() ?? EPOCH_DATE,
-            endDate: x.endDate?.toDate() ?? EPOCH_DATE,
-            galleryId: x.galleryId,
-            srcImage: x.image,
-            imageUrl: fromFirestoreImageUrl(x.image, undefined, snapshot.id),
-            thumbUrl: '',
-            tmpImageData: '',
-            getDatePeriod: function () {
-              return getDatePeriod(this.startDate, this.endDate);
-            },
-          }) satisfies Exhibit,
-      ) ?? [];
-
     return {
       name: data.name ?? '',
       genre: data.genre ?? '',
@@ -103,8 +63,8 @@ export const creatorConverter: FirestoreDataConverter<Creator> = {
         data.highlightProductThumbPath === undefined
           ? null
           : storageCreatorsBaseUrl + data.highlightProductThumbPath,
-      products: products_old,
-      exhibits: exhibits_old,
+      products: [],
+      exhibits: [],
     } satisfies Creator;
   },
 
@@ -127,30 +87,6 @@ export const creatorConverter: FirestoreDataConverter<Creator> = {
       links: creator.links,
       highlightProductId: highlightProduct?.id,
       highlightProductThumbPath,
-      // todo: v0.6.1で削除
-      products: creator.products.map(
-        x =>
-          ({
-            id: x.id,
-            title: x.title,
-            detail: x.detail,
-            image: x.srcImage,
-            order: x.order,
-          }) satisfies FirebaseProduct,
-      ),
-      // todo: v0.6.1で削除
-      exhibits: creator.exhibits.map(
-        x =>
-          ({
-            id: x.id,
-            title: x.title,
-            location: x.location,
-            galleryId: x.galleryId,
-            startDate: Timestamp.fromDate(x.startDate),
-            endDate: Timestamp.fromDate(x.endDate),
-            image: x.srcImage,
-          }) satisfies FirebaseExhibit,
-      ),
       updateAt: Timestamp.fromDate(new Date()),
     } satisfies FirebaseCreator;
   },
@@ -173,8 +109,8 @@ export const getProductConverter = (
       imageUrl: fromFirestoreImageUrl(data.image, data.imagePath, userId),
       thumbUrl: fromFirestoreThumbUrl(data.thumbPath),
       tmpImageData: '',
-      createdAt: data.createdAt?.toDate(),
-      addedAt: data.addedAt?.toDate(),
+      createdAt: data.createdAt.toDate(),
+      addedAt: data.addedAt.toDate(),
     } satisfies Product;
   },
 
@@ -187,12 +123,8 @@ export const getProductConverter = (
       image: product.srcImage,
       imagePath: toFirestoreImageUrl(product.imageUrl),
       thumbPath: toFirestoreImageUrl(product.thumbUrl),
-      createdAt: product.createdAt
-        ? Timestamp.fromDate(product.createdAt)
-        : undefined,
-      addedAt: product.addedAt
-        ? Timestamp.fromDate(product.addedAt)
-        : undefined,
+      createdAt: Timestamp.fromDate(product.createdAt),
+      addedAt: Timestamp.fromDate(product.addedAt),
     } satisfies FirebaseProduct;
   },
 });

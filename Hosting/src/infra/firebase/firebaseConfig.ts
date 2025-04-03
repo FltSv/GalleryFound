@@ -90,9 +90,6 @@ export interface Creator {
    */
   highlightProductThumbPath?: string;
 
-  products?: Product[];
-  exhibits?: Exhibit[];
-
   /** 最終更新日 */
   updateAt: Timestamp;
 }
@@ -106,12 +103,10 @@ export interface Product extends ImageObject {
   order: number;
 
   /** 作品の作成日 */
-  //todo: v0.6.1で必須にする
-  createdAt?: Timestamp;
+  createdAt: Timestamp;
 
   /** DBへの登録日 */
-  //todo: v0.6.1で必須にする
-  addedAt?: Timestamp;
+  addedAt: Timestamp;
 }
 
 /** firestore Exhibit */
