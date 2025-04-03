@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, MenuButton, MenuItem, Dropdown, IconButton } from '@mui/joy';
 import { FaBars } from 'react-icons/fa';
-import { useAuthContext } from '../AuthContext';
+import { useAuthContext } from 'components/AuthContext';
 
 const Header = () => {
   const styles = `

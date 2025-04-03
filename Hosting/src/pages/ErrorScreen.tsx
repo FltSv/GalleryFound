@@ -1,8 +1,8 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import ReactGA from 'react-ga4';
 
-import { Button } from 'components/ui/Input';
-import { ProgressBar } from 'components/ui/ProgressBar';
+import { Button } from 'components/Input';
+import { ProgressBar } from 'components/ProgressBar';
 
 export const ErrorScreen: FC<{ error: unknown }> = ({ error }) => {
   const errorInstance = error instanceof Error ? error : undefined;

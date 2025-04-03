@@ -4,7 +4,7 @@ import './index.tailwind.css';
 
 import { AuthProvider } from './components/AuthContext.tsx';
 import { APIProvider } from '@vis.gl/react-google-maps';
-import { Map } from './components/pages/Map.tsx';
+import { Map } from './pages/Map.tsx';
 
 // components
 // eslint-disable-next-line no-unused-vars

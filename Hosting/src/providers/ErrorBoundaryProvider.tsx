@@ -4,7 +4,7 @@ import {
   ErrorBoundary,
   useErrorBoundary,
 } from 'react-error-boundary';
-import { ErrorScreen } from 'components/pages/ErrorScreen';
+import { ErrorScreen } from 'src/pages/ErrorScreen';
 
 interface ChildrenProps {
   children: ReactNode;
