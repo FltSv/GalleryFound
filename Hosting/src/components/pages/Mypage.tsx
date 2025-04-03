@@ -654,7 +654,7 @@ const ProductCell = (props: ProductCellProps) => {
               md:h-40
             `}
             key={data.id}
-            src={data.tmpImageData || data.imageUrl}
+            src={data.imageUrl}
           />
         </div>
         <p
@@ -740,7 +740,7 @@ const ExhibitRow = (props: ExhibitRowProps) => {
 
             md:max-w-40
           `}
-          src={data.tmpImageData || data.imageUrl}
+          src={data.imageUrl}
         />
         {/* 内容 */}
         <div className="flex w-full flex-col gap-1 align-top">
@@ -837,10 +837,7 @@ const ProductPopup = (props: ProductPopupProps) => {
             md:flex-row
           `}>
           <div className="flex max-w-max basis-1/2 flex-col">
-            <img
-              className="w-full max-w-xs"
-              src={product.tmpImageData || product.imageUrl}
-            />
+            <img className="w-full max-w-xs" src={product.imageUrl} />
           </div>
           <div
             className={`

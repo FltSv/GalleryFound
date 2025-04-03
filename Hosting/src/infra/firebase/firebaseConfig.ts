@@ -99,7 +99,6 @@ export interface Product extends ImageObject {
   id: string;
   title?: string;
   detail?: string;
-  image: string;
   order: number;
 
   /** 作品の作成日 */
@@ -117,7 +116,6 @@ export interface Exhibit extends ImageObject {
   galleryId: string;
   startDate?: Timestamp;
   endDate?: Timestamp;
-  image: string;
 }
 
 interface ImageObject {
@@ -125,12 +123,12 @@ interface ImageObject {
    * Storageのcreators/以下を格納
    * @example `{creatorId}%2F{imageId}.png?alt=media&token={token}`
    */
-  imagePath?: string;
+  imagePath: string;
 
   /**
    * Storageのcreators/thumbs/以下を格納
    */
-  thumbPath?: string;
+  thumbPath: string;
 }
 
 /** firestore Gallery */

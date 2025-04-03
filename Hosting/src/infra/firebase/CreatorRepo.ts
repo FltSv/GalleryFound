@@ -23,10 +23,6 @@ import {
   exhibitConverter,
   getProductConverter,
 } from 'src/infra/firebase/converter';
-import { storageCreatorsBaseUrl } from './StorageRepo';
-
-export const getCreatorStorageUrl = (userId: string) =>
-  `${storageCreatorsBaseUrl}${userId}%2F`;
 
 export const getCreatorData = async (user: User) => {
   const userId = user.uid;

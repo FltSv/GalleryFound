@@ -37,8 +37,6 @@ export const createProduct = async (
     isHighlight: false,
     detail: '',
     order,
-    tmpImageData: '',
-    srcImage: parseSrcImage(result.imageUrl),
     imageUrl: result.imageUrl,
     thumbUrl: result.thumbUrl,
     createdAt: new Date(),
@@ -81,8 +79,6 @@ export const createExhibit = async (
   const uploadedExhibit: Exhibit = {
     id: exhibitId,
     title: exhibitData.title,
-    tmpImageData: '',
-    srcImage: parseSrcImage(result.imageUrl),
     imageUrl: result.imageUrl,
     thumbUrl: result.thumbUrl,
     location: exhibitData.location,
@@ -119,7 +115,6 @@ export const updateExhibit = async (
   );
   const imageUpdatedExhibit = {
     ...exhibit,
-    srcImage: parseSrcImage(result.imageUrl),
     imageUrl: result.imageUrl,
     thumbUrl: result.thumbUrl,
   };
@@ -134,6 +129,3 @@ export const deleteExhibit = async (userId: string, exhibit: Exhibit) => {
   ];
   await Promise.all(deleteTasks);
 };
-
-const parseSrcImage = (imageUrl: string) =>
-  imageUrl.match(/.*%2F(.*)$/)?.[1] ?? '';

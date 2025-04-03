@@ -16,34 +16,12 @@ import {
   Exhibit as FirebaseExhibit,
   Gallery as FirebaseGallery,
 } from 'src/infra/firebase/firebaseConfig';
-import { getCreatorStorageUrl } from 'src/infra/firebase/CreatorRepo';
 import { storageCreatorsBaseUrl } from 'src/infra/firebase/StorageRepo';
 
 const EPOCH_DATE = new Date(0);
 
-const fromFirestoreImageUrl = (
-  image: string,
-  imagePath?: string,
-  userId?: string,
-): string => {
-  if (userId === undefined) {
-    throw new Error('userId is undefined');
-  }
-
-  if (imagePath === undefined) {
-    return getCreatorStorageUrl(userId) + image;
-  }
-
-  return storageCreatorsBaseUrl + imagePath;
-};
-
-const fromFirestoreThumbUrl = (thumbPath?: string): string => {
-  if (thumbPath === undefined || thumbPath === '') {
-    return '';
-  }
-
-  return storageCreatorsBaseUrl + thumbPath;
-};
+const fromFirestoreImageUrl = (imagePath: string): string =>
+  storageCreatorsBaseUrl + imagePath;
 
 const toFirestoreImageUrl = (imageUrl: string): string =>
   imageUrl.match(/.*creators%2F(.*)$/)?.[1] ?? imageUrl;
@@ -97,7 +75,6 @@ export const getProductConverter = (
 ): FirestoreDataConverter<Product> => ({
   fromFirestore(snapshot, options?) {
     const data = snapshot.data(options) as FirebaseProduct;
-    const userId = snapshot.ref.parent.parent?.id;
 
     return {
       id: data.id,
@@ -105,10 +82,8 @@ export const getProductConverter = (
       isHighlight: data.id === highlightProductId,
       detail: data.detail ?? '',
       order: data.order,
-      srcImage: data.image,
-      imageUrl: fromFirestoreImageUrl(data.image, data.imagePath, userId),
-      thumbUrl: fromFirestoreThumbUrl(data.thumbPath),
-      tmpImageData: '',
+      imageUrl: fromFirestoreImageUrl(data.imagePath),
+      thumbUrl: fromFirestoreImageUrl(data.thumbPath),
       createdAt: data.createdAt.toDate(),
       addedAt: data.addedAt.toDate(),
     } satisfies Product;
@@ -120,7 +95,6 @@ export const getProductConverter = (
       title: product.title,
       detail: product.detail,
       order: product.order,
-      image: product.srcImage,
       imagePath: toFirestoreImageUrl(product.imageUrl),
       thumbPath: toFirestoreImageUrl(product.thumbUrl),
       createdAt: Timestamp.fromDate(product.createdAt),
@@ -132,7 +106,6 @@ export const getProductConverter = (
 export const exhibitConverter: FirestoreDataConverter<Exhibit> = {
   fromFirestore(snapshot, options?) {
     const data = snapshot.data(options) as FirebaseExhibit;
-    const userId = snapshot.ref.parent.parent?.id;
 
     return {
       id: data.id,
@@ -141,10 +114,8 @@ export const exhibitConverter: FirestoreDataConverter<Exhibit> = {
       galleryId: data.galleryId,
       startDate: data.startDate?.toDate() ?? EPOCH_DATE,
       endDate: data.endDate?.toDate() ?? EPOCH_DATE,
-      srcImage: data.image,
-      imageUrl: fromFirestoreImageUrl(data.image, data.imagePath, userId),
-      thumbUrl: fromFirestoreThumbUrl(data.thumbPath),
-      tmpImageData: '',
+      imageUrl: fromFirestoreImageUrl(data.imagePath),
+      thumbUrl: fromFirestoreImageUrl(data.thumbPath),
       getDatePeriod: function () {
         return getDatePeriod(this.startDate, this.endDate);
       },
@@ -159,7 +130,6 @@ export const exhibitConverter: FirestoreDataConverter<Exhibit> = {
       galleryId: exhibit.galleryId,
       startDate: Timestamp.fromDate(exhibit.startDate),
       endDate: Timestamp.fromDate(exhibit.endDate),
-      image: exhibit.srcImage,
       imagePath: toFirestoreImageUrl(exhibit.imageUrl),
       thumbPath: toFirestoreImageUrl(exhibit.thumbUrl),
     } satisfies FirebaseExhibit;

@@ -67,13 +67,7 @@ export interface Exhibit extends ImageStatus {
 }
 
 export interface ImageStatus {
-  /* DBのファイル名＋トークン */
-  srcImage: string;
-
-  /** イメージ(Upload前) */
-  tmpImageData: string;
-
-  /** イメージ(Upload後) */
+  /** 画像URL */
   imageUrl: string;
 
   /** サムネイルURL */
