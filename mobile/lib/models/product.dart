@@ -6,8 +6,6 @@ class Product extends ImageBase {
     required this.id,
     required this.title,
     required this.detail,
-    required super.image,
-    required super.fetchThumbUrl,
     required super.imagePath,
     required super.thumbPath,
   });

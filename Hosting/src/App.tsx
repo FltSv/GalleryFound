@@ -8,19 +8,18 @@ import {
 import ReactGA from 'react-ga4';
 
 // page
-import { Top } from './components/pages/Top';
-import { Login } from './components/pages/Login';
-import { Logout } from './components/pages/Logout';
-import { Mypage } from './components/pages/Mypage';
-import { Galleries } from './components/pages/Galleries';
-import { SendVerify, NoVerify } from './components/pages/Verify';
-import { NotFound } from './components/pages/NotFound';
+import { Top } from 'src/pages/Top';
+import { Login } from 'src/pages/Login';
+import { Logout } from 'src/pages/Logout';
+import { Mypage } from 'src/pages/Mypage';
+import { Galleries } from 'src/pages/Galleries';
+import { SendVerify, NoVerify } from 'src/pages/Verify';
+import { NotFound } from 'src/pages/NotFound';
+import { Policy } from 'src/pages/Policy';
 
 // ui
-import Header from './components/ui/Header';
-
-import { useAuthContext } from './components/AuthContext';
-import { Policy } from './components/pages/Policy';
+import Header from 'components/Header';
+import { useAuthContext } from 'components/AuthContext';
 import { ErrorBoundaryProvider } from './providers/ErrorBoundaryProvider';
 
 const AuthRouting = (props: { page: ReactNode }) => {

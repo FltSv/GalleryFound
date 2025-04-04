@@ -90,9 +90,6 @@ export interface Creator {
    */
   highlightProductThumbPath?: string;
 
-  products?: Product[];
-  exhibits?: Exhibit[];
-
   /** 最終更新日 */
   updateAt: Timestamp;
 }
@@ -102,16 +99,13 @@ export interface Product extends ImageObject {
   id: string;
   title?: string;
   detail?: string;
-  image: string;
   order: number;
 
   /** 作品の作成日 */
-  //todo: v0.6.1で必須にする
-  createdAt?: Timestamp;
+  createdAt: Timestamp;
 
   /** DBへの登録日 */
-  //todo: v0.6.1で必須にする
-  addedAt?: Timestamp;
+  addedAt: Timestamp;
 }
 
 /** firestore Exhibit */
@@ -122,7 +116,6 @@ export interface Exhibit extends ImageObject {
   galleryId: string;
   startDate?: Timestamp;
   endDate?: Timestamp;
-  image: string;
 }
 
 interface ImageObject {
@@ -130,12 +123,12 @@ interface ImageObject {
    * Storageのcreators/以下を格納
    * @example `{creatorId}%2F{imageId}.png?alt=media&token={token}`
    */
-  imagePath?: string;
+  imagePath: string;
 
   /**
    * Storageのcreators/thumbs/以下を格納
    */
-  thumbPath?: string;
+  thumbPath: string;
 }
 
 /** firestore Gallery */

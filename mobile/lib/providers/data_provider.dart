@@ -26,10 +26,6 @@ class DataProvider {
   late List<Book> _books;
   List<Book> get books => _books;
 
-  late String Function(String userId, String image) _getImageUrl;
-  String getImageUrl(String userId, String image) =>
-      _getImageUrl(userId, image);
-
   late final String _storageImageBaseUrl;
   String get storageImageBaseUrl => _storageImageBaseUrl;
 
@@ -37,7 +33,6 @@ class DataProvider {
   Future<void> fetchData() async {
     final repo = Factory.getDataRepo();
 
-    _getImageUrl = repo.getImageUrl;
     _creators = await repo.fetchCreators();
     _galleries = await repo.fetchGalleries();
     _storageImageBaseUrl = repo.storageImageBaseUrl;

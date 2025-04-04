@@ -30,10 +30,10 @@ import {
   SubmitButton,
   Textarea,
   Textbox,
-} from 'components/ui/Input';
-import { Popup } from 'components/ui/Popup';
+} from 'src/components/Input';
+import { Popup } from 'components/Popup';
 import { Gallery, Creator, Product, Exhibit } from 'src/domain/entities';
-import { DraggableList, SortableProps } from 'components/ui/DraggableList';
+import { DraggableList, SortableProps } from 'components/DraggableList';
 import { getConfig } from 'src/infra/firebase/firebaseConfig';
 import { UserName } from 'src/domain/UserName';
 import { getCreatorData, setCreatorData } from 'src/infra/firebase/CreatorRepo';
@@ -45,11 +45,11 @@ import {
   deleteProduct,
   updateExhibit,
 } from 'src/application/CreatorService';
-import { ProgressBar } from 'components/ui/ProgressBar';
-import { FeedbackButton } from 'components/ui/FeedbackButton';
+import { ProgressBar } from 'components/ProgressBar';
+import { FeedbackButton } from 'components/FeedbackButton';
 import { useFormGuard } from 'src/hooks/useFormGuard';
-import { ConfirmDelete } from 'components/ui/ConfirmDelete';
-import { Spinner } from 'components/ui/Spinner';
+import { ConfirmDelete } from 'components/ConfirmDelete';
+import { Spinner } from 'components/Spinner';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -654,7 +654,7 @@ const ProductCell = (props: ProductCellProps) => {
               md:h-40
             `}
             key={data.id}
-            src={data.tmpImageData || data.imageUrl}
+            src={data.imageUrl}
           />
         </div>
         <p
@@ -740,7 +740,7 @@ const ExhibitRow = (props: ExhibitRowProps) => {
 
             md:max-w-40
           `}
-          src={data.tmpImageData || data.imageUrl}
+          src={data.imageUrl}
         />
         {/* 内容 */}
         <div className="flex w-full flex-col gap-1 align-top">
@@ -837,10 +837,7 @@ const ProductPopup = (props: ProductPopupProps) => {
             md:flex-row
           `}>
           <div className="flex max-w-max basis-1/2 flex-col">
-            <img
-              className="w-full max-w-xs"
-              src={product.tmpImageData || product.imageUrl}
-            />
+            <img className="w-full max-w-xs" src={product.imageUrl} />
           </div>
           <div
             className={`
