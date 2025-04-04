@@ -15,24 +15,14 @@ class ThumbImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: imageBase.thumbUrl,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LoadingPlaceholder();
-        }
+    final resolvedThumbURL = imageBase.thumbUrl;
+    final availThumb = resolvedThumbURL.isNotEmpty;
 
-        final resolvedThumbURL = snapshot.data;
-        final availThumb =
-            resolvedThumbURL != null && resolvedThumbURL.isNotEmpty;
-
-        return CachedNetworkImage(
-          imageUrl: availThumb ? resolvedThumbURL : imageBase.imageUrl,
-          placeholder: (context, url) => const LoadingPlaceholder(),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
-          fit: fit,
-        );
-      },
+    return CachedNetworkImage(
+      imageUrl: availThumb ? resolvedThumbURL : imageBase.imageUrl,
+      placeholder: (context, url) => const LoadingPlaceholder(),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
+      fit: fit,
     );
   }
 }

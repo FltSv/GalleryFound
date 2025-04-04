@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobile/infra/firebase/converter_extensions.dart';
 import 'package:mobile/models/creator.dart';
@@ -70,27 +69,6 @@ class FirebaseRepo implements DataRepoBase {
   @override
   String get storageImageBaseUrl =>
       'https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F';
-
-  @override
-  String getImageUrl(String userId, String image) {
-    const domain =
-        'firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com';
-    return 'https://$domain/o/creators%2F$userId%2F$image';
-  }
-
-  @override
-  Future<String?> getThumbUrl(String userId, String image) async {
-    final thumbImage = image.replaceAll(RegExp(r'\.png\?.*'), '.webp');
-    final path = 'creators/$userId/thumbs/$thumbImage';
-
-    try {
-      final ref = FirebaseStorage.instance.ref().child(path);
-      final url = await ref.getDownloadURL(); // ダウンロードURLを取得
-      return url;
-    } on Object {
-      return null;
-    }
-  }
 
   Future<Product?> _getHighlightProduct(
     DocumentSnapshot<Map<String, dynamic>> docSnap,
