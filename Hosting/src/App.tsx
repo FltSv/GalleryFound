@@ -18,7 +18,7 @@ import { NotFound } from 'src/pages/NotFound';
 import { Policy } from 'src/pages/Policy';
 
 // ui
-import Header from 'components/Header';
+import { Header } from 'components/Header';
 import { useAuthContext } from 'components/AuthContext';
 import { ErrorBoundaryProvider } from './providers/ErrorBoundaryProvider';
 
