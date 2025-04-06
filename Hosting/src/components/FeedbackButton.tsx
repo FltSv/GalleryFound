@@ -50,7 +50,7 @@ export const FeedbackButton = () => {
   return (
     <div
       className={`
-        fixed bottom-4 right-4 z-50
+        fixed bottom-4 right-4 z-10
 
         md:bottom-8 md:right-8
       `}>

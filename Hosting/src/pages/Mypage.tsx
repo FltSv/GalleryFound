@@ -50,6 +50,7 @@ import { FeedbackButton } from 'components/FeedbackButton';
 import { useFormGuard } from 'src/hooks/useFormGuard';
 import { ConfirmDelete } from 'components/ConfirmDelete';
 import { Spinner } from 'components/Spinner';
+import { Snackbar } from 'src/components/Snackbar';
 
 export const Mypage = () => {
   const { user } = useAuthContext();
@@ -375,9 +376,12 @@ export const Mypage = () => {
       console.debug('submit: ', submitData);
       await setCreatorData(user, submitData);
 
-      // 変更状態をリセットしてからリロード
-      markAsClean(() => {
-        window.location.reload();
+      // 変更状態をリセット
+      markAsClean();
+      setIsSubmitting(false);
+      await Snackbar.call({
+        message: '更新が完了しました！',
+        theme: 'success',
       });
     },
     [creator, profileHashtags, user, markAsClean],
@@ -588,6 +592,7 @@ export const Mypage = () => {
 
       <FeedbackButton />
       <ConfirmDelete.Root />
+      <Snackbar.Root />
     </>
   );
 };
