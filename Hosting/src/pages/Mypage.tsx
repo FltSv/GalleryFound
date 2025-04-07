@@ -21,7 +21,7 @@ import { Button as MuiJoyButton, IconButton, Card, Input } from '@mui/joy';
 import { Autocomplete, AutocompleteRenderInputParams } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { RiDraggable } from 'react-icons/ri';
-import { useAuthContext } from 'components/AuthContext';
+import { useAuthContext } from 'src/contexts/AuthContext';
 import {
   Button,
   FileInput,

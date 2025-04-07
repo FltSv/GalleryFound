@@ -2,7 +2,7 @@
 import { createRoot } from 'react-dom/client';
 import './index.tailwind.css';
 
-import { AuthProvider } from './components/AuthContext.tsx';
+import { AuthProvider } from './contexts/AuthContext.tsx';
 import { APIProvider } from '@vis.gl/react-google-maps';
 import { Map } from './pages/Map.tsx';
 

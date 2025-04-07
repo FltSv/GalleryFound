@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useAuthContext } from 'components/AuthContext';
+import { useAuthContext } from 'src/contexts/AuthContext';
 import { MobileMenu } from './MobileMenu';
 import { DesktopMenu } from './DesktopMenu';
 

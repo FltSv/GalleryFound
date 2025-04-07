@@ -5,9 +5,9 @@ import { Divider, Checkbox } from '@mui/joy';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
 import { FirebaseError } from 'firebase/app';
-import { Button, SubmitButton, Textbox } from '../components/Input';
-import { loginWithEmail, loginWith, signupWithEmail } from '../Auth';
-import { useAuthContext } from '../components/AuthContext';
+import { Button, SubmitButton, Textbox } from 'components/Input';
+import { loginWithEmail, loginWith, signupWithEmail } from 'src/Auth';
+import { useAuthContext } from 'src/contexts/AuthContext';
 
 interface Inputs {
   mail: string;

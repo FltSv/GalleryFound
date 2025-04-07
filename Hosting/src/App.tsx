@@ -19,7 +19,7 @@ import { Policy } from 'src/pages/Policy';
 
 // ui
 import { Header } from 'components/Header';
-import { useAuthContext } from 'components/AuthContext';
+import { useAuthContext } from 'src/contexts/AuthContext';
 import { ErrorBoundaryProvider } from './providers/ErrorBoundaryProvider';
 
 const AuthRouting = (props: { page: ReactNode }) => {
