@@ -82,13 +82,13 @@ export interface Creator {
   profile?: string;
   profileHashtags?: string[];
   links?: string[];
-  highlightProductId?: string;
+  highlightProductId?: string | null;
 
   /**
    * Storageのcreators/以下を格納
    * @example `{creatorId}%2F{imageId}.png?alt=media&token={token}`
    */
-  highlightProductThumbPath?: string;
+  highlightProductThumbPath?: string | null;
 
   /** 最終更新日 */
   updateAt: Timestamp;

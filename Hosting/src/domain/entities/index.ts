@@ -1,5 +1,7 @@
 /** 作家 */
 export interface Creator {
+  id: string;
+
   /** 表示名 */
   name: string;
 
