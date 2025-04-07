@@ -54,7 +54,11 @@ import { Snackbar } from 'src/components/Snackbar';
 import { useCreatorContext } from 'src/contexts/CreatorContext';
 
 export const Mypage = () => {
-  const { creator: contextCreator, loading } = useCreatorContext();
+  const {
+    creator: contextCreator,
+    loading,
+    update: updateCreator,
+  } = useCreatorContext();
   const [creator, setCreator] = useState<Creator | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addLink, setAddLink] = useState('');
@@ -362,6 +366,8 @@ export const Mypage = () => {
         links: creator.links,
         products: creator.products,
         exhibits: creator.exhibits,
+        highlightThumbUrl:
+          creator.products.find(p => p.isHighlight)?.thumbUrl ?? null,
       };
 
       // ローディングの表示
@@ -371,6 +377,9 @@ export const Mypage = () => {
       console.debug('submit: ', submitData);
       await setCreatorData(submitData);
 
+      // CreatorContextを更新
+      updateCreator(submitData);
+
       // 変更状態をリセット
       markAsClean();
       setIsSubmitting(false);
@@ -379,7 +388,7 @@ export const Mypage = () => {
         theme: 'success',
       });
     },
-    [creator, profileHashtags, markAsClean],
+    [creator, profileHashtags, markAsClean, updateCreator],
   );
 
   const onSubmit = useCallback(

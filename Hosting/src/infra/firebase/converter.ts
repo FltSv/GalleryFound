@@ -39,7 +39,8 @@ export const creatorConverter: FirestoreDataConverter<Creator> = {
       links: data.links ?? [],
       highlightProductId: data.highlightProductId ?? null,
       highlightThumbUrl:
-        data.highlightProductThumbPath === undefined
+        data.highlightProductThumbPath === undefined ||
+        data.highlightProductThumbPath === null
           ? null
           : storageCreatorsBaseUrl + data.highlightProductThumbPath,
       products: [],
@@ -48,15 +49,15 @@ export const creatorConverter: FirestoreDataConverter<Creator> = {
   },
 
   toFirestore(creator: Creator) {
-    const highlightProduct = creator.products.find(x => x.isHighlight);
+    const highlightProduct =
+      creator.products.find(x => x.isHighlight) ?? creator.products.at(0);
 
-    const highlightProductThumbUrl =
-      highlightProduct?.thumbUrl ?? creator.products.at(0)?.thumbUrl;
+    const highlightProductThumbUrl = highlightProduct?.thumbUrl ?? null;
 
     const highlightProductThumbPath =
-      highlightProductThumbUrl !== undefined
+      highlightProductThumbUrl !== null
         ? toFirestoreImageUrl(highlightProductThumbUrl)
-        : undefined;
+        : null;
 
     return {
       name: creator.name,
@@ -64,7 +65,7 @@ export const creatorConverter: FirestoreDataConverter<Creator> = {
       profile: creator.profile,
       profileHashtags: creator.profileHashtags,
       links: creator.links,
-      highlightProductId: highlightProduct?.id,
+      highlightProductId: highlightProduct?.id ?? null,
       highlightProductThumbPath,
       updateAt: Timestamp.fromDate(new Date()),
     } satisfies FirebaseCreator;

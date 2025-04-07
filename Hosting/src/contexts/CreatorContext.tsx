@@ -14,12 +14,14 @@ interface CreatorContextType {
   creator: Creator | null;
   loading: boolean;
   refetch: () => Promise<void>;
+  update: (updatedCreator: Creator) => void;
 }
 
 const CreatorContext = createContext<CreatorContextType>({
   creator: null,
   loading: true,
   refetch: async () => {},
+  update: () => {},
 });
 
 export const useCreatorContext = () => useContext(CreatorContext);
@@ -59,8 +61,12 @@ export const CreatorProvider = (props: { children: ReactNode }) => {
     }
   };
 
+  const update = (updatedCreator: Creator) => {
+    setCreator(updatedCreator);
+  };
+
   return (
-    <CreatorContext.Provider value={{ creator, loading, refetch }}>
+    <CreatorContext.Provider value={{ creator, loading, refetch, update }}>
       {props.children}
     </CreatorContext.Provider>
   );
