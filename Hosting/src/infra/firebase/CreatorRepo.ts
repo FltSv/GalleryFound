@@ -37,6 +37,7 @@ export const getCreatorData = async (user: User) => {
   if (!docSnap.exists()) {
     // 存在しない場合、情報は空のままで登録を促す
     const empty: Creator = {
+      id: userId,
       name: '',
       genre: '',
       profile: '',
@@ -77,8 +78,8 @@ export const getCreatorData = async (user: User) => {
 /**
  *  値の確定、DBへデータを送信する
  */
-export const setCreatorData = async (user: User, data: Creator) => {
-  const userId = user.uid;
+export const setCreatorData = async (data: Creator) => {
+  const userId = data.id;
 
   // 作品の並び順更新
   const updateProductTasks = data.products.map((product, i) =>

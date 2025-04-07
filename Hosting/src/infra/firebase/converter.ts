@@ -31,6 +31,7 @@ export const creatorConverter: FirestoreDataConverter<Creator> = {
     const data = snapshot.data(options) as FirebaseCreator;
 
     return {
+      id: snapshot.id,
       name: data.name ?? '',
       genre: data.genre ?? '',
       profile: data.profile ?? '',
