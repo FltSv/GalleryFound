@@ -1,7 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/widgets/empty_image_placeholder.dart';
-import 'package:mobile/widgets/thumb_image.dart';
+import 'package:mobile/widgets/loading_placeholder.dart';
 
 class CreatorItem extends StatelessWidget {
   const CreatorItem({
@@ -13,7 +14,7 @@ class CreatorItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final product = creator.highlightProduct;
+    final imageUrl = creator.highlightProductUrl;
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -23,8 +24,13 @@ class CreatorItem extends StatelessWidget {
       child: Stack(
         children: [
           // 背景画像またはプレースホルダー
-          product != null
-              ? ThumbImage(imageBase: product)
+          imageUrl != null
+              ? CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  placeholder: (context, url) => const LoadingPlaceholder(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  fit: BoxFit.cover,
+                )
               : const EmptyImagePlaceholder(),
           // シャドウグラデーション
           Positioned(
@@ -39,7 +45,7 @@ class CreatorItem extends StatelessWidget {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withOpacity(0.8),
+                    Colors.black.withValues(alpha: 0.8),
                   ],
                 ),
               ),

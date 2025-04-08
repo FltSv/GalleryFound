@@ -1,5 +1,3 @@
-import 'package:mobile/models/product.dart';
-
 class Creator {
   Creator({
     required this.id,
@@ -8,10 +6,9 @@ class Creator {
     required this.profile,
     required this.profileHashtags,
     required this.links,
-    required this.highlightProduct,
-  }) {
-    highlightProduct?.creator = this;
-  }
+    required this.highlightProductId,
+    required this.highlightProductUrl,
+  });
 
   final String id;
 
@@ -30,6 +27,9 @@ class Creator {
   /// SNSリンク
   final List<String> links;
 
-  /// 代表作品
-  final Product? highlightProduct;
+  /// 代表作品ID
+  final String? highlightProductId;
+
+  /// 代表作品URL
+  final String? highlightProductUrl;
 }

@@ -12,33 +12,15 @@ class FirebaseRepo implements DataRepoBase {
   @override
   Future<List<Creator>> fetchCreators() async {
     final db = FirebaseFirestore.instance;
-    final querySnap = await db.collection('creators').get();
+    final querySnap =
+        await db.collection('creators').withCreatorConverter(this).get();
 
     final ignoreIds = ConfigProvider().config.debugUserIds;
 
-    final fetchTasks = querySnap.docs
+    return querySnap.docs
         .where((docSnap) => kDebugMode || !ignoreIds.contains(docSnap.id))
-        .map((docSnap) async {
-      final data = docSnap.data();
-
-      final profileHashtags =
-          ((data['profileHashtags'] ?? <String>[]) as List<dynamic>)
-              .cast<String>();
-
-      final highlightProduct = await _getHighlightProduct(docSnap);
-
-      return Creator(
-        id: docSnap.id,
-        name: toStr(data['name']),
-        genre: toStr(data['genre']),
-        profile: toStr(data['profile']),
-        profileHashtags: profileHashtags,
-        links: ((data['links'] ?? <String>[]) as List<dynamic>).cast<String>(),
-        highlightProduct: highlightProduct,
-      );
-    });
-
-    return Future.wait(fetchTasks);
+        .map((docSnap) => docSnap.data())
+        .toList();
   }
 
   @override
@@ -69,34 +51,6 @@ class FirebaseRepo implements DataRepoBase {
   @override
   String get storageImageBaseUrl =>
       'https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F';
-
-  Future<Product?> _getHighlightProduct(
-    DocumentSnapshot<Map<String, dynamic>> docSnap,
-  ) async {
-    final productsCollectionRef = docSnap.reference.collection('products');
-    final data = docSnap.data();
-
-    final highlightProductId = toStr(data?['highlightProductId']);
-    if (highlightProductId.isNotEmpty) {
-      final highlightProductSnap = await productsCollectionRef
-          .doc(highlightProductId)
-          .withProductConverter(this)
-          .get();
-      return highlightProductSnap.data();
-    }
-
-    final firstProduct = await productsCollectionRef
-        .orderBy('order')
-        .limit(1)
-        .withProductConverter(this)
-        .get();
-
-    if (firstProduct.docs.isEmpty) {
-      return null;
-    }
-
-    return firstProduct.docs.first.data();
-  }
 
   @override
   Future<List<Product>> fetchCreatorProducts(Creator creator) async {
