@@ -1,21 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobile/infra/firebase/converter_extensions.dart';
+import 'package:mobile/models/config.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/models/gallery.dart';
 import 'package:mobile/models/product.dart';
-import 'package:mobile/providers/config_provider.dart';
 import 'package:mobile/repos/data_repo_base.dart';
 
 class FirebaseRepo implements DataRepoBase {
+  FirebaseRepo(Config config) : _config = config;
+
+  final Config _config;
+
   @override
   Future<List<Creator>> fetchCreators() async {
     final db = FirebaseFirestore.instance;
-    final querySnap =
-        await db.collection('creators').withCreatorConverter(this).get();
+    final orderConfig = _config.creatorsOrder;
 
-    final ignoreIds = ConfigProvider().config.debugUserIds;
+    final querySnap = await db
+        .collection('creators')
+        .orderBy(orderConfig.field, descending: !orderConfig.isAsc)
+        .withCreatorConverter(this)
+        .get();
+
+    final ignoreIds = _config.debugUserIds;
 
     return querySnap.docs
         .where((docSnap) => kDebugMode || !ignoreIds.contains(docSnap.id))
@@ -86,11 +95,13 @@ class FirebaseRepo implements DataRepoBase {
   @override
   Future<List<Exhibit>> fetchCreatorExhibits(Creator creator) async {
     final db = FirebaseFirestore.instance;
+    final orderConfig = _config.exhibitsOrder;
 
     final exhibitsSnap = await db
         .collection('creators')
         .doc(creator.id)
         .collection('exhibits')
+        .orderBy(orderConfig.field, descending: !orderConfig.isAsc)
         .withExhibitConverter(this)
         .get();
 
@@ -102,10 +113,12 @@ class FirebaseRepo implements DataRepoBase {
     DateTime date,
   ) async {
     final db = FirebaseFirestore.instance;
-    final ignoreCreatorIds = ConfigProvider().config.debugUserIds;
+    final ignoreCreatorIds = _config.debugUserIds;
+    final orderConfig = _config.exhibitsOrder;
 
     final exhibitsSnap = await db
         .collectionGroup('exhibits')
+        .orderBy(orderConfig.field, descending: !orderConfig.isAsc)
         .where('endDate', isGreaterThanOrEqualTo: date)
         .withExhibitConverter(this)
         .get();
@@ -123,10 +136,11 @@ class FirebaseRepo implements DataRepoBase {
   }) async {
     final db = FirebaseFirestore.instance;
     final ignoreProductIds = await getIgnoreProductIds();
+    final orderConfig = _config.productsOrder;
 
     final productsQuery = db
         .collectionGroup('products')
-        .orderBy('id', descending: true)
+        .orderBy(orderConfig.field, descending: !orderConfig.isAsc)
         .where('id', whereNotIn: ignoreProductIds)
         .withProductConverter(this);
 
@@ -163,7 +177,7 @@ class FirebaseRepo implements DataRepoBase {
     }
 
     final db = FirebaseFirestore.instance;
-    final ignoreCreatorIds = ConfigProvider().config.debugUserIds;
+    final ignoreCreatorIds = _config.debugUserIds;
 
     final tasks = ignoreCreatorIds.map((creatorId) async {
       final querySnap = await db
