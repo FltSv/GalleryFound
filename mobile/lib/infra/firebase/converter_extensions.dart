@@ -79,12 +79,15 @@ T _withProductConverter<T>(
   return withConverter(
     fromFirestore: (snapshot, _) {
       final data = snapshot.data()!;
+      final creatorId = snapshot.reference.parent.parent!.id;
+
       return Product(
         id: toStr(data['id']),
         title: toStr(data['title']),
         detail: toStr(data['detail']),
         imagePath: data['imagePath'].toString(),
         thumbPath: data['thumbPath'].toString(),
+        creatorId: creatorId,
       );
     },
     toFirestore: _readOnlyToFirestore(),
@@ -98,6 +101,8 @@ T _withExhibitConverter<T>(
   return withConverter(
     fromFirestore: (snapshot, _) {
       final data = snapshot.data()!;
+      final creatorId = snapshot.reference.parent.parent!.id;
+
       return Exhibit(
         id: toStr(data['id']),
         title: toStr(data['title']),
@@ -107,6 +112,7 @@ T _withExhibitConverter<T>(
         thumbPath: data['thumbPath'].toString(),
         startDate: toDateTime(data['startDate']),
         endDate: toDateTime(data['endDate']),
+        creatorId: creatorId,
       );
     },
     toFirestore: _readOnlyToFirestore(),

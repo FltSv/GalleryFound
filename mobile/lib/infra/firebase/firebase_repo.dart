@@ -24,6 +24,22 @@ class FirebaseRepo implements DataRepoBase {
   }
 
   @override
+  Future<Creator> fetchCreatorById(String creatorId) async {
+    final db = FirebaseFirestore.instance;
+    final docSnap = await db
+        .collection('creators')
+        .doc(creatorId)
+        .withCreatorConverter(this)
+        .get();
+
+    if (!docSnap.exists) {
+      throw Exception('CreatorId "$creatorId" is not found.');
+    }
+
+    return docSnap.data()!;
+  }
+
+  @override
   Future<List<Gallery>> fetchGalleries() async {
     final db = FirebaseFirestore.instance;
     final querySnap =
@@ -64,9 +80,7 @@ class FirebaseRepo implements DataRepoBase {
         .withProductConverter(this)
         .get();
 
-    return productsSnap.docs
-        .map((docSnap) => docSnap.data()..creator = creator)
-        .toList();
+    return productsSnap.docs.map((docSnap) => docSnap.data()).toList();
   }
 
   @override
@@ -80,15 +94,12 @@ class FirebaseRepo implements DataRepoBase {
         .withExhibitConverter(this)
         .get();
 
-    return exhibitsSnap.docs
-        .map((docSnap) => docSnap.data()..creator = creator)
-        .toList();
+    return exhibitsSnap.docs.map((docSnap) => docSnap.data()).toList();
   }
 
   @override
   Future<List<Exhibit>> fetchExhibitsAfterDate(
     DateTime date,
-    List<Creator> creators,
   ) async {
     final db = FirebaseFirestore.instance;
     final ignoreCreatorIds = ConfigProvider().config.debugUserIds;
@@ -99,22 +110,14 @@ class FirebaseRepo implements DataRepoBase {
         .withExhibitConverter(this)
         .get();
 
-    return exhibitsSnap.docs.where((docSnap) {
-      final id = docSnap.reference.parent.parent!.id;
-      return !ignoreCreatorIds.contains(id);
-    }).map((docSnap) {
-      final creatorId = docSnap.reference.parent.parent!.id;
-      final creator = creators.firstWhere(
-        (creator) => creator.id == creatorId,
-      );
-
-      return docSnap.data()..creator = creator;
-    }).toList();
+    return exhibitsSnap.docs
+        .map((docSnap) => docSnap.data())
+        .where((exhibit) => !ignoreCreatorIds.contains(exhibit.creatorId))
+        .toList();
   }
 
   @override
   Future<List<Product>> fetchProducts({
-    required List<Creator> creators,
     required int limit,
     Product? lastProduct,
   }) async {
@@ -141,24 +144,12 @@ class FirebaseRepo implements DataRepoBase {
             .limit(limit)
             .get();
 
-        return querySnap.docs.map((docSnap) {
-          final creatorId = docSnap.reference.parent.parent!.id;
-          final creator = creators.firstWhere(
-            (creator) => creator.id == creatorId,
-          );
-
-          return docSnap.data()..creator = creator;
-        }).toList();
+        return querySnap.docs.map((docSnap) => docSnap.data()).toList();
       }
     }
 
     final querySnap = await productsQuery.limit(limit).get();
-    return querySnap.docs.map((docSnap) {
-      final creatorId = docSnap.reference.parent.parent!.id;
-      final creator = creators.firstWhere((creator) => creator.id == creatorId);
-
-      return docSnap.data()..creator = creator;
-    }).toList();
+    return querySnap.docs.map((docSnap) => docSnap.data()).toList();
   }
 
   List<String> _ignoreProductIds = [];

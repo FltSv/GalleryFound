@@ -12,6 +12,7 @@ class Exhibit extends ImageBase {
     required this.endDate,
     required super.imagePath,
     required super.thumbPath,
+    required super.creatorId,
   });
 
   final String id;

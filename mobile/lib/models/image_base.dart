@@ -5,6 +5,7 @@ class ImageBase {
   ImageBase({
     required this.imagePath,
     required this.thumbPath,
+    required this.creatorId,
   });
 
   /// Storageのcreators/以下を格納する画像パス
@@ -24,5 +25,12 @@ class ImageBase {
   /// サムネイル画像のURL
   String get thumbUrl => DataProvider().storageImageBaseUrl + thumbPath;
 
-  late final Creator creator;
+  /// アイテムを所有するCreatorのID
+  final String creatorId;
+
+  /// アイテムを所有するCreator
+  Creator get creator => DataProvider().creators.firstWhere(
+        (creator) => creator.id == creatorId,
+        orElse: () => throw Exception('Creator "$creatorId" not found.'),
+      );
 }
