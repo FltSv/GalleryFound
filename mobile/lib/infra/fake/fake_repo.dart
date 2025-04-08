@@ -18,15 +18,9 @@ class FakeRepo implements DataRepoBase {
         profile: 'すなプロフィール',
         profileHashtags: [],
         links: ['https://mstdn.jp/@fltsv', 'https://mstdn.jp/@himarori'],
-        highlightProduct: Product(
-          id: '10043286-3072-49b8-a04a-83b9b1f790f5',
-          title: 'ねこ',
-          detail: 'ねこ説明',
-          imagePath:
-              'nkRObVdYriU5AolyNxJy5pIDKEs2/9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f',
-          thumbPath:
-              'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
-        ),
+        highlightProductId: '10043286-3072-49b8-a04a-83b9b1f790f5',
+        highlightProductUrl:
+            'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
       ),
       Creator(
         id: 'cWp162TEn9MrXVUqifEmRJ22nyx1',
@@ -39,17 +33,21 @@ class FakeRepo implements DataRepoBase {
           'https://x.com/utsukikuroko',
           'https://misskey.m544.net/@choco',
         ],
-        highlightProduct: Product(
-          id: '43a0e71b-9761-4800-9e88-1a57a3a4ed53',
-          title: '',
-          detail: '',
-          imagePath:
-              'cWp162TEn9MrXVUqifEmRJ22nyx1/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.png?alt=media&token=f2f8f802-c85b-464e-8de8-8a29468c74c8',
-          thumbPath:
-              'cWp162TEn9MrXVUqifEmRJ22nyx1/thumbs/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.webp',
-        ),
+        highlightProductId: '43a0e71b-9761-4800-9e88-1a57a3a4ed53',
+        highlightProductUrl:
+            'cWp162TEn9MrXVUqifEmRJ22nyx1/thumbs/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.webp',
       ),
     ]);
+  }
+
+  @override
+  Future<Creator> fetchCreatorById(String creatorId) async {
+    final creators = await fetchCreators();
+    final creator = creators.firstWhere(
+      (creator) => creator.id == creatorId,
+      orElse: () => throw Exception('CreatorId "$creatorId" is not found.'),
+    );
+    return creator;
   }
 
   @override
@@ -129,7 +127,8 @@ class FakeRepo implements DataRepoBase {
             'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
         startDate: DateTime(2024, 7, 3),
         endDate: DateTime(2024, 7, 3, 23),
-      )..creator = creator,
+        creatorId: creator.id,
+      ),
       Exhibit(
         id: '01J1E3FS0PQDNVDD20QWMM467M',
         title: 'neko',
@@ -141,7 +140,8 @@ class FakeRepo implements DataRepoBase {
             'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
         startDate: DateTime(2024, 7, 2),
         endDate: DateTime(2024, 7, 4, 23),
-      )..creator = creator,
+        creatorId: creator.id,
+      ),
       Exhibit(
         id: '1c53ca10-1220-4d12-b68c-b0a35a1820df',
         title: 'うにゃ～',
@@ -153,7 +153,8 @@ class FakeRepo implements DataRepoBase {
             'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
         startDate: DateTime(2024, 3, 13),
         endDate: DateTime(2024, 3, 28),
-      )..creator = creator,
+        creatorId: creator.id,
+      ),
     ];
   }
 
@@ -168,7 +169,8 @@ class FakeRepo implements DataRepoBase {
             'nkRObVdYriU5AolyNxJy5pIDKEs2/9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f',
         thumbPath:
             'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
-      )..creator = creator,
+        creatorId: creator.id,
+      ),
       Product(
         id: '4eb84461-3664-480c-b89d-77dc401bb0e5',
         title: '',
@@ -177,7 +179,8 @@ class FakeRepo implements DataRepoBase {
             'cWp162TEn9MrXVUqifEmRJ22nyx1/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.png?alt=media&token=f2f8f802-c85b-464e-8de8-8a29468c74c8',
         thumbPath:
             'cWp162TEn9MrXVUqifEmRJ22nyx1/thumbs/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.webp',
-      )..creator = creator,
+        creatorId: creator.id,
+      ),
       Product(
         id: '43a0e71b-9761-4800-9e88-1a57a3a4ed53',
         title: '',
@@ -186,7 +189,8 @@ class FakeRepo implements DataRepoBase {
             'cWp162TEn9MrXVUqifEmRJ22nyx1/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.png?alt=media&token=f2f8f802-c85b-464e-8de8-8a29468c74c8',
         thumbPath:
             'cWp162TEn9MrXVUqifEmRJ22nyx1/thumbs/46ff0e7f-b781-4694-bb0d-cf94ce3aa2fa.webp',
-      )..creator = creator,
+        creatorId: creator.id,
+      ),
       Product(
         id: 'd94c32a0-e82e-41b8-af6e-4c61ce4a065b',
         title: '',
@@ -195,25 +199,22 @@ class FakeRepo implements DataRepoBase {
             'nkRObVdYriU5AolyNxJy5pIDKEs2/9887707f-ac43-43bd-9015-2f112df57576.png?alt=media&token=10b319a5-8349-4fb1-959e-4d50d05cfb6f',
         thumbPath:
             'nkRObVdYriU5AolyNxJy5pIDKEs2/thumbs/9887707f-ac43-43bd-9015-2f112df57576.webp',
-      )..creator = creator,
+        creatorId: creator.id,
+      ),
     ];
   }
 
   @override
   Future<List<Exhibit>> fetchExhibitsAfterDate(
     DateTime date,
-    List<Creator> creators,
   ) async {
-    final creators = await fetchCreators();
-    final creator = creators[0];
-
+    final creator = await fetchCreatorById('nkRObVdYriU5AolyNxJy5pIDKEs2');
     final exhibits = await fetchCreatorExhibits(creator);
     return exhibits.where((exhibit) => exhibit.endDate.isAfter(date)).toList();
   }
 
   @override
   Future<List<Product>> fetchProducts({
-    required List<Creator> creators,
     required int limit,
     Product? lastProduct,
   }) {

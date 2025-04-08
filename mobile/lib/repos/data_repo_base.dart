@@ -7,6 +7,9 @@ abstract class DataRepoBase {
   /// 全クリエイター一覧を取得
   Future<List<Creator>> fetchCreators();
 
+  /// 指定IDのクリエイターを取得
+  Future<Creator> fetchCreatorById(String creatorId);
+
   /// 全ギャラリー一覧を取得
   Future<List<Gallery>> fetchGalleries();
 
@@ -22,12 +25,10 @@ abstract class DataRepoBase {
   /// 指定日時以降の展示一覧を取得
   Future<List<Exhibit>> fetchExhibitsAfterDate(
     DateTime date,
-    List<Creator> creators,
   );
 
   /// 作品一覧を取得
   Future<List<Product>> fetchProducts({
-    required List<Creator> creators,
     required int limit,
     Product? lastProduct,
   });

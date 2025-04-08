@@ -6,6 +6,7 @@ import 'package:mobile/infra/factory.dart';
 import 'package:mobile/infra/fake/fake_repo.dart';
 import 'package:mobile/infra/shared_preferences/shared_pref_user_data_repo.dart';
 import 'package:mobile/models/book.dart';
+import 'package:mobile/models/config.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/gallery.dart';
 
@@ -16,6 +17,8 @@ class DataProvider {
 
   // シングルトンのインスタンスを作成
   static final DataProvider _instance = DataProvider._internal();
+
+  late Config _config;
 
   late List<Creator> _creators;
   List<Creator> get creators => _creators;
@@ -30,8 +33,10 @@ class DataProvider {
   String get storageImageBaseUrl => _storageImageBaseUrl;
 
   /// データの取得
-  Future<void> fetchData() async {
-    final repo = Factory.getDataRepo();
+  Future<void> fetchData(Config config) async {
+    _config = config;
+
+    final repo = getDataRepo(_config);
 
     _creators = await repo.fetchCreators();
     _galleries = await repo.fetchGalleries();
@@ -40,7 +45,7 @@ class DataProvider {
   }
 }
 
-final dataRepoProvider = Provider((ref) => Factory.getDataRepo());
+final dataRepoProvider = Provider((ref) => getDataRepo(DataProvider()._config));
 final userDataRepoProvider = Provider((ref) => SharedPrefUserDataRepo());
 
 final creatorUsecaseProvider =

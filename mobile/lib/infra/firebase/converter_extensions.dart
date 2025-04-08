@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/models/gallery.dart';
 import 'package:mobile/models/product.dart';
@@ -10,6 +11,9 @@ typedef WithConverterType<T, R> = T Function({
 });
 
 extension DocumentRefX on DocumentReference {
+  DocumentReference<Creator> withCreatorConverter(DataRepoBase repo) =>
+      _withCreatorConverter(withConverter, repo);
+
   DocumentReference<Product> withProductConverter(DataRepoBase repo) =>
       _withProductConverter(withConverter, repo);
 
@@ -21,6 +25,9 @@ extension DocumentRefX on DocumentReference {
 }
 
 extension QueryX on Query {
+  Query<Creator> withCreatorConverter(DataRepoBase repo) =>
+      _withCreatorConverter(withConverter, repo);
+
   Query<Product> withProductConverter(DataRepoBase repo) =>
       _withProductConverter(withConverter, repo);
 
@@ -31,6 +38,40 @@ extension QueryX on Query {
       _withGalleryConverter(withConverter, repo);
 }
 
+T _withCreatorConverter<T>(
+  WithConverterType<T, Creator> withConverter,
+  DataRepoBase repo,
+) {
+  return withConverter(
+    fromFirestore: (snapshot, _) {
+      final data = snapshot.data()!;
+
+      final profileHashtags =
+          ((data['profileHashtags'] ?? <String>[]) as List<dynamic>)
+              .cast<String>();
+
+      final highlightProductId = data['highlightProductId'] as String?;
+
+      final highlightProductPath = data['highlightProductThumbPath'] as String?;
+      final highlightProductUrl = highlightProductPath != null
+          ? repo.storageImageBaseUrl + highlightProductPath
+          : null;
+
+      return Creator(
+        id: snapshot.id,
+        name: toStr(data['name']),
+        genre: toStr(data['genre']),
+        profile: toStr(data['profile']),
+        profileHashtags: profileHashtags,
+        links: ((data['links'] ?? <String>[]) as List<dynamic>).cast<String>(),
+        highlightProductId: highlightProductId,
+        highlightProductUrl: highlightProductUrl,
+      );
+    },
+    toFirestore: _readOnlyToFirestore(),
+  );
+}
+
 T _withProductConverter<T>(
   WithConverterType<T, Product> withConverter,
   DataRepoBase repo,
@@ -38,12 +79,15 @@ T _withProductConverter<T>(
   return withConverter(
     fromFirestore: (snapshot, _) {
       final data = snapshot.data()!;
+      final creatorId = snapshot.reference.parent.parent!.id;
+
       return Product(
         id: toStr(data['id']),
         title: toStr(data['title']),
         detail: toStr(data['detail']),
         imagePath: data['imagePath'].toString(),
         thumbPath: data['thumbPath'].toString(),
+        creatorId: creatorId,
       );
     },
     toFirestore: _readOnlyToFirestore(),
@@ -57,6 +101,8 @@ T _withExhibitConverter<T>(
   return withConverter(
     fromFirestore: (snapshot, _) {
       final data = snapshot.data()!;
+      final creatorId = snapshot.reference.parent.parent!.id;
+
       return Exhibit(
         id: toStr(data['id']),
         title: toStr(data['title']),
@@ -66,6 +112,7 @@ T _withExhibitConverter<T>(
         thumbPath: data['thumbPath'].toString(),
         startDate: toDateTime(data['startDate']),
         endDate: toDateTime(data['endDate']),
+        creatorId: creatorId,
       );
     },
     toFirestore: _readOnlyToFirestore(),

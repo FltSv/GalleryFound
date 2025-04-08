@@ -48,7 +48,7 @@ void main() {
 
     // データの取得
     await ConfigProvider().init();
-    await DataProvider().fetchData();
+    await DataProvider().fetchData(ConfigProvider().config);
 
     // 更新の確認
     await VersionService.checkUpdateRequired();

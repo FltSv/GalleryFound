@@ -8,6 +8,7 @@ class Product extends ImageBase {
     required this.detail,
     required super.imagePath,
     required super.thumbPath,
+    required super.creatorId,
   });
 
   final String id;

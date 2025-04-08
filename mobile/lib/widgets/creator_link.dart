@@ -1,9 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_detail_screen.dart';
-import 'package:mobile/widgets/thumb_image.dart';
+import 'package:mobile/widgets/loading_placeholder.dart';
 
 class CreatorLink extends StatelessWidget {
   const CreatorLink({
@@ -17,7 +18,7 @@ class CreatorLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final product = creator.highlightProduct;
+    final imageUrl = creator.highlightProductUrl;
 
     return InkWell(
       onTap: () {
@@ -35,9 +36,13 @@ class CreatorLink extends StatelessWidget {
               width: avatarSize,
               height: avatarSize,
               child: ClipOval(
-                child: product != null
-                    ? ThumbImage(
-                        imageBase: product,
+                child: imageUrl != null
+                    ? CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        placeholder: (context, url) =>
+                            const LoadingPlaceholder(),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                         fit: BoxFit.cover,
                       )
                     : ColoredBox(

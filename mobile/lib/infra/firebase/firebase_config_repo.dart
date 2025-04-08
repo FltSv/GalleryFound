@@ -10,11 +10,18 @@ class FirebaseConfigRepo implements ConfigRepoBase {
     final config = FirebaseRemoteConfig.instance;
     await config.fetchAndActivate();
 
+    // ordersのJSONを取得して解析
+    final ordersJson =
+        json.decode(config.getString('orders')) as Map<String, dynamic>;
+
     return Config(
       mapUrl: config.getString('map_url'),
       debugUserIds: _getJsonAsList<String>(config, 'debug_user_ids'),
       requiredAppVersion: config.getString('required_app_version'),
       genres: _getJsonAsList(config, 'genres'),
+      creatorsOrder: _parseOrderConfig(ordersJson['creators']),
+      productsOrder: _parseOrderConfig(ordersJson['products']),
+      exhibitsOrder: _parseOrderConfig(ordersJson['exhibits']),
     );
   }
 
@@ -36,5 +43,14 @@ class FirebaseConfigRepo implements ConfigRepoBase {
     final string = config.getString(key);
     final list = json.decode(string) as List<dynamic>;
     return list.cast<T>();
+  }
+
+  OrderConfig _parseOrderConfig(dynamic orderData) {
+    final orderDataMap = orderData as Map<String, dynamic>;
+
+    return OrderConfig(
+      field: orderDataMap['field'] as String,
+      isAsc: orderDataMap['asc'] as bool,
+    );
   }
 }
