@@ -1,24 +1,18 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "sourceMap": true, // ソースマップを有効化
-    "target": "ESNext",
-    "module": "ES2015", // TSのモジュールはES Modulesとして出力
-    "strict": true, // 厳密モードとして設定
-    "moduleResolution": "node",
-    "rootDir": "./src",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "useDefineForClassFields": true,
     "outDir": "./dist",
-    "allowSyntheticDefaultImports": true,
 
-    // React
+    /* Bundler mode */
     "jsx": "react-jsx",
-    "lib": ["ESNext", "DOM"],
 
     "paths": {
       "src/*": ["./src/*"],
       "components/*": ["./src/components/*"]
-    },
-
-    "typeRoots": ["node_modules/@types"]
+    }
   },
-  "include": ["./src/**/*"]
+  "include": ["src", "vite.config.ts"]
 }

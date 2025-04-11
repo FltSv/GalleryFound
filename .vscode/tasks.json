@@ -3,23 +3,19 @@
   "tasks": [
     {
       "type": "npm",
-      "script": "start",
+      "script": "dev",
       "path": "Hosting/",
-      "label": "npm: start",
-      "group": {
-        "kind": "test",
-        "isDefault": true
-      },
+      "label": "npm: dev",
       "isBackground": true,
       "problemMatcher": {
         "owner": "custom",
         "pattern": {
-          "regexp": "^$"
+          "regexp": ".+"
         },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "npm run .*",
-          "endsPattern": "compiled .*"
+          "endsPattern": "ready in .*"
         }
       }
     }
