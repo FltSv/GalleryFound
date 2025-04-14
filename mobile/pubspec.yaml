@@ -51,10 +51,12 @@ dependencies:
   cached_network_image: ^3.4.1
   firebase_storage: ^12.3.7
   package_info_plus: ^8.1.2
-  shared_preferences: ^2.3.5
+  shared_preferences: ^2.5.3
   flutter_svg: ^2.0.17
   flutter_riverpod: ^2.6.1
   infinite_scroll_pagination: ^5.0.0
+  firebase_crashlytics: ^4.3.5
+  firebase_analytics: ^11.4.5
 
 dev_dependencies:
   flutter_test:
