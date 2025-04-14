@@ -6,7 +6,7 @@
   },
   "hosting": {
     "site": "gallery-found",
-    "public": "public",
+    "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {

@@ -7,17 +7,15 @@ export const DesktopMenu = ({
   visibleMypage,
 }: MenuProps) => {
   const styles = `
-    text-nowrap rounded-3xl border border-solid border-current px-4 py-2
+    rounded-3xl border border-solid border-current px-4 py-2 text-nowrap
     no-underline transition
-
-    hover:bg-sky-200 hover:bg-opacity-60
+    hover:bg-sky-200/60
   `;
 
   return (
     <div
       className={`
         hidden gap-4
-
         md:flex
       `}>
       {visibleLogin && (

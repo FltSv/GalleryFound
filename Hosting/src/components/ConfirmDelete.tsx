@@ -21,7 +21,7 @@ export const ConfirmDelete = createCallable<Props, Response>(
     return (
       <div
         className={`
-          fixed inset-0 flex items-center justify-center bg-black bg-opacity-20
+          fixed inset-0 flex items-center justify-center bg-black/20
           backdrop-blur
         `}>
         <div
@@ -33,16 +33,22 @@ export const ConfirmDelete = createCallable<Props, Response>(
           role="dialog">
           <p className="text-lg font-bold">{title}</p>
           <p>{message}</p>
-          <hr />
+          <hr className="border-gray-300" />
           <div className="flex gap-2">
             <button
-              className="rounded-md bg-red-600 px-4 py-2 text-sm text-white"
+              className={`
+                cursor-pointer rounded-md bg-red-600 px-4 py-2 text-sm
+                text-white
+                hover:opacity-80
+              `}
               onClick={onAccept}>
               削除
             </button>
             <button
               className={`
-                rounded-md border border-gray-300 bg-white px-4 py-2 text-sm
+                cursor-pointer rounded-md border border-gray-300 bg-white px-4
+                py-2 text-sm
+                hover:opacity-80
               `}
               onClick={onDecline}>
               キャンセル

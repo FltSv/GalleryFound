@@ -65,17 +65,8 @@ node_modules/
 # dotenv environment variables file
 .env
 
-# Webpack
-/public/bundle.js
-/app.js
+# Vite
+/*dist/
 
 # OS Auto Generate File
 *.DS_Store
-
-# distImages
-/public/assets/images
-/public/favicon.ico
-
-# outputFonts
-/public/*.ttf
-/public/*.woff
