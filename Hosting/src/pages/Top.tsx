@@ -16,7 +16,6 @@ export const Top = () => (
       <img
         className={`
           w-24
-
           md:w-40
         `}
         src="img/exhibit-screen.png"
@@ -32,7 +31,6 @@ export const Top = () => (
       <img
         className={`
           w-24
-
           md:w-40
         `}
         src="img/map-screen.png"
@@ -64,7 +62,6 @@ export const Top = () => (
       <img
         className={`
           w-24
-
           md:w-40
         `}
         src="img/creator-screen.png"
@@ -80,7 +77,6 @@ export const Top = () => (
     <div
       className={`
         mx-auto my-16 flex gap-1
-
         md:gap-4
       `}>
       <div className="relative">
@@ -91,13 +87,12 @@ export const Top = () => (
           <img
             className={`
               m-2 h-12 object-contain
-
               md:h-16
             `}
             src="img/google-play-badge_JP.png"
           />
         </a>
-        <div className="absolute bottom-0 bg-black bg-opacity-50 p-1 text-white">
+        <div className="absolute bottom-0 bg-black/50 p-1 text-white">
           準備中
         </div>
       </div>
@@ -109,13 +104,12 @@ export const Top = () => (
           <img
             className={`
               m-2 h-12 object-contain
-
               md:h-16
             `}
             src="img/DownloadAppStore_JP.svg"
           />
         </a>
-        <div className="absolute bottom-0 bg-black bg-opacity-50 p-1 text-white">
+        <div className="absolute bottom-0 bg-black/50 p-1 text-white">
           準備中
         </div>
       </div>

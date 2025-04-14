@@ -158,8 +158,8 @@ export const Login = () => {
         />
         <SubmitButton
           className={`
-            w-full bg-gradient-to-r from-fuchsia-400 to-indigo-500
-            font-redhatdisp text-white
+            font-redhatdisp w-full bg-linear-to-r from-fuchsia-400 to-indigo-500
+            text-white
           `}
           loading={isSubmitting}>
           {actionText}

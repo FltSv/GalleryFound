@@ -39,9 +39,8 @@ export const ErrorScreen: FC<{ error: unknown }> = ({ error }) => {
   return (
     <div
       className={`
-        flex flex-col items-center justify-center gap-4 bg-red-100 bg-opacity-50
+        bg-opacity-50 flex flex-col items-center justify-center gap-4 bg-red-100
         px-8 py-6 text-center text-red-700
-
         md:mx-10 md:rounded-md
       `}>
       <h2 className="font-yojo text-6xl font-bold">えらー</h2>
@@ -59,7 +58,7 @@ export const ErrorScreen: FC<{ error: unknown }> = ({ error }) => {
       </p>
       <ProgressBar value={reportProgress} />
       <Button
-        className="rounded bg-red-200 text-red-700"
+        className="rounded-sm bg-red-200 text-red-700"
         disabled={!reported}
         onClick={handleReload}>
         再読み込み

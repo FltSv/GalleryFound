@@ -125,7 +125,7 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
         {/* 重ねるための下レイヤー */}
         <div
           className={`
-            absolute left-0 top-0 w-full border border-transparent px-3 py-2
+            absolute top-0 left-0 w-full border border-transparent px-3 py-2
           `}
           ref={highlighterRef}
           style={{
@@ -141,8 +141,7 @@ export const HashtagTextarea = forwardRef<HTMLDivElement, HashtagTextareaProps>(
           {...restProps}
           className={`
             relative w-full rounded-md border border-black bg-transparent px-3
-            py-2 text-transparent outline-none
-
+            py-2 text-transparent outline-hidden
             focus:border-2 focus:border-blue-600
           `}
           onChange={handleChange}

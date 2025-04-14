@@ -430,10 +430,9 @@ export const Mypage = () => {
           <p>作品ジャンル</p>
           <select
             className={`
-              my-1 block w-fit rounded-md border border-black bg-transparent
-              px-2 py-2
-
-              focus:border-2 focus:border-blue-600 focus:outline-none
+              my-1 w-fit rounded-md border border-black bg-transparent px-2 py-2
+              outline-hidden
+              focus:border-blue-600 focus:ring-1 focus:ring-blue-600
             `}
             defaultValue={creator?.genre}
             {...register('genre')}>
@@ -482,7 +481,6 @@ export const Mypage = () => {
                   <label
                     className={`
                       hidden
-
                       md:inline md:pl-2
                     `}>
                     削除
@@ -504,7 +502,6 @@ export const Mypage = () => {
                 <label
                   className={`
                     hidden
-
                     md:inline md:pl-2
                   `}>
                   追加
@@ -638,7 +635,6 @@ const ProductCell = (props: ProductCellProps) => {
     <div
       className={`
         relative min-w-fit
-
         ${bgHighlight}
       `}>
       <div className="flex">
@@ -657,9 +653,7 @@ const ProductCell = (props: ProductCellProps) => {
           <img
             className={`
               h-28 p-2 transition-opacity duration-300
-
               ${loading ? 'opacity-50' : ''}
-
               md:h-40
             `}
             key={data.id}
@@ -668,12 +662,12 @@ const ProductCell = (props: ProductCellProps) => {
         </div>
         <p
           className={`
-            absolute bottom-0 w-fit bg-black bg-opacity-50 px-2 text-white
+            bg-opacity-50 absolute bottom-0 w-fit bg-black px-2 text-white
           `}>
           {data.title}
         </p>
       </div>
-      <div className="absolute right-0 top-0 flex flex-col gap-2">
+      <div className="absolute top-0 right-0 flex flex-col gap-2">
         <IconButton
           color="neutral"
           onClick={onEditClick}
@@ -727,16 +721,15 @@ const ExhibitRow = (props: ExhibitRowProps) => {
   return (
     <tr
       className={`
-        even:bg-neutral-50
-
         odd:bg-neutral-200
+        even:bg-neutral-50
       `}>
       <td className="relative flex gap-4 p-2">
         {loading && (
           <div
             className={`
-              absolute inset-0 z-10 flex items-center justify-center bg-white
-              bg-opacity-60
+              bg-opacity-60 absolute inset-0 z-10 flex items-center
+              justify-center bg-white
             `}>
             <Spinner />
           </div>
@@ -746,7 +739,6 @@ const ExhibitRow = (props: ExhibitRowProps) => {
           alt={data.title}
           className={`
             max-w-32
-
             md:max-w-40
           `}
           src={data.imageUrl}
@@ -768,7 +760,6 @@ const ExhibitRow = (props: ExhibitRowProps) => {
             <label
               className={`
                 hidden
-
                 md:inline md:pl-2
               `}>
               編集
@@ -783,7 +774,6 @@ const ExhibitRow = (props: ExhibitRowProps) => {
             <label
               className={`
                 hidden
-
                 md:inline md:pl-2
               `}>
               削除
@@ -841,8 +831,7 @@ const ProductPopup = (props: ProductPopupProps) => {
 
         <div
           className={`
-            mb-4 mt-2 flex max-w-2xl flex-col gap-4
-
+            mt-2 mb-4 flex max-w-2xl flex-col gap-4
             md:flex-row
           `}>
           <div className="flex max-w-max basis-1/2 flex-col">
@@ -851,7 +840,6 @@ const ProductPopup = (props: ProductPopupProps) => {
           <div
             className={`
               flex basis-1/2 flex-col gap-2
-
               md:w-max
             `}>
             <Textbox label="作品名" {...register('title')} />
@@ -957,7 +945,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
   const handleLocationChange = useCallback(
     (field: LocationFieldProps) =>
-      (event: SyntheticEvent, value: string | null) => {
+      (_: SyntheticEvent, value: string | null) => {
         field.onChange(value);
       },
     [],
@@ -1088,7 +1076,6 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       <div
         className={`
           my-2 flex max-w-2xl flex-col
-
           md:flex-row
         `}>
         <div className="flex max-w-max basis-1/2 flex-col gap-2 p-2">
@@ -1101,7 +1088,6 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         <div
           className={`
             flex basis-1/2 flex-col gap-2 p-2
-
             md:w-max
           `}>
           <Textbox
