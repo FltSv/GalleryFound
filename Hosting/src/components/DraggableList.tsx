@@ -99,7 +99,7 @@ const SortableItem = <T extends { id: string }>(
 
   return (
     <div
-      className="rounded-md bg-white bg-opacity-50 p-1 shadow-md"
+      className="rounded-md bg-white/50 p-1 shadow-md"
       ref={setNodeRef}
       style={{
         transform: CSS.Transform.toString(transform),

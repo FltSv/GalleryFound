@@ -43,7 +43,6 @@ export const Textbox = forwardRef<HTMLInputElement, TextboxProps>(
           autoComplete={others.autoComplete ?? 'off'}
           className={`
             my-1 border bg-transparent
-
             ${others.className ?? ''}
           `}
           defaultValue={defaultDate ?? others.defaultValue}
@@ -64,9 +63,7 @@ export const Button: FC<ButtonProps> = props => (
     {...props}
     className={`
       rounded-full font-normal transition
-
       hover:opacity-80
-
       ${props.className ?? ''}
     `}
     sx={{
@@ -85,7 +82,6 @@ export const SubmitButton: FC<ButtonProps> = props => {
       {...props}
       className={`
         rounded-full font-normal transition
-
         ${disabled ? '' : `hover:opacity-80`}
         ${props.className ?? ''}
       `}

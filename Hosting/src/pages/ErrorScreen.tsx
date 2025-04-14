@@ -39,8 +39,8 @@ export const ErrorScreen: FC<{ error: unknown }> = ({ error }) => {
   return (
     <div
       className={`
-        bg-opacity-50 flex flex-col items-center justify-center gap-4 bg-red-100
-        px-8 py-6 text-center text-red-700
+        flex flex-col items-center justify-center gap-4 bg-red-100/50 px-8 py-6
+        text-center text-red-700
         md:mx-10 md:rounded-md
       `}>
       <h2 className="font-yojo text-6xl font-bold">えらー</h2>

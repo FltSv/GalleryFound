@@ -568,7 +568,7 @@ export const Mypage = () => {
         </div>
 
         <SubmitButton
-          className="w-fit rounded-md border bg-white text-black"
+          className="w-fit rounded-md bg-white text-black"
           disabled={!isDirty}
           loading={isSubmitting}
           startDecorator={<FaCheck />}>
@@ -660,10 +660,7 @@ const ProductCell = (props: ProductCellProps) => {
             src={data.imageUrl}
           />
         </div>
-        <p
-          className={`
-            bg-opacity-50 absolute bottom-0 w-fit bg-black px-2 text-white
-          `}>
+        <p className="absolute bottom-0 w-fit bg-black/50 px-2 text-white">
           {data.title}
         </p>
       </div>
@@ -728,8 +725,7 @@ const ExhibitRow = (props: ExhibitRowProps) => {
         {loading && (
           <div
             className={`
-              bg-opacity-60 absolute inset-0 z-10 flex items-center
-              justify-center bg-white
+              absolute inset-0 z-10 flex items-center justify-center bg-white/60
             `}>
             <Spinner />
           </div>
