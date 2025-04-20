@@ -4,7 +4,9 @@ import 'package:intersperse/intersperse.dart';
 import 'package:mobile/models/product.dart';
 import 'package:mobile/widgets/creator_link.dart';
 import 'package:mobile/widgets/favorite_button.dart';
+import 'package:mobile/widgets/linkable_text.dart';
 import 'package:mobile/widgets/thumb_interlace_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   const ProductDetailScreen({
@@ -28,7 +30,15 @@ class ProductDetailScreen extends StatelessWidget {
         children: [
           ThumbInterlaceImage(imageBase: product),
           const Gap(8),
-          Text(product.detail),
+          LinkableText(
+            text: product.detail,
+            onUrlTap: (url) {
+              launchUrl(
+                Uri.parse(url),
+                mode: LaunchMode.externalApplication,
+              );
+            },
+          ),
           CreatorLink(creator: product.creator),
         ].intersperse(const Gap(8)).toList(),
       ),
