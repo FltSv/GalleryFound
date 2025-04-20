@@ -136,12 +136,12 @@ class FirebaseRepo implements DataRepoBase {
   }) async {
     final db = FirebaseFirestore.instance;
     final ignoreProductIds = await getIgnoreProductIds();
+    final ignoreIdsLength = ignoreProductIds?.length ?? 0;
     final orderConfig = _config.productsOrder;
 
     final productsQuery = db
         .collectionGroup('products')
         .orderBy(orderConfig.field, descending: !orderConfig.isAsc)
-        .where('id', whereNotIn: ignoreProductIds)
         .withProductConverter(this);
 
     if (lastProduct != null) {
@@ -155,15 +155,21 @@ class FirebaseRepo implements DataRepoBase {
       if (lastDocSnap.exists) {
         final querySnap = await productsQuery
             .startAfterDocument(lastDocSnap)
-            .limit(limit)
+            .limit(limit + ignoreIdsLength)
             .get();
 
-        return querySnap.docs.map((docSnap) => docSnap.data()).toList();
+        return querySnap.docs
+            .map((docSnap) => docSnap.data())
+            .where((p) => !(ignoreProductIds?.contains(p.id) ?? false))
+            .toList();
       }
     }
 
-    final querySnap = await productsQuery.limit(limit).get();
-    return querySnap.docs.map((docSnap) => docSnap.data()).toList();
+    final querySnap = await productsQuery.limit(limit + ignoreIdsLength).get();
+    return querySnap.docs
+        .map((docSnap) => docSnap.data())
+        .where((p) => !(ignoreProductIds?.contains(p.id) ?? false))
+        .toList();
   }
 
   List<String> _ignoreProductIds = [];
