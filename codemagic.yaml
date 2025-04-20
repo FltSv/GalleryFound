@@ -84,6 +84,7 @@ workflows:
     max_build_duration: 20
     integrations:
       app_store_connect: GalleryFound Codemagic
+
     environment:
       <<: *env_versions
       ios_signing:
@@ -93,18 +94,92 @@ workflows:
           - galleryfound_profile
       groups:
         - appstore_credentials
+        - git_credentials
+
     cache:
       <<: *cache
+
     scripts:
+      # 署名設定
       - name: Set up code signing settings on Xcode project
         working_directory: mobile/ios
         script: |
           xcode-project use-profiles
+
+      # 依存取得
       - *get_flutter_packages
-      - name: Install pods
+
+      # Pods インストール（失敗時に clean → repo update → 再インストール）
+      - name: Install pods (auto clean & repo update when needed)
         working_directory: mobile/ios
         script: |
-          find . -name "Podfile" -execdir pod install \;
+          set -e
+
+          echo "▶︎ 1st try: pod install"
+          if pod install; then
+            echo "✅ Pods installed successfully on first try."
+          else
+            echo "⚠️  Pod install failed. Cleaning & updating specs ..."
+
+            # flutter clean (プロジェクトルートで)
+            pushd ..
+            flutter clean
+            flutter pub get
+            popd
+
+            # Pods／Podfile.lock を削除して再構築
+            rm -rf Pods Podfile.lock
+
+            # CocoaPods specs 更新
+            pod repo update
+
+            echo "▶︎ 2nd try: pod install after clean & repo update"
+            pod install
+
+            # repo update が走った証明ファイルを残す
+            touch /tmp/pod_repo_updated
+          fi
+
+      # Podfile / Podfile.lock が変化していたら自動コミット & Push
+      - name: Commit and push Podfile changes if repo was updated
+        working_directory: mobile/ios
+        script: |
+          set -e
+          # repo update が行われたビルドのみ実施
+          if [ -f /tmp/pod_repo_updated ]; then
+            echo "🔄  Checking for Podfile changes…"
+            git diff --quiet Podfile Podfile.lock && {
+              echo "ℹ️  No changes detected, skipping git push."
+              exit 0
+            }
+
+            # Git user 情報設定
+            git config --global user.name  "Codemagic Bot"
+            git config --global user.email "codemagic-bot@gallery-found.jp"
+
+            # 取得している clone URL を PAT 付きに置き換え
+            GIT_URL=$(git config --get remote.origin.url)
+            # https://github.com/owner/repo.git → https://$TOKEN@github.com/owner/repo.git
+            PAT_URL="${GIT_URL/https:\/\/github.com/https:\/\/${GIT_PUSH_TOKEN}@github.com}"
+            git remote set-url origin "$PAT_URL"
+
+            # 新規ブランチ名を組み立て（例: auto/pod-update-<BUILD_ID>）
+            BRANCH_NAME="auto/pod-update-${CM_BUILD_ID}"
+            git checkout -b "$BRANCH_NAME"
+
+            # 変更をコミット
+            git add Podfile Podfile.lock
+            git commit -m "chore(pods): Update specs via Codemagic build ${CM_BUILD_ID}"
+
+            # Push
+            git push -u origin "$BRANCH_NAME"
+
+            echo "✅  Pushed Podfile changes to branch ${BRANCH_NAME}"
+          else
+            echo "ℹ️  pod repo update was not executed; nothing to commit."
+          fi
+
+      # IPA ビルド
       - name: Flutter build ipa
         working_directory: mobile
         script: |
