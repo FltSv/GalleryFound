@@ -1,45 +1,51 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobile/infra/firebase/converter_extensions.dart';
+import 'package:mobile/models/config.dart';
 import 'package:mobile/models/creator.dart';
 import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/models/gallery.dart';
 import 'package:mobile/models/product.dart';
-import 'package:mobile/providers/config_provider.dart';
 import 'package:mobile/repos/data_repo_base.dart';
 
 class FirebaseRepo implements DataRepoBase {
+  FirebaseRepo(Config config) : _config = config;
+
+  final Config _config;
+
   @override
   Future<List<Creator>> fetchCreators() async {
     final db = FirebaseFirestore.instance;
-    final querySnap = await db.collection('creators').get();
+    final orderConfig = _config.creatorsOrder;
 
-    final ignoreIds = ConfigProvider().config.debugUserIds;
+    final querySnap = await db
+        .collection('creators')
+        .orderBy(orderConfig.field, descending: !orderConfig.isAsc)
+        .withCreatorConverter(this)
+        .get();
 
-    final fetchTasks = querySnap.docs
+    final ignoreIds = _config.debugUserIds;
+
+    return querySnap.docs
         .where((docSnap) => kDebugMode || !ignoreIds.contains(docSnap.id))
-        .map((docSnap) async {
-      final data = docSnap.data();
+        .map((docSnap) => docSnap.data())
+        .toList();
+  }
 
-      final profileHashtags =
-          ((data['profileHashtags'] ?? <String>[]) as List<dynamic>)
-              .cast<String>();
+  @override
+  Future<Creator> fetchCreatorById(String creatorId) async {
+    final db = FirebaseFirestore.instance;
+    final docSnap = await db
+        .collection('creators')
+        .doc(creatorId)
+        .withCreatorConverter(this)
+        .get();
 
-      final highlightProduct = await _getHighlightProduct(docSnap);
+    if (!docSnap.exists) {
+      throw Exception('CreatorId "$creatorId" is not found.');
+    }
 
-      return Creator(
-        id: docSnap.id,
-        name: toStr(data['name']),
-        genre: toStr(data['genre']),
-        profile: toStr(data['profile']),
-        profileHashtags: profileHashtags,
-        links: ((data['links'] ?? <String>[]) as List<dynamic>).cast<String>(),
-        highlightProduct: highlightProduct,
-      );
-    });
-
-    return Future.wait(fetchTasks);
+    return docSnap.data()!;
   }
 
   @override
@@ -72,55 +78,6 @@ class FirebaseRepo implements DataRepoBase {
       'https://firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com/o/creators%2F';
 
   @override
-  String getImageUrl(String userId, String image) {
-    const domain =
-        'firebasestorage.googleapis.com/v0/b/gallery-found.appspot.com';
-    return 'https://$domain/o/creators%2F$userId%2F$image';
-  }
-
-  @override
-  Future<String?> getThumbUrl(String userId, String image) async {
-    final thumbImage = image.replaceAll(RegExp(r'\.png\?.*'), '.webp');
-    final path = 'creators/$userId/thumbs/$thumbImage';
-
-    try {
-      final ref = FirebaseStorage.instance.ref().child(path);
-      final url = await ref.getDownloadURL(); // ダウンロードURLを取得
-      return url;
-    } on Object {
-      return null;
-    }
-  }
-
-  Future<Product?> _getHighlightProduct(
-    DocumentSnapshot<Map<String, dynamic>> docSnap,
-  ) async {
-    final productsCollectionRef = docSnap.reference.collection('products');
-    final data = docSnap.data();
-
-    final highlightProductId = toStr(data?['highlightProductId']);
-    if (highlightProductId.isNotEmpty) {
-      final highlightProductSnap = await productsCollectionRef
-          .doc(highlightProductId)
-          .withProductConverter(this)
-          .get();
-      return highlightProductSnap.data();
-    }
-
-    final firstProduct = await productsCollectionRef
-        .orderBy('order')
-        .limit(1)
-        .withProductConverter(this)
-        .get();
-
-    if (firstProduct.docs.isEmpty) {
-      return null;
-    }
-
-    return firstProduct.docs.first.data();
-  }
-
-  @override
   Future<List<Product>> fetchCreatorProducts(Creator creator) async {
     final db = FirebaseFirestore.instance;
 
@@ -132,67 +89,59 @@ class FirebaseRepo implements DataRepoBase {
         .withProductConverter(this)
         .get();
 
-    return productsSnap.docs
-        .map((docSnap) => docSnap.data()..creator = creator)
-        .toList();
+    return productsSnap.docs.map((docSnap) => docSnap.data()).toList();
   }
 
   @override
   Future<List<Exhibit>> fetchCreatorExhibits(Creator creator) async {
     final db = FirebaseFirestore.instance;
+    final orderConfig = _config.exhibitsOrder;
 
     final exhibitsSnap = await db
         .collection('creators')
         .doc(creator.id)
         .collection('exhibits')
+        .orderBy(orderConfig.field, descending: !orderConfig.isAsc)
         .withExhibitConverter(this)
         .get();
 
-    return exhibitsSnap.docs
-        .map((docSnap) => docSnap.data()..creator = creator)
-        .toList();
+    return exhibitsSnap.docs.map((docSnap) => docSnap.data()).toList();
   }
 
   @override
   Future<List<Exhibit>> fetchExhibitsAfterDate(
     DateTime date,
-    List<Creator> creators,
   ) async {
     final db = FirebaseFirestore.instance;
-    final ignoreCreatorIds = ConfigProvider().config.debugUserIds;
+    final ignoreCreatorIds = _config.debugUserIds;
+    final orderConfig = _config.exhibitsOrder;
 
     final exhibitsSnap = await db
         .collectionGroup('exhibits')
+        .orderBy(orderConfig.field, descending: !orderConfig.isAsc)
         .where('endDate', isGreaterThanOrEqualTo: date)
         .withExhibitConverter(this)
         .get();
 
-    return exhibitsSnap.docs.where((docSnap) {
-      final id = docSnap.reference.parent.parent!.id;
-      return !ignoreCreatorIds.contains(id);
-    }).map((docSnap) {
-      final creatorId = docSnap.reference.parent.parent!.id;
-      final creator = creators.firstWhere(
-        (creator) => creator.id == creatorId,
-      );
-
-      return docSnap.data()..creator = creator;
-    }).toList();
+    return exhibitsSnap.docs
+        .map((docSnap) => docSnap.data())
+        .where((exhibit) => !ignoreCreatorIds.contains(exhibit.creatorId))
+        .toList();
   }
 
   @override
   Future<List<Product>> fetchProducts({
-    required List<Creator> creators,
     required int limit,
     Product? lastProduct,
   }) async {
     final db = FirebaseFirestore.instance;
     final ignoreProductIds = await getIgnoreProductIds();
+    final ignoreIdsLength = ignoreProductIds?.length ?? 0;
+    final orderConfig = _config.productsOrder;
 
     final productsQuery = db
         .collectionGroup('products')
-        .orderBy('id', descending: true)
-        .where('id', whereNotIn: ignoreProductIds)
+        .orderBy(orderConfig.field, descending: !orderConfig.isAsc)
         .withProductConverter(this);
 
     if (lastProduct != null) {
@@ -206,27 +155,21 @@ class FirebaseRepo implements DataRepoBase {
       if (lastDocSnap.exists) {
         final querySnap = await productsQuery
             .startAfterDocument(lastDocSnap)
-            .limit(limit)
+            .limit(limit + ignoreIdsLength)
             .get();
 
-        return querySnap.docs.map((docSnap) {
-          final creatorId = docSnap.reference.parent.parent!.id;
-          final creator = creators.firstWhere(
-            (creator) => creator.id == creatorId,
-          );
-
-          return docSnap.data()..creator = creator;
-        }).toList();
+        return querySnap.docs
+            .map((docSnap) => docSnap.data())
+            .where((p) => !(ignoreProductIds?.contains(p.id) ?? false))
+            .toList();
       }
     }
 
-    final querySnap = await productsQuery.limit(limit).get();
-    return querySnap.docs.map((docSnap) {
-      final creatorId = docSnap.reference.parent.parent!.id;
-      final creator = creators.firstWhere((creator) => creator.id == creatorId);
-
-      return docSnap.data()..creator = creator;
-    }).toList();
+    final querySnap = await productsQuery.limit(limit + ignoreIdsLength).get();
+    return querySnap.docs
+        .map((docSnap) => docSnap.data())
+        .where((p) => !(ignoreProductIds?.contains(p.id) ?? false))
+        .toList();
   }
 
   List<String> _ignoreProductIds = [];
@@ -240,7 +183,7 @@ class FirebaseRepo implements DataRepoBase {
     }
 
     final db = FirebaseFirestore.instance;
-    final ignoreCreatorIds = ConfigProvider().config.debugUserIds;
+    final ignoreCreatorIds = _config.debugUserIds;
 
     final tasks = ignoreCreatorIds.map((creatorId) async {
       final querySnap = await db

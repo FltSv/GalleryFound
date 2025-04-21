@@ -21,17 +21,23 @@ class LinkableText extends StatelessWidget {
     // テキストをパース
     final parsedText = TextParser().parse(text);
 
+    const linkColor = Colors.blue;
+
     // ハッシュタグ用のスタイル
-    const linkStyle = TextStyle(
-      color: Colors.blue,
+    const baseLinkStyle = TextStyle(
+      color: linkColor,
     );
 
     // URL用のスタイル
-    const lineLinkStyle = TextStyle(
-      color: Colors.blue,
+    final underlinedLinkStyle = baseLinkStyle.copyWith(
       decoration: TextDecoration.underline,
-      decorationColor: Colors.blue,
+      decorationColor: linkColor,
     );
+
+    // 各要素のスタイル
+    final hashtagStyle = onHashtagTap == null ? null : baseLinkStyle;
+    final urlStyle = onUrlTap == null ? null : underlinedLinkStyle;
+    final emailStyle = onEmailTap == null ? null : underlinedLinkStyle;
 
     // TextSpanのリストを格納する
     final children = parsedText
@@ -39,7 +45,7 @@ class LinkableText extends StatelessWidget {
           (element) => switch (element) {
             Hashtag() => TextSpan(
                 text: element.toString(),
-                style: linkStyle,
+                style: hashtagStyle,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
                     onHashtagTap?.call(element.trim());
@@ -47,7 +53,7 @@ class LinkableText extends StatelessWidget {
               ),
             Url() => TextSpan(
                 text: element.toString(),
-                style: lineLinkStyle,
+                style: urlStyle,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
                     onUrlTap?.call(element.toString());
@@ -55,7 +61,7 @@ class LinkableText extends StatelessWidget {
               ),
             Email() => TextSpan(
                 text: element.toString(),
-                style: lineLinkStyle,
+                style: emailStyle,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
                     onEmailTap?.call(element.toString());

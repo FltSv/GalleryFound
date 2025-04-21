@@ -10,10 +10,9 @@ class Exhibit extends ImageBase {
     required this.galleryId,
     required this.startDate,
     required this.endDate,
-    required super.image,
-    required super.fetchThumbUrl,
     required super.imagePath,
     required super.thumbPath,
+    required super.creatorId,
   });
 
   final String id;

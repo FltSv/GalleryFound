@@ -1,7 +1,6 @@
 import 'package:mobile/models/favorite_id.dart';
 import 'package:mobile/models/product.dart';
 import 'package:mobile/models/user_data.dart';
-import 'package:mobile/providers/data_provider.dart';
 import 'package:mobile/repos/data_repo_base.dart';
 import 'package:mobile/repos/user_data_repo_base.dart';
 
@@ -16,7 +15,6 @@ class ProductUsecase {
 
   Future<List<Product>> fetch({int limit = 10, Product? lastProduct}) {
     return dataRepo.fetchProducts(
-      creators: DataProvider().creators,
       limit: limit,
       lastProduct: lastProduct,
     );

@@ -1,5 +1,7 @@
 /** 作家 */
 export interface Creator {
+  id: string;
+
   /** 表示名 */
   name: string;
 
@@ -43,12 +45,10 @@ export interface Product extends ImageStatus {
   order: number;
 
   /** 作品の作成日 */
-  //todo: v0.6.1で必須にする
-  createdAt?: Date;
+  createdAt: Date;
 
   /** DBへの登録日 */
-  //todo: v0.6.1で必須にする
-  addedAt?: Date;
+  addedAt: Date;
 }
 
 /** 展示 */
@@ -69,13 +69,7 @@ export interface Exhibit extends ImageStatus {
 }
 
 export interface ImageStatus {
-  /* DBのファイル名＋トークン */
-  srcImage: string;
-
-  /** イメージ(Upload前) */
-  tmpImageData: string;
-
-  /** イメージ(Upload後) */
+  /** 画像URL */
   imageUrl: string;
 
   /** サムネイルURL */

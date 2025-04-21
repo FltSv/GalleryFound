@@ -52,4 +52,4 @@ post_install do |installer|
   end
 end
 
-$FirebaseSDKVersion = '10.22.0'
+$FirebaseSDKVersion = '11.11.0'

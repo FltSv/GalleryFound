@@ -21,7 +21,7 @@ import { Button as MuiJoyButton, IconButton, Card, Input } from '@mui/joy';
 import { Autocomplete, AutocompleteRenderInputParams } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { RiDraggable } from 'react-icons/ri';
-import { useAuthContext } from 'components/AuthContext';
+import { useAuthContext } from 'src/contexts/AuthContext';
 import {
   Button,
   FileInput,
@@ -30,13 +30,13 @@ import {
   SubmitButton,
   Textarea,
   Textbox,
-} from 'components/ui/Input';
-import { Popup } from 'components/ui/Popup';
+} from 'src/components/Input';
+import { Popup } from 'components/Popup';
 import { Gallery, Creator, Product, Exhibit } from 'src/domain/entities';
-import { DraggableList, SortableProps } from 'components/ui/DraggableList';
+import { DraggableList, SortableProps } from 'components/DraggableList';
 import { getConfig } from 'src/infra/firebase/firebaseConfig';
 import { UserName } from 'src/domain/UserName';
-import { getCreatorData, setCreatorData } from 'src/infra/firebase/CreatorRepo';
+import { setCreatorData } from 'src/infra/firebase/CreatorRepo';
 import { addGallery, getGalleries } from 'src/application/GalleryMapService';
 import {
   createExhibit,
@@ -45,16 +45,21 @@ import {
   deleteProduct,
   updateExhibit,
 } from 'src/application/CreatorService';
-import { ProgressBar } from 'components/ui/ProgressBar';
-import { FeedbackButton } from 'components/ui/FeedbackButton';
+import { ProgressBar } from 'components/ProgressBar';
+import { FeedbackButton } from 'components/FeedbackButton';
 import { useFormGuard } from 'src/hooks/useFormGuard';
-import { ConfirmDelete } from 'components/ui/ConfirmDelete';
-import { Spinner } from 'components/ui/Spinner';
+import { ConfirmDelete } from 'components/ConfirmDelete';
+import { Spinner } from 'components/Spinner';
+import { Snackbar } from 'src/components/Snackbar';
+import { useCreatorContext } from 'src/contexts/CreatorContext';
 
 export const Mypage = () => {
-  const { user } = useAuthContext();
-  const [creator, setCreator] = useState<Creator>();
-  const [loading, setLoading] = useState(true);
+  const {
+    creator: contextCreator,
+    loading,
+    update: updateCreator,
+  } = useCreatorContext();
+  const [creator, setCreator] = useState<Creator | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addLink, setAddLink] = useState('');
   const [addLinkError, setAddLinkError] = useState(false);
@@ -70,24 +75,22 @@ export const Mypage = () => {
   } | null>(null);
   const { isDirty, markAsDirty, markAsClean } = useFormGuard();
 
+  // contextCreatorが変更されたらcreatorを更新
   useEffect(() => {
-    if (user === null) {
-      return;
+    if (contextCreator !== null) {
+      setCreator(contextCreator);
     }
+  }, [contextCreator]);
 
+  // ジャンル情報の取得
+  useEffect(() => {
     void (async () => {
-      // データの取得
-      const creator = await getCreatorData(user);
-      setCreator(creator);
-
       const genres = (await getConfig()).genres;
       setGenres(genres);
-
-      setLoading(false);
     })().catch((e: unknown) => {
-      console.error('failed fetch data: ', e);
+      console.error('failed fetch genres data: ', e);
     });
-  }, [user]);
+  }, []);
 
   const {
     register,
@@ -118,7 +121,7 @@ export const Mypage = () => {
 
   /** Linkが検証されていれば、Linkを追加 */
   const onAddLink = useCallback(() => {
-    if (creator === undefined) return;
+    if (creator === null) return;
     if (addLinkError) return;
 
     const links = [...creator.links, addLink];
@@ -130,7 +133,7 @@ export const Mypage = () => {
   /** Linkの削除 */
   const handleRemoveLink = useCallback(
     (link: string) => () => {
-      if (creator === undefined) return;
+      if (creator === null) return;
 
       const links = creator.links.filter(x => x !== link);
       setCreator({ ...creator, links });
@@ -165,8 +168,7 @@ export const Mypage = () => {
    */
   const onChangeProductFileInput = useCallback(
     async (e: ChangeEvent<HTMLInputElement>) => {
-      if (user === null) return;
-      if (creator === undefined) return;
+      if (creator === null) return;
 
       const files = e.currentTarget.files;
       if (files === null) return;
@@ -180,7 +182,7 @@ export const Mypage = () => {
       const tasks = Array.from(files).map(async (file, i) => {
         const order = creator.products.length + i + 1;
         const result = await createProduct(
-          user.uid,
+          creator.id,
           file,
           order,
           (progress: number) => {
@@ -208,7 +210,7 @@ export const Mypage = () => {
 
       setUploadProgress(null);
     },
-    [creator, user, markAsDirty],
+    [creator, markAsDirty],
   );
 
   const uploadProgressPercent = useMemo(() => {
@@ -225,7 +227,7 @@ export const Mypage = () => {
    */
   const setDraggableProducts = useCallback(
     (items: Product[]) => {
-      if (creator === undefined) return;
+      if (creator === null) return;
 
       const newProducts = items
         .map(item => creator.products.find(product => product.id === item.id))
@@ -240,16 +242,15 @@ export const Mypage = () => {
   /** 作品の削除 */
   const onDeleteRenderProduct = useCallback(
     async (product: Product) => {
-      if (user === null) return;
-      if (creator === undefined) return;
+      if (creator === null) return;
 
-      await deleteProduct(user.uid, product);
+      await deleteProduct(creator.id, product);
 
       const newProducts = creator.products.filter(x => x.id !== product.id);
       setCreator({ ...creator, products: newProducts });
       markAsDirty();
     },
-    [creator, markAsDirty, user],
+    [creator, markAsDirty],
   );
 
   /** 作品の編集画面の表示 */
@@ -283,16 +284,15 @@ export const Mypage = () => {
   /** 展示削除 */
   const onDeleteExhibit = useCallback(
     async (exhibit: Exhibit) => {
-      if (user === null) return;
-      if (creator === undefined) return;
+      if (creator === null) return;
 
-      await deleteExhibit(user.uid, exhibit);
+      await deleteExhibit(creator.id, exhibit);
 
       const newExhibits = creator.exhibits.filter(x => x.id !== exhibit.id);
       setCreator({ ...creator, exhibits: newExhibits });
       markAsDirty();
     },
-    [creator, markAsDirty, user],
+    [creator, markAsDirty],
   );
 
   /** 展示編集画面の表示 */
@@ -306,7 +306,7 @@ export const Mypage = () => {
 
   const onSubmitProductPopup = useCallback(
     (newValue: Product) => {
-      if (creator === undefined) return;
+      if (creator === null) return;
       if (editProduct === undefined) return;
 
       // Productsの中でisHighlightがtrueの要素は1つのみにする処理
@@ -330,7 +330,7 @@ export const Mypage = () => {
 
   const onSubmitExhibitPopup = useCallback(
     (newValue: Exhibit) => {
-      if (creator === undefined) return;
+      if (creator === null) return;
 
       if (editExhibit === undefined) {
         // 追加
@@ -355,17 +355,19 @@ export const Mypage = () => {
 
   const onValid: SubmitHandler<Creator> = useCallback(
     async data => {
-      if (user === null) return;
-      if (creator === undefined) return;
+      if (creator === null) return;
 
       // 一時データの結合
       const submitData = {
         ...data,
+        id: creator.id,
         name: new UserName(data.name).toString(),
         profileHashtags: profileHashtags,
         links: creator.links,
         products: creator.products,
         exhibits: creator.exhibits,
+        highlightThumbUrl:
+          creator.products.find(p => p.isHighlight)?.thumbUrl ?? null,
       };
 
       // ローディングの表示
@@ -373,14 +375,20 @@ export const Mypage = () => {
 
       // 情報の送信
       console.debug('submit: ', submitData);
-      await setCreatorData(user, submitData);
+      await setCreatorData(submitData);
 
-      // 変更状態をリセットしてからリロード
-      markAsClean(() => {
-        window.location.reload();
+      // CreatorContextを更新
+      updateCreator(submitData);
+
+      // 変更状態をリセット
+      markAsClean();
+      setIsSubmitting(false);
+      await Snackbar.call({
+        message: '更新が完了しました！',
+        theme: 'success',
       });
     },
-    [creator, profileHashtags, user, markAsClean],
+    [creator, profileHashtags, markAsClean, updateCreator],
   );
 
   const onSubmit = useCallback(
@@ -390,7 +398,7 @@ export const Mypage = () => {
     [handleSubmit, onValid],
   );
 
-  if (loading) {
+  if (loading || creator === null) {
     //todo ローディングコンポーネントに置き換え
     return <p>Now loading...</p>;
   }
@@ -422,10 +430,9 @@ export const Mypage = () => {
           <p>作品ジャンル</p>
           <select
             className={`
-              my-1 block w-fit rounded-md border border-black bg-transparent
-              px-2 py-2
-
-              focus:border-2 focus:border-blue-600 focus:outline-none
+              my-1 w-fit rounded-md border border-black bg-transparent px-2 py-2
+              outline-hidden
+              focus:border-blue-600 focus:ring-1 focus:ring-blue-600
             `}
             defaultValue={creator?.genre}
             {...register('genre')}>
@@ -474,7 +481,6 @@ export const Mypage = () => {
                   <label
                     className={`
                       hidden
-
                       md:inline md:pl-2
                     `}>
                     削除
@@ -496,7 +502,6 @@ export const Mypage = () => {
                 <label
                   className={`
                     hidden
-
                     md:inline md:pl-2
                   `}>
                   追加
@@ -529,7 +534,7 @@ export const Mypage = () => {
               <ProgressBar value={uploadProgressPercent / 100} />
             </div>
           )}
-          {creator && (
+          {creator !== null && (
             <DraggableList
               items={creator.products}
               renderItem={renderProductItem}
@@ -563,7 +568,7 @@ export const Mypage = () => {
         </div>
 
         <SubmitButton
-          className="w-fit rounded-md border bg-white text-black"
+          className="w-fit rounded-md bg-white text-black"
           disabled={!isDirty}
           loading={isSubmitting}
           startDecorator={<FaCheck />}>
@@ -588,6 +593,7 @@ export const Mypage = () => {
 
       <FeedbackButton />
       <ConfirmDelete.Root />
+      <Snackbar.Root />
     </>
   );
 };
@@ -629,7 +635,6 @@ const ProductCell = (props: ProductCellProps) => {
     <div
       className={`
         relative min-w-fit
-
         ${bgHighlight}
       `}>
       <div className="flex">
@@ -648,23 +653,18 @@ const ProductCell = (props: ProductCellProps) => {
           <img
             className={`
               h-28 p-2 transition-opacity duration-300
-
               ${loading ? 'opacity-50' : ''}
-
               md:h-40
             `}
             key={data.id}
-            src={data.tmpImageData || data.imageUrl}
+            src={data.imageUrl}
           />
         </div>
-        <p
-          className={`
-            absolute bottom-0 w-fit bg-black bg-opacity-50 px-2 text-white
-          `}>
+        <p className="absolute bottom-0 w-fit bg-black/50 px-2 text-white">
           {data.title}
         </p>
       </div>
-      <div className="absolute right-0 top-0 flex flex-col gap-2">
+      <div className="absolute top-0 right-0 flex flex-col gap-2">
         <IconButton
           color="neutral"
           onClick={onEditClick}
@@ -718,16 +718,14 @@ const ExhibitRow = (props: ExhibitRowProps) => {
   return (
     <tr
       className={`
-        even:bg-neutral-50
-
         odd:bg-neutral-200
+        even:bg-neutral-50
       `}>
       <td className="relative flex gap-4 p-2">
         {loading && (
           <div
             className={`
-              absolute inset-0 z-10 flex items-center justify-center bg-white
-              bg-opacity-60
+              absolute inset-0 z-10 flex items-center justify-center bg-white/60
             `}>
             <Spinner />
           </div>
@@ -737,10 +735,9 @@ const ExhibitRow = (props: ExhibitRowProps) => {
           alt={data.title}
           className={`
             max-w-32
-
             md:max-w-40
           `}
-          src={data.tmpImageData || data.imageUrl}
+          src={data.imageUrl}
         />
         {/* 内容 */}
         <div className="flex w-full flex-col gap-1 align-top">
@@ -759,7 +756,6 @@ const ExhibitRow = (props: ExhibitRowProps) => {
             <label
               className={`
                 hidden
-
                 md:inline md:pl-2
               `}>
               編集
@@ -774,7 +770,6 @@ const ExhibitRow = (props: ExhibitRowProps) => {
             <label
               className={`
                 hidden
-
                 md:inline md:pl-2
               `}>
               削除
@@ -832,20 +827,15 @@ const ProductPopup = (props: ProductPopupProps) => {
 
         <div
           className={`
-            mb-4 mt-2 flex max-w-2xl flex-col gap-4
-
+            mt-2 mb-4 flex max-w-2xl flex-col gap-4
             md:flex-row
           `}>
           <div className="flex max-w-max basis-1/2 flex-col">
-            <img
-              className="w-full max-w-xs"
-              src={product.tmpImageData || product.imageUrl}
-            />
+            <img className="w-full max-w-xs" src={product.imageUrl} />
           </div>
           <div
             className={`
               flex basis-1/2 flex-col gap-2
-
               md:w-max
             `}>
             <Textbox label="作品名" {...register('title')} />
@@ -951,7 +941,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
   const handleLocationChange = useCallback(
     (field: LocationFieldProps) =>
-      (event: SyntheticEvent, value: string | null) => {
+      (_: SyntheticEvent, value: string | null) => {
         field.onChange(value);
       },
     [],
@@ -1082,7 +1072,6 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       <div
         className={`
           my-2 flex max-w-2xl flex-col
-
           md:flex-row
         `}>
         <div className="flex max-w-max basis-1/2 flex-col gap-2 p-2">
@@ -1095,7 +1084,6 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         <div
           className={`
             flex basis-1/2 flex-col gap-2 p-2
-
             md:w-max
           `}>
           <Textbox

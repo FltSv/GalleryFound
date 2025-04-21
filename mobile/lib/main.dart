@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -48,10 +49,19 @@ void main() {
 
     // データの取得
     await ConfigProvider().init();
-    await DataProvider().fetchData();
+    await DataProvider().fetchData(ConfigProvider().config);
 
     // 更新の確認
     await VersionService.checkUpdateRequired();
+
+    // フレームワークからCrashlyticsに、捕捉されなかった"fatal" errorsをすべて渡す。
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+    // Flutterフレームワークで処理されないすべてのキャッチされない非同期エラーをCrashlyticsに渡す
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
 
     // スプラッシュ画面を解除
     FlutterNativeSplash.remove();

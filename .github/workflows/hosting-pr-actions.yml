@@ -84,7 +84,7 @@ jobs:
 
   deploy:
     if: "${{ github.event.pull_request.head.repo.full_name == github.repository }}"
-    needs: [setup, prettier, eslint, spell-check]
+    needs: [setup, prettier, eslint]
     environment: production
     runs-on: ubuntu-latest
     steps:
@@ -95,7 +95,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('Hosting/package-lock.json') }}
       - run: npm ci && npm run build
         env:
-          MAPS_JS_API: ${{ secrets.MAPS_JS_API }}
+          VITE_MAPS_JS_API: ${{ secrets.MAPS_JS_API }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"

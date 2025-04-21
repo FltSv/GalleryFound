@@ -4,7 +4,7 @@
       "android": {
         "default": {
           "projectId": "gallery-found",
-          "appId": "1:985501114281:android:fc253b6b47125039826eb8",
+          "appId": "1:985501114281:android:481a5fb931582e16826eb8",
           "fileOutput": "android/app/google-services.json"
         }
       },
@@ -12,8 +12,8 @@
         "lib/firebase_options.dart": {
           "projectId": "gallery-found",
           "configurations": {
-            "android": "1:985501114281:android:fc253b6b47125039826eb8",
-            "ios": "1:985501114281:ios:9be2fae25d13dba2826eb8"
+            "android": "1:985501114281:android:481a5fb931582e16826eb8",
+            "ios": "1:985501114281:ios:b802d389dea42d4b826eb8"
           }
         }
       }

@@ -5,10 +5,14 @@
       "type": "chrome",
       "request": "launch",
       "name": "web debug",
-      "preLaunchTask": "npm: start",
+      "preLaunchTask": "npm: dev",
       "url": "http://localhost:5000",
-      "webRoot": "${workspaceFolder}/Hosting",
-      "sourceMaps": true
+      "webRoot": "${workspaceFolder}/Hosting/src",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/Hosting/**",
+        "!**/node_modules/**"
+      ]
     }
   ]
 }

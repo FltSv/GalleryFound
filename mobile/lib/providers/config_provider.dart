@@ -12,7 +12,7 @@ class ConfigProvider {
   Config get config => _config;
 
   Future<void> init() async {
-    final repo = Factory.getConfigRepo();
+    final repo = getConfigRepo();
 
     await repo.init();
     _config = await repo.getConfig();

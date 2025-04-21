@@ -23,10 +23,6 @@ import {
   exhibitConverter,
   getProductConverter,
 } from 'src/infra/firebase/converter';
-import { storageCreatorsBaseUrl } from './StorageRepo';
-
-export const getCreatorStorageUrl = (userId: string) =>
-  `${storageCreatorsBaseUrl}${userId}%2F`;
 
 export const getCreatorData = async (user: User) => {
   const userId = user.uid;
@@ -41,6 +37,7 @@ export const getCreatorData = async (user: User) => {
   if (!docSnap.exists()) {
     // 存在しない場合、情報は空のままで登録を促す
     const empty: Creator = {
+      id: userId,
       name: '',
       genre: '',
       profile: '',
@@ -72,11 +69,7 @@ export const getCreatorData = async (user: User) => {
   const exhibitsSnap = await getDocs(exhibitsRef);
   const exhibits = exhibitsSnap.docs.map(doc => doc.data());
 
-  const creator: Creator = {
-    ...data,
-    products: products.length === 0 ? data.products : products,
-    exhibits: exhibits.length === 0 ? data.exhibits : exhibits,
-  };
+  const creator: Creator = { ...data, products, exhibits };
 
   console.debug('creator:', creator);
   return creator;
@@ -85,24 +78,21 @@ export const getCreatorData = async (user: User) => {
 /**
  *  値の確定、DBへデータを送信する
  */
-export const setCreatorData = async (user: User, data: Creator) => {
-  const userId = user.uid;
+export const setCreatorData = async (data: Creator) => {
+  const userId = data.id;
 
-  // 画像のアップロード
+  // 作品の並び順更新
   const updateProductTasks = data.products.map((product, i) =>
     updateProduct(userId, { ...product, order: i }),
   );
-  const updateExhibitTasks = data.exhibits.map(exhibit =>
-    updateExhibit(userId, exhibit),
-  );
-  await Promise.all([...updateProductTasks, ...updateExhibitTasks]);
 
-  // DB更新
+  await Promise.all(updateProductTasks);
+
+  // Creatorドキュメント更新
   const docRef = doc(db, collectionNames.creators, userId).withConverter(
     creatorConverter,
   );
 
-  // メインドキュメント更新
   await setDoc(docRef, data, { merge: true });
 };
 

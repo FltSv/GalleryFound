@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: npm ci && npm run build
         env:
-          MAPS_JS_API: ${{ secrets.MAPS_JS_API }}
+          VITE_MAPS_JS_API: ${{ secrets.MAPS_JS_API }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}

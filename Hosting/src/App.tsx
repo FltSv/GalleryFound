@@ -6,22 +6,20 @@ import {
   Outlet,
 } from 'react-router-dom';
 import ReactGA from 'react-ga4';
-
-// page
-import { Top } from './components/pages/Top';
-import { Login } from './components/pages/Login';
-import { Logout } from './components/pages/Logout';
-import { Mypage } from './components/pages/Mypage';
-import { Galleries } from './components/pages/Galleries';
-import { SendVerify, NoVerify } from './components/pages/Verify';
-import { NotFound } from './components/pages/NotFound';
-
-// ui
-import Header from './components/ui/Header';
-
-import { useAuthContext } from './components/AuthContext';
-import { Policy } from './components/pages/Policy';
-import { ErrorBoundaryProvider } from './providers/ErrorBoundaryProvider';
+import { Top } from 'src/pages/Top';
+import { Login } from 'src/pages/Login';
+import { Logout } from 'src/pages/Logout';
+import { Mypage } from 'src/pages/Mypage';
+import { Galleries } from 'src/pages/Galleries';
+import { SendVerify, NoVerify } from 'src/pages/Verify';
+import { NotFound } from 'src/pages/NotFound';
+import { Policy } from 'src/pages/Policy';
+import { Header } from 'components/Header';
+import { AuthProvider, useAuthContext } from 'src/contexts/AuthContext';
+import { CreatorProvider } from 'src/contexts/CreatorContext';
+import { ErrorBoundaryProvider } from 'src/providers/ErrorBoundaryProvider';
+import { APIProvider } from '@vis.gl/react-google-maps';
+import { Env } from './Env';
 
 const AuthRouting = (props: { page: ReactNode }) => {
   const { user, loading } = useAuthContext();
@@ -100,9 +98,15 @@ const router = createBrowserRouter([
   },
 ]);
 
-const App = () => {
+export const App = () => {
   ReactGA.initialize('G-GLSP40W377');
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <CreatorProvider>
+        <APIProvider apiKey={Env.MAPS_JS_API}>
+          <RouterProvider router={router} />
+        </APIProvider>
+      </CreatorProvider>
+    </AuthProvider>
+  );
 };
-
-export default App;

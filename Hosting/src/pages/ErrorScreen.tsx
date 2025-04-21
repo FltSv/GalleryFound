@@ -1,8 +1,8 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import ReactGA from 'react-ga4';
 
-import { Button } from 'components/ui/Input';
-import { ProgressBar } from 'components/ui/ProgressBar';
+import { Button } from 'components/Input';
+import { ProgressBar } from 'components/ProgressBar';
 
 export const ErrorScreen: FC<{ error: unknown }> = ({ error }) => {
   const errorInstance = error instanceof Error ? error : undefined;
@@ -39,9 +39,8 @@ export const ErrorScreen: FC<{ error: unknown }> = ({ error }) => {
   return (
     <div
       className={`
-        flex flex-col items-center justify-center gap-4 bg-red-100 bg-opacity-50
-        px-8 py-6 text-center text-red-700
-
+        flex flex-col items-center justify-center gap-4 bg-red-100/50 px-8 py-6
+        text-center text-red-700
         md:mx-10 md:rounded-md
       `}>
       <h2 className="font-yojo text-6xl font-bold">えらー</h2>
@@ -59,7 +58,7 @@ export const ErrorScreen: FC<{ error: unknown }> = ({ error }) => {
       </p>
       <ProgressBar value={reportProgress} />
       <Button
-        className="rounded bg-red-200 text-red-700"
+        className="rounded-sm bg-red-200 text-red-700"
         disabled={!reported}
         onClick={handleReload}>
         再読み込み

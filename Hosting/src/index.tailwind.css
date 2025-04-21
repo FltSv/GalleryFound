@@ -1,24 +1,30 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+/* 
+  CSSの仕様に基づき、全ての@importは他のルールの前に配置する必要がある
+  更に、外部CSSやフォントを最初に、Tailwind CSSはその後にインポートする必要がある
+*/
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap')
+layer(base);
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display&display=swap')
+layer(base);
 
-@import 'assets/fonts/index.css';
-
-@layer base {
-  h1 {
-    @apply text-2xl font-bold text-purple-900;
-  }
-  h2 {
-    @apply text-xl font-bold;
-  }
-  h3 {
-    @apply text-lg font-bold;
-  }
-}
+@import 'tailwindcss';
+@config '../tailwind.config.js';
 
 body {
-  @apply bg-gradient-to-b from-purple-300 to-blue-200 bg-fixed text-slate-950;
+  @apply bg-linear-to-b from-purple-300 to-blue-200 bg-fixed text-slate-950;
   font-family: Roboto, Helvetica, Arial, sans-serif;
+}
+
+h1 {
+  @apply text-2xl font-bold text-purple-900;
+}
+
+h2 {
+  @apply text-xl font-bold;
+}
+
+h3 {
+  @apply text-lg font-bold;
 }
 
 input:-webkit-autofill,
@@ -26,4 +32,19 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-background-clip: text;
+}
+
+@font-face {
+  font-family: magneto;
+  src: url('/assets/fonts/magnetob.ttf');
+}
+
+@font-face {
+  font-family: yojo;
+  src: url('/assets/fonts/yojo.woff');
+}
+
+@font-face {
+  font-family: comesinhandy;
+  src: url('/assets/fonts/comesinhandy.ttf');
 }

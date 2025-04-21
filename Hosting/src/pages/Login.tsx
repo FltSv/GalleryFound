@@ -5,9 +5,9 @@ import { Divider, Checkbox } from '@mui/joy';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
 import { FirebaseError } from 'firebase/app';
-import { Button, SubmitButton, Textbox } from '../ui/Input';
-import { loginWithEmail, loginWith, signupWithEmail } from '../../Auth';
-import { useAuthContext } from '../AuthContext';
+import { Button, SubmitButton, Textbox } from 'components/Input';
+import { loginWithEmail, loginWith, signupWithEmail } from 'src/Auth';
+import { useAuthContext } from 'src/contexts/AuthContext';
 
 interface Inputs {
   mail: string;
@@ -158,8 +158,8 @@ export const Login = () => {
         />
         <SubmitButton
           className={`
-            w-full bg-gradient-to-r from-fuchsia-400 to-indigo-500
-            font-redhatdisp text-white
+            font-redhatdisp w-full bg-linear-to-r from-fuchsia-400 to-indigo-500
+            text-white
           `}
           loading={isSubmitting}>
           {actionText}
