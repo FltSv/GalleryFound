@@ -3,9 +3,7 @@ import {
   Dispatch,
   FormEvent,
   KeyboardEvent,
-  MouseEventHandler,
   SetStateAction,
-  SyntheticEvent,
   useCallback,
   useEffect,
   useState,
@@ -18,7 +16,6 @@ import {
   ControllerRenderProps,
 } from 'react-hook-form';
 import { Button as MuiJoyButton, IconButton, Card, Input } from '@mui/joy';
-import { Autocomplete, AutocompleteRenderInputParams } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { RiDraggable } from 'react-icons/ri';
 import { useAuthContext } from 'src/contexts/AuthContext';
@@ -32,12 +29,11 @@ import {
   Textbox,
 } from 'src/components/Input';
 import { Popup } from 'components/Popup';
-import { Gallery, Creator, Product, Exhibit } from 'src/domain/entities';
+import { Creator, Product, Exhibit } from 'src/domain/entities';
 import { DraggableList, SortableProps } from 'components/DraggableList';
 import { getConfig } from 'src/infra/firebase/firebaseConfig';
 import { UserName } from 'src/domain/UserName';
 import { setCreatorData } from 'src/infra/firebase/CreatorRepo';
-import { addGallery, getGalleries } from 'src/application/GalleryMapService';
 import {
   createExhibit,
   createProduct,
@@ -52,6 +48,7 @@ import { ConfirmDelete } from 'components/ConfirmDelete';
 import { Spinner } from 'components/Spinner';
 import { Snackbar } from 'src/components/Snackbar';
 import { useCreatorContext } from 'src/contexts/CreatorContext';
+import { MapLocationPicker, PlaceData } from 'src/components/MapLocationPicker';
 
 export const Mypage = () => {
   const {
@@ -878,12 +875,13 @@ interface ExhibitFormValues extends Exhibit {
 const ExhibitForm = (props: ExhibitFormProps) => {
   const { user } = useAuthContext();
   const { exhibit, onSubmit } = props;
-  const [galleries, setGalleries] = useState<Gallery[] | undefined>(undefined);
   const [previewImage, setPreviewImage] = useState<string>(
     exhibit?.imageUrl ?? '',
   );
   const [selectedFile, setSelectedFile] = useState<File>();
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState<PlaceData | null>(null);
+
   const {
     control,
     getValues,
@@ -891,20 +889,8 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     handleSubmit,
     setError,
     clearErrors,
-    watch,
     formState: { errors },
   } = useForm<ExhibitFormValues>({ defaultValues: exhibit });
-
-  const fetchGalleries = useCallback(
-    () =>
-      void (async () => {
-        const galleries = await getGalleries();
-        setGalleries(galleries);
-      })(),
-    [],
-  );
-
-  useEffect(fetchGalleries, [fetchGalleries]);
 
   const requireMsg = '1文字以上の入力が必要です。';
   const invalidDateMsg = '有効な日付を入力してください。';
@@ -930,68 +916,36 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     [clearErrors],
   );
 
-  const location = watch('location');
-  const matchGallery = galleries?.find(x => x.name === location);
-  const isMatchGallery = matchGallery !== undefined;
-
   type LocationFieldProps = ControllerRenderProps<
     ExhibitFormValues,
     'location'
   >;
 
-  const handleLocationChange = useCallback(
-    (field: LocationFieldProps) =>
-      (_: SyntheticEvent, value: string | null) => {
-        field.onChange(value);
-      },
+  const createLocationSelectHandler = useCallback(
+    (field: LocationFieldProps) => (locationData: PlaceData) => {
+      field.onChange(locationData.address);
+      setSelectedPlace(locationData);
+    },
     [],
   );
 
-  const handleRenderInput = useCallback((field: LocationFieldProps) => {
-    const renderAutocompleteInput = (params: AutocompleteRenderInputParams) => (
-      <Input
-        slotProps={{
-          root: { ref: params.InputProps.ref },
-          input: {
-            ...params.inputProps,
-            onChange: e => {
-              field.onChange(e);
-              params.inputProps.onChange?.(e);
-            },
-          },
-        }}
-        sx={{ borderColor: 'black' }}
-      />
-    );
-    return renderAutocompleteInput;
-  }, []);
-
   const renderLocation = useCallback(
     ({ field }: { field: LocationFieldProps }) => {
-      const onChange = handleLocationChange(field);
-      const renderInput = handleRenderInput(field);
+      const locationSelectHandler = createLocationSelectHandler(field);
 
       return (
-        <Autocomplete
-          freeSolo
-          onChange={onChange}
-          options={galleries?.map(x => x.name) ?? []}
-          renderInput={renderInput}
-          value={field.value || null}
+        <MapLocationPicker
+          initialLocation={field.value}
+          onSelectLocation={locationSelectHandler}
         />
       );
     },
-    [galleries, handleLocationChange, handleRenderInput],
+    [createLocationSelectHandler],
   );
-
-  const onChangeLocation = useCallback(() => {
-    fetchGalleries();
-    setError('location', {});
-  }, [setError, fetchGalleries]);
 
   const onValid: SubmitHandler<ExhibitFormValues> = useCallback(
     async data => {
-      if (!isMatchGallery) {
+      if (selectedPlace === null) {
         setError('location', {
           message: 'ギャラリー情報の指定または入力が必要です。',
         });
@@ -1006,7 +960,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       const exhibitData = {
         title: data.title,
         location: data.location,
-        galleryId: matchGallery.id,
+        galleryId: selectedPlace.placeId,
         startDate: new Date(data.startDateString + 'T00:00:00'),
         endDate: new Date(data.endDateString + 'T23:59:59'),
       };
@@ -1019,6 +973,8 @@ const ExhibitForm = (props: ExhibitFormProps) => {
           });
           return;
         }
+
+        // todo:ギャラリー情報の追加・編集
 
         const createdExhibit = await createExhibit(
           user.uid,
@@ -1046,15 +1002,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
       setUploadProgress(null);
     },
-    [
-      exhibit,
-      isMatchGallery,
-      matchGallery?.id,
-      onSubmit,
-      selectedFile,
-      setError,
-      user,
-    ],
+    [exhibit, onSubmit, selectedFile, setError, user, selectedPlace],
   );
 
   const onSubmitForm = useCallback(
@@ -1097,19 +1045,21 @@ const ExhibitForm = (props: ExhibitFormProps) => {
               control={control}
               name="location"
               render={renderLocation}
-              rules={{ required: requireMsg }}
+              rules={{ required: '場所を選択してください。' }}
             />
-            <p className="text-xs text-red-600">{errors.location?.message}</p>
-            {location !== '' && isMatchGallery ? (
+            {selectedPlace ? (
               <Card>
-                <div>
-                  <p className="text-lg font-bold">{matchGallery.name}</p>
-                  <p>{matchGallery.location}</p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-lg font-bold">{selectedPlace.name}</p>
+                  <p>{selectedPlace.address}</p>
                 </div>
               </Card>
             ) : (
-              <NoGalleryInfo newName={location} onChange={onChangeLocation} />
+              <Card>
+                <p>場所が選択されていません。</p>
+              </Card>
             )}
+            <p className="text-xs text-red-600">{errors.location?.message}</p>
           </div>
           <Textbox
             defaultDateValue={exhibit?.startDate}
@@ -1163,78 +1113,5 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         </div>
       )}
     </form>
-  );
-};
-
-interface NoGalleryProps {
-  newName: string;
-  onChange: () => void;
-}
-
-const NoGalleryInfo = (props: NoGalleryProps) => {
-  const {
-    register,
-    handleSubmit,
-    setError,
-    clearErrors,
-    formState: { errors, isSubmitting },
-  } = useForm<Gallery>({ defaultValues: { name: props.newName } as Gallery });
-
-  const onValid: SubmitHandler<Gallery> = useCallback(
-    async data => {
-      if (!props.newName) {
-        setError('name', { message: '場所（ギャラリー名称）が未入力です。' });
-        return;
-      }
-
-      try {
-        await addGallery({ ...data, name: props.newName });
-      } catch (error) {
-        console.error('error: ', error);
-        setError('name', { message: '入力された住所が見つかりませんでした。' });
-        return;
-      }
-
-      props.onChange();
-    },
-    [props, setError],
-  );
-
-  const onClick: MouseEventHandler<HTMLAnchorElement> = useCallback(
-    e => {
-      clearErrors('name');
-      void handleSubmit(onValid)(e);
-    },
-    [clearErrors, handleSubmit, onValid],
-  );
-
-  return (
-    <Card size="sm">
-      <p>
-        情報がありません。
-        <br />
-        ギャラリー情報の新規追加
-      </p>
-      <div className="flex flex-col gap-2">
-        <Textbox
-          label="住所"
-          size="sm"
-          {...register('location', {
-            required: 'ギャラリーの住所を入力してください。',
-          })}
-          fieldError={errors.name || errors.location}
-        />
-        <MuiJoyButton
-          className="w-fit"
-          color="neutral"
-          loading={isSubmitting}
-          onClick={onClick}
-          size="sm"
-          startDecorator={<FaPlus />}
-          variant="soft">
-          追加
-        </MuiJoyButton>
-      </div>
-    </Card>
   );
 };
