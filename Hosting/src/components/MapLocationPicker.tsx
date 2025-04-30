@@ -1,4 +1,10 @@
-import { ChangeEvent, useCallback, useState, KeyboardEvent } from 'react';
+import {
+  ChangeEvent,
+  useCallback,
+  useState,
+  KeyboardEvent,
+  useEffect,
+} from 'react';
 import { Input, IconButton } from '@mui/joy';
 import { FaSearch } from 'react-icons/fa';
 import {
@@ -42,6 +48,13 @@ export const MapLocationPicker = ({
   const [isLoading, setIsLoading] = useState(false);
   const map = useMap();
   const placesLibrary = useMapsLibrary('places');
+
+  useEffect(() => {
+    if (initialPosition) {
+      setMarkerPos(initialPosition);
+      map?.panTo(initialPosition);
+    }
+  }, [initialPosition, map]);
 
   // 共通の処理：位置情報から場所データを取得して返す
   const fetchLocationDetails = useCallback(

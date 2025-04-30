@@ -29,7 +29,7 @@ import {
   Textbox,
 } from 'src/components/Input';
 import { Popup } from 'components/Popup';
-import { Creator, Product, Exhibit } from 'src/domain/entities';
+import { Creator, Product, Exhibit, Gallery } from 'src/domain/entities';
 import { DraggableList, SortableProps } from 'components/DraggableList';
 import { getConfig } from 'src/infra/firebase/firebaseConfig';
 import { UserName } from 'src/domain/UserName';
@@ -41,6 +41,11 @@ import {
   deleteProduct,
   updateExhibit,
 } from 'src/application/CreatorService';
+import {
+  getGallery,
+  getGalleryByPlaceId,
+  updateGallery,
+} from 'src/application/GalleryMapService';
 import { ProgressBar } from 'components/ProgressBar';
 import { FeedbackButton } from 'components/FeedbackButton';
 import { useFormGuard } from 'src/hooks/useFormGuard';
@@ -881,6 +886,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const [selectedFile, setSelectedFile] = useState<File>();
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<PlaceData | null>(null);
+  const [gallery, setGallery] = useState<Gallery | null>(null);
 
   const {
     control,
@@ -895,6 +901,25 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const requireMsg = '1文字以上の入力が必要です。';
   const invalidDateMsg = '有効な日付を入力してください。';
   const isAdd = exhibit === undefined;
+
+  // 編集時、ギャラリー情報を取得
+  useEffect(() => {
+    if (exhibit?.galleryId === undefined) return;
+
+    const fetchGallery = async () => {
+      try {
+        const galleryData = await getGallery(exhibit.galleryId);
+
+        if (galleryData !== undefined) {
+          setGallery(galleryData);
+        }
+      } catch (error) {
+        console.error('ギャラリー情報の取得に失敗しました:', error);
+      }
+    };
+
+    fetchGallery();
+  }, [exhibit]);
 
   // 画像選択時の処理
   const onFileChange = useCallback(
@@ -922,9 +947,19 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   >;
 
   const createLocationSelectHandler = useCallback(
-    (field: LocationFieldProps) => (locationData: PlaceData) => {
-      field.onChange(locationData.address);
+    (field: LocationFieldProps) => async (locationData: PlaceData) => {
+      field.onChange(locationData.name);
       setSelectedPlace(locationData);
+
+      // PlaceIdに一致するギャラリーを取得
+      const galleryData = await getGalleryByPlaceId(locationData.placeId);
+      if (galleryData !== undefined) {
+        setGallery(galleryData);
+        return;
+      }
+
+      // ギャラリーが存在しない場合
+      setGallery(null);
     },
     [],
   );
@@ -936,11 +971,12 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       return (
         <MapLocationPicker
           initialLocation={field.value}
+          initialPosition={gallery?.latLng}
           onSelectLocation={locationSelectHandler}
         />
       );
     },
-    [createLocationSelectHandler],
+    [createLocationSelectHandler, gallery],
   );
 
   const onValid: SubmitHandler<ExhibitFormValues> = useCallback(
@@ -957,10 +993,19 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       // 処理開始
       setUploadProgress(0);
 
+      // ギャラリー情報の追加・編集
+      const updatedGallery = await updateGallery({
+        id: exhibit?.galleryId,
+        placeId: gallery?.placeId ?? selectedPlace.placeId,
+        name: gallery?.name ?? selectedPlace.name,
+        location: gallery?.location ?? selectedPlace.address,
+        latLng: gallery?.latLng ?? selectedPlace.position,
+      });
+
       const exhibitData = {
         title: data.title,
-        location: data.location,
-        galleryId: selectedPlace.placeId,
+        location: updatedGallery.name,
+        galleryId: updatedGallery.id,
         startDate: new Date(data.startDateString + 'T00:00:00'),
         endDate: new Date(data.endDateString + 'T23:59:59'),
       };
@@ -973,8 +1018,6 @@ const ExhibitForm = (props: ExhibitFormProps) => {
           });
           return;
         }
-
-        // todo:ギャラリー情報の追加・編集
 
         const createdExhibit = await createExhibit(
           user.uid,
@@ -1002,7 +1045,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
       setUploadProgress(null);
     },
-    [exhibit, onSubmit, selectedFile, setError, user, selectedPlace],
+    [exhibit, onSubmit, selectedFile, setError, user, selectedPlace, gallery],
   );
 
   const onSubmitForm = useCallback(
@@ -1047,18 +1090,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
               render={renderLocation}
               rules={{ required: '場所を選択してください。' }}
             />
-            {selectedPlace ? (
-              <Card>
-                <div className="flex flex-col gap-1">
-                  <p className="text-lg font-bold">{selectedPlace.name}</p>
-                  <p>{selectedPlace.address}</p>
-                </div>
-              </Card>
-            ) : (
-              <Card>
-                <p>場所が選択されていません。</p>
-              </Card>
-            )}
+            <GalleryInfoCard gallery={gallery} placeData={selectedPlace} />
             <p className="text-xs text-red-600">{errors.location?.message}</p>
           </div>
           <Textbox
@@ -1113,5 +1145,32 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         </div>
       )}
     </form>
+  );
+};
+
+interface GalleryInfoCardProps {
+  gallery: Gallery | null;
+  placeData: PlaceData | null;
+}
+
+const GalleryInfoCard = ({ gallery, placeData }: GalleryInfoCardProps) => {
+  if (placeData === null && gallery === null) {
+    return (
+      <Card>
+        <p>場所が選択されていません。</p>
+      </Card>
+    );
+  }
+
+  const name = gallery?.name ?? placeData?.name;
+  const address = gallery?.location ?? placeData?.address;
+
+  return (
+    <Card>
+      <div className="flex flex-col gap-1">
+        <p className="text-lg font-bold">{name}</p>
+        <p>{address}</p>
+      </div>
+    </Card>
   );
 };

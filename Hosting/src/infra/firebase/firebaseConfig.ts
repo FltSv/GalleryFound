@@ -136,6 +136,7 @@ export interface Gallery {
   name: string;
   location: string;
   latLng: GeoPoint;
+  placeId?: string;
 }
 
 /** Remote Config */

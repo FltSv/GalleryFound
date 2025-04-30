@@ -82,6 +82,7 @@ export interface Gallery {
   name: string;
   location: string;
   latLng: google.maps.LatLngLiteral;
+  placeId?: string;
 }
 
 /** 日付の期間の表示値を返す */
