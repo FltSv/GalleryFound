@@ -34,12 +34,14 @@ export interface MapLocationPickerProps {
   initialLocation?: string;
   initialPosition?: google.maps.LatLngLiteral;
   onSelectLocation: (locationData: PlaceData) => void;
+  onInitialLoad?: (locationData: PlaceData) => void;
 }
 
 export const MapLocationPicker = ({
   initialLocation,
   initialPosition,
   onSelectLocation,
+  onInitialLoad,
 }: MapLocationPickerProps) => {
   const [markerPos, setMarkerPos] = useState<google.maps.LatLngLiteral>(
     initialPosition || TOKYO_POS,
@@ -165,6 +167,23 @@ export const MapLocationPicker = ({
     },
     [placesLibrary],
   );
+
+  // 初回読込完了時の処理
+  useEffect(() => {
+    const loadInitialLocationData = async () => {
+      if (!map || !onInitialLoad) return;
+
+      setIsLoading(true);
+      try {
+        const locationData = await fetchLocationDetails(markerPos, null);
+        onInitialLoad(locationData);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadInitialLocationData();
+  }, [map, onInitialLoad, markerPos, fetchLocationDetails]);
 
   // マップクリック時の処理
   const handleMapClick = useCallback(

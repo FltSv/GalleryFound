@@ -70,8 +70,9 @@ const addGallery = async (data: Omit<Gallery, 'id'>) => {
   // Firestoreの自動採番を使用
   const colRef = collection(db, collectionNames.galleries);
   const docRef = doc(colRef).withConverter(galleryConverter);
-  await setDoc(docRef, data);
-  return { ...data, id: docRef.id } satisfies Gallery;
+  const gallery = { ...data, id: docRef.id } satisfies Gallery;
+  await setDoc(docRef, gallery);
+  return gallery;
 };
 
 /** ギャラリー情報の編集 */

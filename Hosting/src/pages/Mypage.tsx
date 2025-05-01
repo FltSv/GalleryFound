@@ -27,6 +27,7 @@ import {
   SubmitButton,
   Textarea,
   Textbox,
+  EditableText,
 } from 'src/components/Input';
 import { Popup } from 'components/Popup';
 import { Creator, Product, Exhibit, Gallery } from 'src/domain/entities';
@@ -941,6 +942,19 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     [clearErrors],
   );
 
+  const onInitialLoad = useCallback(
+    (locationData: PlaceData) => {
+      if (gallery === null) {
+        return;
+      }
+
+      if (gallery.placeId === undefined) {
+        setSelectedPlace(locationData);
+      }
+    },
+    [gallery],
+  );
+
   type LocationFieldProps = ControllerRenderProps<
     ExhibitFormValues,
     'location'
@@ -972,11 +986,12 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         <MapLocationPicker
           initialLocation={field.value}
           initialPosition={gallery?.latLng}
+          onInitialLoad={onInitialLoad}
           onSelectLocation={locationSelectHandler}
         />
       );
     },
-    [createLocationSelectHandler, gallery],
+    [createLocationSelectHandler, gallery?.latLng, onInitialLoad],
   );
 
   const onValid: SubmitHandler<ExhibitFormValues> = useCallback(
@@ -995,7 +1010,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
       // ギャラリー情報の追加・編集
       const updatedGallery = await updateGallery({
-        id: exhibit?.galleryId,
+        id: gallery?.id,
         placeId: gallery?.placeId ?? selectedPlace.placeId,
         name: gallery?.name ?? selectedPlace.name,
         location: gallery?.location ?? selectedPlace.address,
@@ -1090,7 +1105,11 @@ const ExhibitForm = (props: ExhibitFormProps) => {
               render={renderLocation}
               rules={{ required: '場所を選択してください。' }}
             />
-            <GalleryInfoCard gallery={gallery} placeData={selectedPlace} />
+            <GalleryInfoCard
+              gallery={gallery}
+              onEdit={setGallery}
+              placeData={selectedPlace}
+            />
             <p className="text-xs text-red-600">{errors.location?.message}</p>
           </div>
           <Textbox
@@ -1151,9 +1170,65 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 interface GalleryInfoCardProps {
   gallery: Gallery | null;
   placeData: PlaceData | null;
+  onEdit?: (gallery: Gallery) => void;
 }
 
-const GalleryInfoCard = ({ gallery, placeData }: GalleryInfoCardProps) => {
+const GalleryInfoCard = ({
+  gallery,
+  placeData,
+  onEdit,
+}: GalleryInfoCardProps) => {
+  const [galleryState, setGalleryState] = useState<Gallery | null>(gallery);
+
+  // galleryまたはplaceDataが変更されたときにgalleryStateを更新
+  useEffect(() => {
+    setGalleryState(gallery);
+  }, [gallery, placeData]);
+
+  // galleryStateが変更されたときに親コンポーネントに通知
+  useEffect(() => {
+    if (galleryState !== null) {
+      onEdit?.(galleryState);
+    }
+  }, [galleryState, onEdit]);
+
+  const handlePropertyChange = useCallback(
+    (property: keyof Gallery, value: string) => {
+      if (galleryState !== null) {
+        setGalleryState({ ...galleryState, [property]: value });
+        return;
+      }
+
+      if (placeData === null) {
+        return;
+      }
+
+      const newGallery: Gallery = {
+        id: '',
+        placeId: placeData.placeId,
+        name: placeData.name,
+        location: placeData.address,
+        latLng: placeData.position,
+      };
+
+      setGalleryState({
+        ...newGallery,
+        [property]: value,
+      });
+    },
+    [galleryState, placeData],
+  );
+
+  const handleNameChange = useCallback(
+    (value: string) => handlePropertyChange('name', value),
+    [handlePropertyChange],
+  );
+
+  const handleAddressChange = useCallback(
+    (value: string) => handlePropertyChange('location', value),
+    [handlePropertyChange],
+  );
+
   if (placeData === null && gallery === null) {
     return (
       <Card>
@@ -1168,8 +1243,12 @@ const GalleryInfoCard = ({ gallery, placeData }: GalleryInfoCardProps) => {
   return (
     <Card>
       <div className="flex flex-col gap-1">
-        <p className="text-lg font-bold">{name}</p>
-        <p>{address}</p>
+        <EditableText
+          className="text-lg font-bold"
+          onChange={handleNameChange}
+          value={name}
+        />
+        <EditableText onChange={handleAddressChange} value={address} />
       </div>
     </Card>
   );
