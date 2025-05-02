@@ -50,17 +50,16 @@ export const FeedbackButton = () => {
   return (
     <div
       className={`
-        fixed bottom-4 right-4 z-10
-
-        md:bottom-8 md:right-8
+        fixed right-4 bottom-4 z-10
+        md:right-8 md:bottom-8
       `}>
       <div className="flex flex-col items-end gap-2">
         {/* 展開時に表示されるフィードバックボタン（モバイルのみ） */}
         {isMobile && isExpanded && (
           <button
             className={`
-              flex items-center gap-2 rounded-lg border border-purple-900
-              bg-white px-4 py-2 text-purple-900 shadow-lg
+              border-primary-500 bg-primary-500 flex items-center gap-2
+              rounded-lg border px-4 py-2 text-white shadow-lg
             `}
             onClick={goToFeedback}>
             <FaRegCommentDots size={20} />
@@ -72,9 +71,8 @@ export const FeedbackButton = () => {
         <button
           aria-label="フィードバックを送る"
           className={`
-            flex items-center justify-center gap-2 rounded-full bg-purple-900
+            bg-primary-500 flex items-center justify-center gap-2 rounded-full
             font-medium text-white shadow-lg transition-all duration-300
-
             ${isExpanded && !isMobile ? 'px-6 py-3' : 'p-3'}
           `}
           onClick={isMobile ? toggleButton : goToFeedback}
