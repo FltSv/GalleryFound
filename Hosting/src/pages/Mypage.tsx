@@ -56,6 +56,7 @@ import { Snackbar } from 'src/components/Snackbar';
 import { useCreatorContext } from 'src/contexts/CreatorContext';
 import { MapLocationPicker } from 'src/components/MapLocationPicker';
 import { PlaceData } from 'src/domain/place';
+import { SelectableText } from 'src/components/Input/SelectableText';
 
 export const Mypage = () => {
   const {
@@ -1205,6 +1206,11 @@ const GalleryInfoCard = ({
   // galleryStateが変更されたときに親コンポーネントに通知
   useEffect(() => {
     if (galleryState !== null) {
+      if (galleryState.operationType === '不明') {
+        onEdit?.({ ...galleryState, operationType: undefined });
+        return;
+      }
+
       onEdit?.(galleryState);
     }
   }, [galleryState, onEdit]);
@@ -1290,8 +1296,10 @@ const GalleryInfoCard = ({
 
       <div>
         <p className="text-sm font-semibold">運営形態</p>
-        <EditableText
+        <SelectableText
           onChange={handlePropertyChange('operationType')}
+          options={['貸出', 'コマーシャル']}
+          undefinedOption="不明"
           value={operationType}
         />
       </div>
