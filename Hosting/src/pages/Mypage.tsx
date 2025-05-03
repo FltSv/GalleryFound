@@ -54,7 +54,8 @@ import { ConfirmDelete } from 'components/ConfirmDelete';
 import { Spinner } from 'components/Spinner';
 import { Snackbar } from 'src/components/Snackbar';
 import { useCreatorContext } from 'src/contexts/CreatorContext';
-import { MapLocationPicker, PlaceData } from 'src/components/MapLocationPicker';
+import { MapLocationPicker } from 'src/components/MapLocationPicker';
+import { PlaceData } from 'src/domain/place';
 
 export const Mypage = () => {
   const {
@@ -1249,6 +1250,13 @@ const GalleryInfoCard = ({
           value={name}
         />
         <EditableText onChange={handleAddressChange} value={address} />
+        <div>
+          {placeData?.openingHours?.weekdayDescriptions.map(openingHour => (
+            <p className="text-sm" key={openingHour}>
+              {openingHour}
+            </p>
+          ))}
+        </div>
       </div>
     </Card>
   );

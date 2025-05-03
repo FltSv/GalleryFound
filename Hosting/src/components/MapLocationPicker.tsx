@@ -16,6 +16,7 @@ import {
   MapMouseEvent,
 } from '@vis.gl/react-google-maps';
 import { Spinner } from './Spinner';
+import { OpeningHours, PlaceData } from 'src/domain/place';
 
 // 東京駅
 export const TOKYO_POS = {
@@ -23,12 +24,97 @@ export const TOKYO_POS = {
   lng: 139.766965,
 } as const satisfies google.maps.LatLngLiteral;
 
-export interface PlaceData {
-  name: string;
-  address: string;
-  position: google.maps.LatLngLiteral;
-  placeId: string;
-}
+type PlaceFields = (keyof google.maps.places.Place)[];
+
+/** PlaceIDからPlaceオブジェクトを取得する */
+const getPlaceById = async (placeId: string) => {
+  const place = new google.maps.places.Place({
+    id: placeId,
+    requestedLanguage: 'ja',
+  });
+
+  const fields: PlaceFields = [
+    'displayName',
+    'formattedAddress',
+    'location',
+    'regularOpeningHours',
+  ];
+
+  await place.fetchFields({ fields });
+  return place;
+};
+
+/** テキスト検索を実行する */
+const searchPlacesByText = async (
+  query: string,
+  map: google.maps.Map,
+): Promise<google.maps.places.Place[]> => {
+  const fields: PlaceFields = [
+    'displayName',
+    'formattedAddress',
+    'id',
+    'location',
+    'regularOpeningHours',
+  ];
+
+  const request: google.maps.places.SearchByTextRequest = {
+    textQuery: query,
+    fields: fields,
+    language: 'ja',
+    region: 'jp',
+    locationBias: map.getBounds(),
+  };
+
+  const { places } = await google.maps.places.Place.searchByText(request);
+  return places;
+};
+
+/** テキスト検索を実行してPlaceDataを取得する */
+const getPlaceDataByText = async (query: string, map: google.maps.Map) => {
+  const searchResults = await searchPlacesByText(query, map);
+
+  if (searchResults.length === 0) {
+    throw new Error(`No places found for the query: ${query}`);
+  }
+
+  const placeData = searchResults[0];
+  return getPlaceDataFromGooglePlace(placeData);
+};
+
+// 位置情報からPlaceIdを取得
+const fetchPlaceIdByLatLng = async (
+  position: google.maps.LatLngLiteral,
+): Promise<string> =>
+  new Promise(resolve => {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: position }, async (results, status) => {
+      if (status !== google.maps.GeocoderStatus.OK) {
+        throw new Error('Geocoder failed due to: ' + status);
+      }
+
+      if (results === null) {
+        throw new Error('Geocoder failed: results is null');
+      }
+
+      if (results.length === 0) {
+        throw new Error('Geocoder failed: no results found');
+      }
+
+      const result = results[0];
+      resolve(result.place_id);
+    });
+  });
+
+/** GooglePlaceオブジェクトからPlaceDataオブジェクトを生成する */
+const getPlaceDataFromGooglePlace = (
+  place: google.maps.places.Place,
+): PlaceData => ({
+  name: place.displayName ?? '不明な場所',
+  address: place.formattedAddress ?? '不明な場所',
+  position: place.location?.toJSON() ?? TOKYO_POS,
+  placeId: place.id,
+  openingHours: OpeningHours.fromGooglePlaces(place.regularOpeningHours),
+});
 
 export interface MapLocationPickerProps {
   initialLocation?: string;
@@ -48,6 +134,7 @@ export const MapLocationPicker = ({
   );
   const [locationQuery, setLocationQuery] = useState(initialLocation ?? '');
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoaded, setIsInitialLoaded] = useState(false);
   const map = useMap();
   const placesLibrary = useMapsLibrary('places');
 
@@ -58,132 +145,32 @@ export const MapLocationPicker = ({
     }
   }, [initialPosition, map]);
 
-  // 共通の処理：位置情報から場所データを取得して返す
-  const fetchLocationDetails = useCallback(
-    async (
-      position: google.maps.LatLngLiteral,
-      placeId: string | null,
-    ): Promise<PlaceData> => {
-      setIsLoading(true);
-      try {
-        // placeIdが提供されている場合、Placeオブジェクトを使用
-        if (
-          typeof placeId === 'string' &&
-          placeId.length > 0 &&
-          placesLibrary
-        ) {
-          const place = new google.maps.places.Place({
-            id: placeId,
-            requestedLanguage: 'ja',
-          });
-
-          try {
-            await place.fetchFields({
-              fields: ['displayName', 'formattedAddress'],
-            });
-
-            const name = place.displayName ?? '不明な場所';
-            const address = place.formattedAddress ?? '不明な場所';
-
-            return {
-              name,
-              address,
-              position,
-              placeId,
-            };
-          } catch (error) {
-            console.error('Place details fetch failed:', error);
-            return {
-              name: '不明な場所',
-              address: '不明な場所',
-              position,
-              placeId,
-            };
-          }
-        }
-
-        // placeIdがない場合、Geocoderを使用
-        return new Promise(resolve => {
-          const geocoder = new google.maps.Geocoder();
-          geocoder.geocode({ location: position }, async (results, status) => {
-            if (
-              status !== google.maps.GeocoderStatus.OK ||
-              !results ||
-              results.length === 0
-            ) {
-              console.error('Geocoder failed due to: ' + status);
-              resolve({
-                name: '不明な場所',
-                address: '不明な場所',
-                position,
-                placeId: '',
-              });
-              return;
-            }
-
-            const result = results[0];
-            const resultPlaceId = result.place_id;
-
-            try {
-              if (!placesLibrary) {
-                resolve({
-                  name: result.formatted_address,
-                  address: result.formatted_address,
-                  position,
-                  placeId: resultPlaceId,
-                });
-                return;
-              }
-
-              const place = new google.maps.places.Place({
-                id: resultPlaceId,
-                requestedLanguage: 'ja',
-              });
-
-              await place.fetchFields({
-                fields: ['displayName'],
-              });
-
-              resolve({
-                name: place.displayName ?? '不明な場所',
-                address: result.formatted_address,
-                position,
-                placeId: resultPlaceId,
-              });
-            } catch (error) {
-              console.error('Place details fetch failed:', error);
-              resolve({
-                name: '不明な場所',
-                address: result.formatted_address || '不明な場所',
-                position,
-                placeId: resultPlaceId,
-              });
-            }
-          });
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [placesLibrary],
-  );
-
   // 初回読込完了時の処理
   useEffect(() => {
-    const loadInitialLocationData = async () => {
-      if (!map || !onInitialLoad) return;
+    if (
+      isInitialLoaded ||
+      markerPos === TOKYO_POS ||
+      map === null ||
+      onInitialLoad === undefined ||
+      locationQuery === ''
+    ) {
+      return;
+    }
 
+    const loadInitialLocationData = async () => {
       setIsLoading(true);
+
       try {
-        const locationData = await fetchLocationDetails(markerPos, null);
-        onInitialLoad(locationData);
+        const placeData = await getPlaceDataByText(locationQuery, map);
+        onInitialLoad(placeData);
       } finally {
+        setIsInitialLoaded(true);
         setIsLoading(false);
       }
     };
 
     loadInitialLocationData();
-  }, [map, onInitialLoad, markerPos, fetchLocationDetails]);
+  }, [map, onInitialLoad, markerPos, isInitialLoaded, locationQuery]);
 
   // マップクリック時の処理
   const handleMapClick = useCallback(
@@ -196,14 +183,31 @@ export const MapLocationPicker = ({
       const newPosition = e.detail.latLng;
       setMarkerPos(newPosition);
 
-      const locationData = await fetchLocationDetails(
-        newPosition,
-        e.detail.placeId,
-      );
-      onSelectLocation(locationData);
-      setIsLoading(false);
+      if (map === null) {
+        console.error('Map instance not available');
+        return;
+      }
+
+      if (placesLibrary === null) {
+        console.error('Places library not loaded');
+        return;
+      }
+
+      try {
+        const placeId =
+          e.detail.placeId ?? (await fetchPlaceIdByLatLng(newPosition));
+
+        const place = await getPlaceById(placeId);
+        const placeData = getPlaceDataFromGooglePlace(place);
+        onSelectLocation(placeData);
+        return;
+      } catch (error) {
+        console.error('Place search request failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
     },
-    [onSelectLocation, fetchLocationDetails],
+    [map, onSelectLocation, placesLibrary],
   );
 
   // 場所検索の処理
@@ -227,79 +231,21 @@ export const MapLocationPicker = ({
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     try {
-      const searchResults = await searchPlacesByText(locationQuery, map);
+      const placeData = await getPlaceDataByText(locationQuery, map);
 
-      if (searchResults.length === 0) {
-        console.error('No places found for the query:', locationQuery);
-        setIsLoading(false);
-        return;
-      }
-
-      const placeData = searchResults[0];
-
-      if (!placeData.location) {
-        console.error('Place location not found:', placeData);
-        setIsLoading(false);
-        return;
-      }
-
-      const newPosition = placeData.location.toJSON();
+      const newPosition = placeData.position;
       setMarkerPos(newPosition);
 
       // 検索結果の位置にマップの中央を移動
       map.panTo(newPosition);
-      const placeId = placeData.id;
 
-      // 必要な情報が既に存在する場合
-      const hasAddress =
-        typeof placeData.formattedAddress === 'string' &&
-        placeData.formattedAddress !== '';
-      const hasName =
-        typeof placeData.displayName === 'string' &&
-        placeData.displayName !== '';
-
-      if (hasAddress && hasName) {
-        setIsLoading(false);
-        onSelectLocation({
-          name: placeData.displayName!,
-          address: placeData.formattedAddress!,
-          position: newPosition,
-          placeId,
-        });
-        return;
-      }
-
-      // 追加情報が必要な場合は共通処理を使用
-      const locationData = await fetchLocationDetails(newPosition, placeId);
-      onSelectLocation(locationData);
+      onSelectLocation(placeData);
     } catch (error) {
-      setIsLoading(false);
       console.error('Place search request failed:', error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [
-    placesLibrary,
-    map,
-    locationQuery,
-    onSelectLocation,
-    fetchLocationDetails,
-  ]);
-
-  // テキスト検索を実行する関数
-  const searchPlacesByText = async (
-    query: string,
-    map: google.maps.Map,
-  ): Promise<google.maps.places.Place[]> => {
-    const request: google.maps.places.SearchByTextRequest = {
-      textQuery: query,
-      fields: ['displayName', 'location', 'id', 'formattedAddress'],
-      language: 'ja',
-      region: 'jp',
-      locationBias: map.getBounds(),
-    };
-
-    const { places } = await google.maps.places.Place.searchByText(request);
-    return places;
-  };
+  }, [placesLibrary, map, locationQuery, onSelectLocation]);
 
   const handleLocationQueryChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
