@@ -137,6 +137,15 @@ export interface Gallery {
   location: string;
   latLng: GeoPoint;
   placeId?: string;
+
+  /** 営業時間 */
+  openingHours?: string;
+
+  /** 取扱作品 */
+  artType?: string;
+
+  /** 運営形態 */
+  operationType?: string;
 }
 
 /** Remote Config */

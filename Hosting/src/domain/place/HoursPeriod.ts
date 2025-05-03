@@ -1,5 +1,10 @@
 import { HourPoint } from '.';
 
+type HoursPeriodJson = {
+  open: string;
+  close: string;
+};
+
 export class HoursPeriod {
   private readonly _symbol: symbol = Symbol();
 
@@ -36,5 +41,21 @@ export class HoursPeriod {
 
   toString(): string {
     return `${this._open.toString()} - ${this._close.toString()}`;
+  }
+
+  toJson(): string {
+    const json: HoursPeriodJson = {
+      open: this._open.toJson(),
+      close: this._close.toJson(),
+    };
+    return JSON.stringify(json);
+  }
+
+  static fromJson(json: string): HoursPeriod {
+    const data = JSON.parse(json) as HoursPeriodJson;
+    return new HoursPeriod(
+      HourPoint.fromJson(data.open),
+      HourPoint.fromJson(data.close),
+    );
   }
 }

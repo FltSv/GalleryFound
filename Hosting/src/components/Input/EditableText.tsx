@@ -113,7 +113,11 @@ export const EditableText = ({
         </div>
       ) : (
         <div className="flex gap-1">
-          <p>{text}</p>
+          {(text?.length ?? 0) > 0 ? (
+            <p>{text}</p>
+          ) : (
+            <p className="text-sm text-gray-400">情報がありません</p>
+          )}
           <button
             className={`
               self-start p-1

@@ -973,8 +973,15 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         return;
       }
 
-      // ギャラリーが存在しない場合
-      setGallery(null);
+      // ギャラリーが存在しない場合、PlaceDataを使用して新規作成
+      setGallery({
+        id: '',
+        placeId: locationData.placeId,
+        name: locationData.name,
+        location: locationData.address,
+        latLng: locationData.position,
+        openingHours: locationData.openingHours,
+      });
     },
     [],
   );
@@ -997,7 +1004,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
   const onValid: SubmitHandler<ExhibitFormValues> = useCallback(
     async data => {
-      if (selectedPlace === null) {
+      if (gallery === null) {
         setError('location', {
           message: 'ギャラリー情報の指定または入力が必要です。',
         });
@@ -1010,13 +1017,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       setUploadProgress(0);
 
       // ギャラリー情報の追加・編集
-      const updatedGallery = await updateGallery({
-        id: gallery?.id,
-        placeId: gallery?.placeId ?? selectedPlace.placeId,
-        name: gallery?.name ?? selectedPlace.name,
-        location: gallery?.location ?? selectedPlace.address,
-        latLng: gallery?.latLng ?? selectedPlace.position,
-      });
+      const updatedGallery = await updateGallery(gallery);
 
       const exhibitData = {
         title: data.title,
@@ -1061,7 +1062,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
       setUploadProgress(null);
     },
-    [exhibit, onSubmit, selectedFile, setError, user, selectedPlace, gallery],
+    [exhibit, onSubmit, selectedFile, setError, user, gallery],
   );
 
   const onSubmitForm = useCallback(
@@ -1183,7 +1184,22 @@ const GalleryInfoCard = ({
 
   // galleryまたはplaceDataが変更されたときにgalleryStateを更新
   useEffect(() => {
-    setGalleryState(gallery);
+    setGalleryState(state => {
+      if (gallery === null) {
+        return null;
+      }
+
+      // 営業時間が未設定の場合、PlaceDataを使用して更新
+      if (gallery?.openingHours === undefined && placeData !== null) {
+        return {
+          ...gallery,
+          ...state,
+          openingHours: placeData.openingHours,
+        };
+      }
+
+      return gallery;
+    });
   }, [gallery, placeData]);
 
   // galleryStateが変更されたときに親コンポーネントに通知
@@ -1194,7 +1210,7 @@ const GalleryInfoCard = ({
   }, [galleryState, onEdit]);
 
   const handlePropertyChange = useCallback(
-    (property: keyof Gallery, value: string) => {
+    (property: keyof Gallery) => (value: string) => {
       if (galleryState !== null) {
         setGalleryState({ ...galleryState, [property]: value });
         return;
@@ -1210,6 +1226,7 @@ const GalleryInfoCard = ({
         name: placeData.name,
         location: placeData.address,
         latLng: placeData.position,
+        openingHours: placeData.openingHours,
       };
 
       setGalleryState({
@@ -1218,16 +1235,6 @@ const GalleryInfoCard = ({
       });
     },
     [galleryState, placeData],
-  );
-
-  const handleNameChange = useCallback(
-    (value: string) => handlePropertyChange('name', value),
-    [handlePropertyChange],
-  );
-
-  const handleAddressChange = useCallback(
-    (value: string) => handlePropertyChange('location', value),
-    [handlePropertyChange],
   );
 
   if (placeData === null && gallery === null) {
@@ -1240,23 +1247,53 @@ const GalleryInfoCard = ({
 
   const name = gallery?.name ?? placeData?.name;
   const address = gallery?.location ?? placeData?.address;
+  const openingHours = gallery?.openingHours ?? placeData?.openingHours;
+  const artType = gallery?.artType;
+  const operationType = gallery?.operationType;
 
   return (
-    <Card>
-      <div className="flex flex-col gap-1">
+    <Card className="flex flex-col gap-2">
+      <div>
         <EditableText
           className="text-lg font-bold"
-          onChange={handleNameChange}
+          onChange={handlePropertyChange('name')}
           value={name}
         />
-        <EditableText onChange={handleAddressChange} value={address} />
+        <EditableText
+          onChange={handlePropertyChange('location')}
+          value={address}
+        />
+      </div>
+
+      <div>
+        <p className="text-sm font-semibold">営業時間</p>
         <div>
-          {placeData?.openingHours?.weekdayDescriptions.map(openingHour => (
-            <p className="text-sm" key={openingHour}>
-              {openingHour}
-            </p>
-          ))}
+          {(openingHours?.weekdayDescriptionsWithoutClosed.length ?? 0) > 0 ? (
+            openingHours?.weekdayDescriptionsWithoutClosed.map(openingHour => (
+              <p className="text-sm" key={openingHour}>
+                {openingHour}
+              </p>
+            ))
+          ) : (
+            <p className="text-sm text-gray-400">情報がありません</p>
+          )}
         </div>
+      </div>
+
+      <div>
+        <p className="text-sm font-semibold">取扱作品</p>
+        <EditableText
+          onChange={handlePropertyChange('artType')}
+          value={artType}
+        />
+      </div>
+
+      <div>
+        <p className="text-sm font-semibold">運営形態</p>
+        <EditableText
+          onChange={handlePropertyChange('operationType')}
+          value={operationType}
+        />
       </div>
     </Card>
   );

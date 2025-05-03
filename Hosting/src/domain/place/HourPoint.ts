@@ -1,3 +1,5 @@
+type HourPointJson = { hour: number; minute: number };
+
 export class HourPoint {
   private readonly _symbol: symbol = Symbol();
 
@@ -53,5 +55,15 @@ export class HourPoint {
     const hour = this._hour.toString().padStart(2, '0');
     const minute = this._minute.toString().padStart(2, '0');
     return `${hour}:${minute}`;
+  }
+
+  toJson(): string {
+    const json: HourPointJson = { hour: this._hour, minute: this._minute };
+    return JSON.stringify(json);
+  }
+
+  static fromJson(json: string): HourPoint {
+    const data = JSON.parse(json) as HourPointJson;
+    return new HourPoint(data.hour, data.minute);
   }
 }

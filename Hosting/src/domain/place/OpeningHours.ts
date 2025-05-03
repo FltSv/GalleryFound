@@ -64,7 +64,18 @@ export class OpeningHours {
 
   /** 各曜日の営業時間 */
   get weekdayDescriptions(): string[] {
-    return WeekDays.map(day => {
+    return this.getWeekdayDescriptions(true);
+  }
+
+  /** 各曜日の営業時間（休廊は表示しない） */
+  get weekdayDescriptionsWithoutClosed(): string[] {
+    return this.getWeekdayDescriptions(false);
+  }
+
+  private getWeekdayDescriptions(showClosed: boolean): string[] {
+    return WeekDays.filter(
+      day => showClosed || this._value[day].length > 0,
+    ).map(day => {
       const periods = this._value[day];
       const label = WeekDayLabels[day];
 
@@ -84,5 +95,34 @@ export class OpeningHours {
 
   toString(): string {
     return this.weekdayDescriptions.toString();
+  }
+
+  toJson(): string {
+    const json = WeekDays.reduce(
+      (acc, day) => {
+        acc[day] = this._value[day].map(p => p.toJson());
+        return acc;
+      },
+      {} as Record<WeekDay, string[]>,
+    );
+    return JSON.stringify(json);
+  }
+
+  static fromJson(json?: string): OpeningHours | undefined {
+    if (json === undefined) {
+      return undefined;
+    }
+
+    const parsedData = JSON.parse(json) as Record<WeekDay, string[]>;
+    const data = Object.entries(parsedData).reduce(
+      (acc, [day, periodStrings]) => {
+        acc[day as WeekDay] = periodStrings.map(str =>
+          HoursPeriod.fromJson(str),
+        );
+        return acc;
+      },
+      {} as Record<WeekDay, HoursPeriod[]>,
+    );
+    return new OpeningHours(data);
   }
 }
