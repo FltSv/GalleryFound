@@ -11,12 +11,12 @@ layer(base);
 @config '../tailwind.config.js';
 
 body {
-  @apply bg-linear-to-b from-purple-300 to-blue-200 bg-fixed text-slate-950;
+  @apply bg-linear-to-b from-purple-200 to-blue-200 bg-fixed text-slate-950;
   font-family: Roboto, Helvetica, Arial, sans-serif;
 }
 
 h1 {
-  @apply text-2xl font-bold text-purple-900;
+  @apply text-2xl font-bold text-primary-500;
 }
 
 h2 {
