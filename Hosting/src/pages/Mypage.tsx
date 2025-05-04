@@ -1199,6 +1199,15 @@ const GalleryInfoCard = ({
         };
       }
 
+      // PlaceIdが未設定の場合、PlaceDataを使用して更新
+      if (gallery?.placeId === undefined && placeData !== null) {
+        return {
+          ...gallery,
+          ...state,
+          placeId: placeData.placeId,
+        };
+      }
+
       return gallery;
     });
   }, [gallery, placeData]);

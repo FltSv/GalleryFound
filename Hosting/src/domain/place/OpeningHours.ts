@@ -75,16 +75,26 @@ export class OpeningHours {
   private getWeekdayDescriptions(showClosed: boolean): string[] {
     return WeekDays.filter(
       day => showClosed || this._value[day].length > 0,
-    ).map(day => {
-      const periods = this._value[day];
-      const label = WeekDayLabels[day];
+    ).map(day => this.getDescriptionForDay(day));
+  }
 
-      if (periods.length === 0) {
-        return `${label}: 休廊`;
-      }
+  /** 指定された日付の曜日に対応する営業時間の説明を取得する */
+  getDescriptionForDate(date: Date): string {
+    const dayIndex = date.getDay(); // 0: 日曜日, 1: 月曜日, ...
+    const weekDay = WeekDays[dayIndex];
+    return this.getDescriptionForDay(weekDay);
+  }
 
-      return `${label}: ${periods.map(p => p.toString()).join(', ')}`;
-    });
+  /** 指定された曜日の営業時間の説明を生成する */
+  private getDescriptionForDay(day: WeekDay): string {
+    const periods = this._value[day];
+    const label = WeekDayLabels[day];
+
+    if (periods.length === 0) {
+      return `${label}: 休廊`;
+    }
+
+    return `${label}: ${periods.map(p => p.toString()).join(', ')}`;
   }
 
   update(weekdays: WeekDay[], hours: HoursPeriod[]): void {
