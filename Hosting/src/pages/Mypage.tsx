@@ -3,9 +3,7 @@ import {
   Dispatch,
   FormEvent,
   KeyboardEvent,
-  MouseEventHandler,
   SetStateAction,
-  SyntheticEvent,
   useCallback,
   useEffect,
   useState,
@@ -18,7 +16,6 @@ import {
   ControllerRenderProps,
 } from 'react-hook-form';
 import { Button as MuiJoyButton, IconButton, Card, Input } from '@mui/joy';
-import { Autocomplete, AutocompleteRenderInputParams } from '@mui/material';
 import { FaCheck, FaPen, FaPlus, FaTimes } from 'react-icons/fa';
 import { RiDraggable } from 'react-icons/ri';
 import { useAuthContext } from 'src/contexts/AuthContext';
@@ -30,14 +27,14 @@ import {
   SubmitButton,
   Textarea,
   Textbox,
+  EditableText,
 } from 'src/components/Input';
 import { Popup } from 'components/Popup';
-import { Gallery, Creator, Product, Exhibit } from 'src/domain/entities';
+import { Creator, Product, Exhibit, Gallery } from 'src/domain/entities';
 import { DraggableList, SortableProps } from 'components/DraggableList';
 import { getConfig } from 'src/infra/firebase/firebaseConfig';
 import { UserName } from 'src/domain/UserName';
 import { setCreatorData } from 'src/infra/firebase/CreatorRepo';
-import { addGallery, getGalleries } from 'src/application/GalleryMapService';
 import {
   createExhibit,
   createProduct,
@@ -45,6 +42,11 @@ import {
   deleteProduct,
   updateExhibit,
 } from 'src/application/CreatorService';
+import {
+  getGallery,
+  getGalleryByPlaceId,
+  updateGallery,
+} from 'src/application/GalleryMapService';
 import { ProgressBar } from 'components/ProgressBar';
 import { FeedbackButton } from 'components/FeedbackButton';
 import { useFormGuard } from 'src/hooks/useFormGuard';
@@ -52,6 +54,9 @@ import { ConfirmDelete } from 'components/ConfirmDelete';
 import { Spinner } from 'components/Spinner';
 import { Snackbar } from 'src/components/Snackbar';
 import { useCreatorContext } from 'src/contexts/CreatorContext';
+import { MapLocationPicker } from 'src/components/MapLocationPicker';
+import { PlaceData } from 'src/domain/place';
+import { SelectableText } from 'src/components/Input/SelectableText';
 
 export const Mypage = () => {
   const {
@@ -878,12 +883,14 @@ interface ExhibitFormValues extends Exhibit {
 const ExhibitForm = (props: ExhibitFormProps) => {
   const { user } = useAuthContext();
   const { exhibit, onSubmit } = props;
-  const [galleries, setGalleries] = useState<Gallery[] | undefined>(undefined);
   const [previewImage, setPreviewImage] = useState<string>(
     exhibit?.imageUrl ?? '',
   );
   const [selectedFile, setSelectedFile] = useState<File>();
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState<PlaceData | null>(null);
+  const [gallery, setGallery] = useState<Gallery | null>(null);
+
   const {
     control,
     getValues,
@@ -891,24 +898,31 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     handleSubmit,
     setError,
     clearErrors,
-    watch,
     formState: { errors },
   } = useForm<ExhibitFormValues>({ defaultValues: exhibit });
-
-  const fetchGalleries = useCallback(
-    () =>
-      void (async () => {
-        const galleries = await getGalleries();
-        setGalleries(galleries);
-      })(),
-    [],
-  );
-
-  useEffect(fetchGalleries, [fetchGalleries]);
 
   const requireMsg = '1文字以上の入力が必要です。';
   const invalidDateMsg = '有効な日付を入力してください。';
   const isAdd = exhibit === undefined;
+
+  // 編集時、ギャラリー情報を取得
+  useEffect(() => {
+    if (exhibit?.galleryId === undefined) return;
+
+    const fetchGallery = async () => {
+      try {
+        const galleryData = await getGallery(exhibit.galleryId);
+
+        if (galleryData !== undefined) {
+          setGallery(galleryData);
+        }
+      } catch (error) {
+        console.error('ギャラリー情報の取得に失敗しました:', error);
+      }
+    };
+
+    fetchGallery();
+  }, [exhibit]);
 
   // 画像選択時の処理
   const onFileChange = useCallback(
@@ -930,68 +944,68 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     [clearErrors],
   );
 
-  const location = watch('location');
-  const matchGallery = galleries?.find(x => x.name === location);
-  const isMatchGallery = matchGallery !== undefined;
+  const onInitialLoad = useCallback(
+    (locationData: PlaceData) => {
+      if (gallery === null) {
+        return;
+      }
+
+      if (gallery.placeId === undefined) {
+        setSelectedPlace(locationData);
+      }
+    },
+    [gallery],
+  );
 
   type LocationFieldProps = ControllerRenderProps<
     ExhibitFormValues,
     'location'
   >;
 
-  const handleLocationChange = useCallback(
-    (field: LocationFieldProps) =>
-      (_: SyntheticEvent, value: string | null) => {
-        field.onChange(value);
-      },
+  const createLocationSelectHandler = useCallback(
+    (field: LocationFieldProps) => async (locationData: PlaceData) => {
+      field.onChange(locationData.name);
+      setSelectedPlace(locationData);
+
+      // PlaceIdに一致するギャラリーを取得
+      const galleryData = await getGalleryByPlaceId(locationData.placeId);
+      if (galleryData !== undefined) {
+        setGallery(galleryData);
+        return;
+      }
+
+      // ギャラリーが存在しない場合、PlaceDataを使用して新規作成
+      setGallery({
+        id: '',
+        placeId: locationData.placeId,
+        name: locationData.name,
+        location: locationData.address,
+        latLng: locationData.position,
+        openingHours: locationData.openingHours,
+      });
+    },
     [],
   );
 
-  const handleRenderInput = useCallback((field: LocationFieldProps) => {
-    const renderAutocompleteInput = (params: AutocompleteRenderInputParams) => (
-      <Input
-        slotProps={{
-          root: { ref: params.InputProps.ref },
-          input: {
-            ...params.inputProps,
-            onChange: e => {
-              field.onChange(e);
-              params.inputProps.onChange?.(e);
-            },
-          },
-        }}
-        sx={{ borderColor: 'black' }}
-      />
-    );
-    return renderAutocompleteInput;
-  }, []);
-
   const renderLocation = useCallback(
     ({ field }: { field: LocationFieldProps }) => {
-      const onChange = handleLocationChange(field);
-      const renderInput = handleRenderInput(field);
+      const locationSelectHandler = createLocationSelectHandler(field);
 
       return (
-        <Autocomplete
-          freeSolo
-          onChange={onChange}
-          options={galleries?.map(x => x.name) ?? []}
-          renderInput={renderInput}
-          value={field.value || null}
+        <MapLocationPicker
+          initialLocation={field.value}
+          initialPosition={gallery?.latLng}
+          onInitialLoad={onInitialLoad}
+          onSelectLocation={locationSelectHandler}
         />
       );
     },
-    [galleries, handleLocationChange, handleRenderInput],
+    [createLocationSelectHandler, gallery?.latLng, onInitialLoad],
   );
-
-  const onChangeLocation = useCallback(() => {
-    fetchGalleries();
-    setError('location', {});
-  }, [setError, fetchGalleries]);
 
   const onValid: SubmitHandler<ExhibitFormValues> = useCallback(
     async data => {
-      if (!isMatchGallery) {
+      if (gallery === null) {
         setError('location', {
           message: 'ギャラリー情報の指定または入力が必要です。',
         });
@@ -1003,10 +1017,13 @@ const ExhibitForm = (props: ExhibitFormProps) => {
       // 処理開始
       setUploadProgress(0);
 
+      // ギャラリー情報の追加・編集
+      const updatedGallery = await updateGallery(gallery);
+
       const exhibitData = {
         title: data.title,
-        location: data.location,
-        galleryId: matchGallery.id,
+        location: updatedGallery.name,
+        galleryId: updatedGallery.id,
         startDate: new Date(data.startDateString + 'T00:00:00'),
         endDate: new Date(data.endDateString + 'T23:59:59'),
       };
@@ -1046,15 +1063,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
       setUploadProgress(null);
     },
-    [
-      exhibit,
-      isMatchGallery,
-      matchGallery?.id,
-      onSubmit,
-      selectedFile,
-      setError,
-      user,
-    ],
+    [exhibit, onSubmit, selectedFile, setError, user, gallery],
   );
 
   const onSubmitForm = useCallback(
@@ -1097,19 +1106,14 @@ const ExhibitForm = (props: ExhibitFormProps) => {
               control={control}
               name="location"
               render={renderLocation}
-              rules={{ required: requireMsg }}
+              rules={{ required: '場所を選択してください。' }}
+            />
+            <GalleryInfoCard
+              gallery={gallery}
+              onEdit={setGallery}
+              placeData={selectedPlace}
             />
             <p className="text-xs text-red-600">{errors.location?.message}</p>
-            {location !== '' && isMatchGallery ? (
-              <Card>
-                <div>
-                  <p className="text-lg font-bold">{matchGallery.name}</p>
-                  <p>{matchGallery.location}</p>
-                </div>
-              </Card>
-            ) : (
-              <NoGalleryInfo newName={location} onChange={onChangeLocation} />
-            )}
           </div>
           <Textbox
             defaultDateValue={exhibit?.startDate}
@@ -1166,74 +1170,147 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   );
 };
 
-interface NoGalleryProps {
-  newName: string;
-  onChange: () => void;
+interface GalleryInfoCardProps {
+  gallery: Gallery | null;
+  placeData: PlaceData | null;
+  onEdit?: (gallery: Gallery) => void;
 }
 
-const NoGalleryInfo = (props: NoGalleryProps) => {
-  const {
-    register,
-    handleSubmit,
-    setError,
-    clearErrors,
-    formState: { errors, isSubmitting },
-  } = useForm<Gallery>({ defaultValues: { name: props.newName } as Gallery });
+const GalleryInfoCard = ({
+  gallery,
+  placeData,
+  onEdit,
+}: GalleryInfoCardProps) => {
+  const [galleryState, setGalleryState] = useState<Gallery | null>(gallery);
 
-  const onValid: SubmitHandler<Gallery> = useCallback(
-    async data => {
-      if (!props.newName) {
-        setError('name', { message: '場所（ギャラリー名称）が未入力です。' });
+  // galleryまたはplaceDataが変更されたときにgalleryStateを更新
+  useEffect(() => {
+    setGalleryState(state => {
+      if (gallery === null) {
+        return null;
+      }
+
+      // 営業時間が未設定の場合、PlaceDataを使用して更新
+      if (gallery?.openingHours === undefined && placeData !== null) {
+        return {
+          ...gallery,
+          ...state,
+          openingHours: placeData.openingHours,
+        };
+      }
+
+      // PlaceIdが未設定の場合、PlaceDataを使用して更新
+      if (gallery?.placeId === undefined && placeData !== null) {
+        return {
+          ...gallery,
+          ...state,
+          placeId: placeData.placeId,
+        };
+      }
+
+      return gallery;
+    });
+  }, [gallery, placeData]);
+
+  // galleryStateが変更されたときに親コンポーネントに通知
+  useEffect(() => {
+    if (galleryState !== null) {
+      if (galleryState.operationType === '不明') {
+        onEdit?.({ ...galleryState, operationType: undefined });
         return;
       }
 
-      try {
-        await addGallery({ ...data, name: props.newName });
-      } catch (error) {
-        console.error('error: ', error);
-        setError('name', { message: '入力された住所が見つかりませんでした。' });
+      onEdit?.(galleryState);
+    }
+  }, [galleryState, onEdit]);
+
+  const handlePropertyChange = useCallback(
+    (property: keyof Gallery) => (value: string) => {
+      if (galleryState !== null) {
+        setGalleryState({ ...galleryState, [property]: value });
         return;
       }
 
-      props.onChange();
+      if (placeData === null) {
+        return;
+      }
+
+      const newGallery: Gallery = {
+        id: '',
+        placeId: placeData.placeId,
+        name: placeData.name,
+        location: placeData.address,
+        latLng: placeData.position,
+        openingHours: placeData.openingHours,
+      };
+
+      setGalleryState({
+        ...newGallery,
+        [property]: value,
+      });
     },
-    [props, setError],
+    [galleryState, placeData],
   );
 
-  const onClick: MouseEventHandler<HTMLAnchorElement> = useCallback(
-    e => {
-      clearErrors('name');
-      void handleSubmit(onValid)(e);
-    },
-    [clearErrors, handleSubmit, onValid],
-  );
+  if (placeData === null && gallery === null) {
+    return (
+      <Card>
+        <p>場所が選択されていません。</p>
+      </Card>
+    );
+  }
+
+  const name = gallery?.name ?? placeData?.name;
+  const address = gallery?.location ?? placeData?.address;
+  const openingHours = gallery?.openingHours ?? placeData?.openingHours;
+  const artType = gallery?.artType;
+  const operationType = gallery?.operationType;
 
   return (
-    <Card size="sm">
-      <p>
-        情報がありません。
-        <br />
-        ギャラリー情報の新規追加
-      </p>
-      <div className="flex flex-col gap-2">
-        <Textbox
-          label="住所"
-          size="sm"
-          {...register('location', {
-            required: 'ギャラリーの住所を入力してください。',
-          })}
-          fieldError={errors.name || errors.location}
+    <Card className="flex flex-col gap-2">
+      <div>
+        <EditableText
+          className="text-lg font-bold"
+          onChange={handlePropertyChange('name')}
+          value={name}
         />
-        <MuiJoyButton
-          className="w-fit"
-          color="neutral"
-          loading={isSubmitting}
-          onClick={onClick}
-          size="sm"
-          startDecorator={<FaPlus />}
-          variant="soft">
-          追加
-        </MuiJoyButton>
+        <EditableText
+          onChange={handlePropertyChange('location')}
+          value={address}
+        />
+      </div>
+
+      <div>
+        <p className="text-sm font-semibold">営業時間</p>
+        <div>
+          {(openingHours?.weekdayDescriptionsWithoutClosed.length ?? 0) > 0 ? (
+            openingHours?.weekdayDescriptionsWithoutClosed.map(openingHour => (
+              <p className="text-sm" key={openingHour}>
+                {openingHour}
+              </p>
+            ))
+          ) : (
+            <p className="text-sm text-gray-400">情報がありません</p>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-sm font-semibold">取扱作品</p>
+        <EditableText
+          onChange={handlePropertyChange('artType')}
+          value={artType}
+        />
+      </div>
+
+      <div>
+        <p className="text-sm font-semibold">運営形態</p>
+        <SelectableText
+          onChange={handlePropertyChange('operationType')}
+          options={['貸出', 'コマーシャル']}
+          undefinedOption="不明"
+          value={operationType}
+        />
       </div>
     </Card>
   );

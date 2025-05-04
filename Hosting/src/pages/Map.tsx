@@ -15,6 +15,8 @@ import {
   GalleryExhibits,
   getGalleryExhibits,
 } from 'src/application/GalleryMapService';
+import { ExpandableDisplay } from 'components/ExpandableDisplay';
+import { Gallery } from 'src/domain/entities';
 
 // 東京駅
 const TOKYO_POS = {
@@ -23,6 +25,27 @@ const TOKYO_POS = {
 } as const satisfies google.maps.LatLngLiteral;
 
 const TODAY = new Date();
+
+const createGoogleMapUrl = {
+  search: (gallery: Gallery): string => {
+    const query = encodeURIComponent(gallery.name);
+    const placeIdQuery =
+      (gallery.placeId?.length ?? 0) > 0
+        ? `&query_place_id=${gallery.placeId}`
+        : '';
+    return `https://www.google.com/maps/search/?api=1&query=${query}${placeIdQuery}`;
+  },
+
+  directions: (gallery: Gallery): string => {
+    const query = encodeURIComponent(gallery.name);
+    const baseUrl = `https://www.google.com/maps/dir/?api=1&destination=${query}`;
+    const placeIdQuery =
+      (gallery.placeId?.length ?? 0) > 0
+        ? `&destination_place_id=${gallery.placeId}`
+        : '';
+    return `${baseUrl}${placeIdQuery}`;
+  },
+};
 
 export const Map = () => {
   // 展示IDを取得
@@ -174,21 +197,61 @@ const GalleryMarker = (props: GalleryMarkerProps) => {
         <InfoWindow
           anchor={marker}
           headerContent={
-            <div>
-              <p className="text-base">{gallery.name}</p>
-              <p className="max-w-60">{gallery.location}</p>
-            </div>
+            <p className="max-w-52 align-middle">
+              <span className="text-base font-bold">{gallery.name}</span>
+              {(gallery.operationType?.length ?? 0) > 0 && (
+                <span
+                  className={`
+                    border-primary-500 text-primary-500 mx-2 h-fit w-fit
+                    rounded-full border px-2 text-nowrap
+                  `}>
+                  {gallery.operationType}
+                </span>
+              )}
+            </p>
           }
           onClose={onClose}>
-          {exhibits.map(x => (
-            <div className="flex gap-2 py-1" key={x.id}>
-              <img className="inline w-16" src={x.imageUrl} />
+          <div className="flex max-w-60 flex-col gap-2 pt-1">
+            <p>{gallery.location}</p>
+            {gallery.openingHours && <OpeningHoursDisplay gallery={gallery} />}
+            {(gallery.artType?.length ?? 0) > 0 && (
               <div>
-                <p className="text-base font-bold">{x.title}</p>
-                <p>{x.getDatePeriod()}</p>
+                <p className="font-medium">取扱作品:</p>
+                <p className="text-xs">{gallery.artType}</p>
               </div>
+            )}
+            <div
+              className={`
+                *:bg-primary-500 *:w-full *:rounded-full *:py-2 *:text-center
+                *:text-xs *:text-white
+                flex gap-2
+              `}>
+              <a
+                href={createGoogleMapUrl.search(gallery)}
+                rel="noopener noreferrer"
+                target="_blank">
+                Mapで開く
+              </a>
+              <a
+                href={createGoogleMapUrl.directions(gallery)}
+                rel="noopener noreferrer"
+                target="_blank">
+                ここへの経路
+              </a>
             </div>
-          ))}
+            {exhibits.map(x => (
+              <div className="flex gap-2 py-1" key={x.id}>
+                <img className="inline w-16" src={x.imageUrl} />
+                <div>
+                  <p className="text-base font-bold">{x.title}</p>
+                  <p>{x.getDatePeriod()}</p>
+                </div>
+              </div>
+            ))}
+            <p className="text-[0.5rem]">
+              ※ 祝日は営業時間が異なる可能性があります。
+            </p>
+          </div>
         </InfoWindow>
       )}
     </AdvancedMarker>
@@ -221,4 +284,36 @@ const useGeolocation = (skip: boolean = false) => {
     error: error ?? undefined,
     isLoading,
   };
+};
+
+interface OpeningHoursDisplayProps {
+  gallery: Gallery;
+}
+
+const OpeningHoursDisplay = ({ gallery }: OpeningHoursDisplayProps) => {
+  // 今日の曜日を取得（0: 日曜日, 1: 月曜日, ..., 6: 土曜日）
+  const todayIndex = TODAY.getDay();
+  const descriptions = gallery.openingHours?.weekdayDescriptions ?? [];
+
+  const collapsedContent = (
+    <p className="text-xs">{descriptions[todayIndex]}</p>
+  );
+
+  const expandedContent = (
+    <div>
+      {descriptions.map((hours, i) => (
+        <p className="text-xs" key={i}>
+          {hours}
+        </p>
+      ))}
+    </div>
+  );
+
+  return (
+    <ExpandableDisplay
+      collapsedContent={collapsedContent}
+      expandedContent={expandedContent}
+      title="営業時間:"
+    />
+  );
 };

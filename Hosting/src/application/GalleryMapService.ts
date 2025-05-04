@@ -1,8 +1,9 @@
 import { Exhibit, Gallery } from 'src/domain/entities';
 import { getActiveExhibits } from 'src/infra/firebase/CreatorRepo';
 import { galleryRepo } from 'src/infra/firebase/GalleryRepo';
-import { GeocodingService } from 'src/domain/services/GeocodingService';
-import { googleMapsGeocoder } from 'src/infra/gcp/GoogleMapsGeocoder';
+
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+type GalleryData = Optional<Gallery, 'id'>;
 
 /**
  * ギャラリーと展示情報を集約したDTO
@@ -34,12 +35,27 @@ export const getGalleryExhibits = async (date: Date) => {
     .toArray();
 };
 
-const geocodingService = new GeocodingService(googleMapsGeocoder);
+/** ギャラリー情報を取得 */
+export const getGallery = async (
+  galleryId: string,
+): Promise<Gallery | undefined> => await galleryRepo.getGallery(galleryId);
 
-/** ギャラリー情報を追加 */
-export const addGallery = async (data: Gallery): Promise<void> => {
-  const latLng = await geocodingService.getLatLngFromAddress(data.location);
-  await galleryRepo.addGallery(data, latLng);
+/** placeIdに対応するギャラリー情報を取得 */
+export const getGalleryByPlaceId = async (
+  placeId: string,
+): Promise<Gallery | undefined> =>
+  await galleryRepo.getGalleryByPlaceId(placeId);
+
+/** ギャラリー情報の追加・編集 */
+export const updateGallery = async (data: GalleryData): Promise<Gallery> => {
+  if (data.id === undefined || data.id.length === 0) {
+    return await galleryRepo.addGallery(data);
+  }
+
+  const gallery = data as Gallery;
+  await galleryRepo.updateGallery(gallery);
+
+  return gallery;
 };
 
 /** ギャラリー情報の一覧を取得 */

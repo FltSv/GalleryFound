@@ -22,6 +22,7 @@ import { FaCloudUploadAlt } from 'react-icons/fa';
 
 export { HashtagTextarea } from './HashtagTextarea';
 export { Textarea } from './Textarea';
+export { EditableText } from './EditableText';
 
 interface TextboxProps extends InputProps {
   label: string;
