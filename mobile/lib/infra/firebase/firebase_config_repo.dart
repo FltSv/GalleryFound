@@ -14,6 +14,9 @@ class FirebaseConfigRepo implements ConfigRepoBase {
     final ordersJson =
         json.decode(config.getString('orders')) as Map<String, dynamic>;
 
+    // メンテナンスモードの設定を取得
+    final maintenanceConfig = _getJsonAsMap(config, 'maintenance_config');
+
     return Config(
       mapUrl: config.getString('map_url'),
       debugUserIds: _getJsonAsList<String>(config, 'debug_user_ids'),
@@ -22,6 +25,8 @@ class FirebaseConfigRepo implements ConfigRepoBase {
       creatorsOrder: _parseOrderConfig(ordersJson['creators']),
       productsOrder: _parseOrderConfig(ordersJson['products']),
       exhibitsOrder: _parseOrderConfig(ordersJson['exhibits']),
+      isMaintenance: maintenanceConfig['maintenance_enabled'] == true,
+      maintenanceMessage: maintenanceConfig['message'] as String? ?? '',
     );
   }
 
@@ -43,6 +48,11 @@ class FirebaseConfigRepo implements ConfigRepoBase {
     final string = config.getString(key);
     final list = json.decode(string) as List<dynamic>;
     return list.cast<T>();
+  }
+
+  Map<String, dynamic> _getJsonAsMap(FirebaseRemoteConfig config, String key) {
+    final string = config.getString(key);
+    return json.decode(string) as Map<String, dynamic>;
   }
 
   OrderConfig _parseOrderConfig(dynamic orderData) {
