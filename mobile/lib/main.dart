@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/firebase_options.dart';
 import 'package:mobile/providers/config_provider.dart';
 import 'package:mobile/providers/data_provider.dart';
+import 'package:mobile/screens/maintenance_screen.dart';
 import 'package:mobile/screens/top_screen.dart';
 import 'package:mobile/services/version_service.dart';
 import 'package:mobile/theme.dart';
@@ -87,15 +88,15 @@ class MyApp extends StatelessWidget {
       title: 'Gallery Found',
       theme: materialTheme.light(),
       darkTheme: materialTheme.dark(),
-      home: const _UpdateCheckWrapper(
+      home: const _CheckWrapper(
         child: TopScreen(),
       ),
     );
   }
 }
 
-class _UpdateCheckWrapper extends StatelessWidget {
-  const _UpdateCheckWrapper({
+class _CheckWrapper extends StatelessWidget {
+  const _CheckWrapper({
     required this.child,
   });
 
@@ -108,6 +109,12 @@ class _UpdateCheckWrapper extends StatelessWidget {
         VersionService.showUpdatePopup(context);
       }
     });
+
+    // メンテナンスモードのチェック
+    final isMaintenance = ConfigProvider().config.isMaintenance;
+    if (isMaintenance) {
+      return const MaintenanceScreen();
+    }
 
     return child;
   }
