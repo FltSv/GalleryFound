@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FaLocationCrosshairs } from 'react-icons/fa6';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaMap, FaDirections } from 'react-icons/fa';
 import {
   APIProvider,
   Map as GoogleMap,
@@ -17,6 +17,7 @@ import {
 } from 'src/application/GalleryMapService';
 import { ExpandableDisplay } from 'components/ExpandableDisplay';
 import { Gallery } from 'src/domain/entities';
+import { RiMapPin2Line, RiPaletteLine, RiTimeLine } from 'react-icons/ri';
 
 // 東京駅
 const TOKYO_POS = {
@@ -212,30 +213,44 @@ const GalleryMarker = (props: GalleryMarkerProps) => {
           }
           onClose={onClose}>
           <div className="flex max-w-60 flex-col gap-2 pt-1">
-            <p>{gallery.location}</p>
-            {gallery.openingHours && <OpeningHoursDisplay gallery={gallery} />}
+            <div className="flex items-center gap-2">
+              <RiMapPin2Line className="text-primary-500 h-6 w-full max-w-6" />
+              <p>{gallery.location}</p>
+            </div>
+
+            {gallery.openingHours && (
+              <div className="flex w-full items-center gap-2">
+                <RiTimeLine className="text-primary-500 h-6 w-full max-w-6" />
+                <OpeningHoursDisplay gallery={gallery} />
+              </div>
+            )}
             {(gallery.artType?.length ?? 0) > 0 && (
-              <div>
+              <div className="flex items-center gap-2">
+                <RiPaletteLine className="text-primary-500 h-6 w-full max-w-6" />
                 <p className="font-medium">取扱作品:</p>
                 <p className="text-xs">{gallery.artType}</p>
               </div>
             )}
             <div
               className={`
-                *:bg-primary-500 *:w-full *:rounded-full *:py-2 *:text-center
+                *:bg-primary-500 *:rounded-full *:px-4 *:py-2 *:text-center
                 *:text-xs *:text-white
-                flex gap-2
+                flex gap-2 pt-2
               `}>
               <a
+                className="flex items-center justify-center gap-1"
                 href={createGoogleMapUrl.search(gallery)}
                 rel="noopener noreferrer"
                 target="_blank">
-                Mapで開く
+                <FaMap />
+                詳細
               </a>
               <a
+                className="flex items-center justify-center gap-1"
                 href={createGoogleMapUrl.directions(gallery)}
                 rel="noopener noreferrer"
                 target="_blank">
+                <FaDirections />
                 ここへの経路
               </a>
             </div>

@@ -26,7 +26,7 @@ export const ExpandableDisplay = ({
         <p className="font-medium">{title}</p>
         <button
           aria-label={isExpanded ? '折りたたむ' : '展開する'}
-          className="text-xs text-gray-600"
+          className="text-xs text-gray-400"
           onClick={toggleExpand}>
           {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
         </button>
