@@ -4,6 +4,8 @@ import {
   RouterProvider,
   Navigate,
   Outlet,
+  useLocation,
+  useLoaderData,
 } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 import { Top } from 'src/pages/Top';
@@ -12,6 +14,7 @@ import { Logout } from 'src/pages/Logout';
 import { Mypage } from 'src/pages/Mypage';
 import { Galleries } from 'src/pages/Galleries';
 import { SendVerify, NoVerify } from 'src/pages/Verify';
+import { Maintenance } from 'src/pages/Maintenance';
 import { NotFound } from 'src/pages/NotFound';
 import { Policy } from 'src/pages/Policy';
 import { Header } from 'components/Header';
@@ -19,6 +22,7 @@ import { AuthProvider, useAuthContext } from 'src/contexts/AuthContext';
 import { CreatorProvider } from 'src/contexts/CreatorContext';
 import { ErrorBoundaryProvider } from 'src/providers/ErrorBoundaryProvider';
 import { APIProvider } from '@vis.gl/react-google-maps';
+import { Config, getConfig } from 'src/infra/firebase/firebaseConfig';
 import { Env } from './Env';
 
 const AuthRouting = (props: { page: ReactNode }) => {
@@ -41,26 +45,36 @@ const AuthRouting = (props: { page: ReactNode }) => {
   return props.page;
 };
 
-const Layout = () => (
-  <>
-    <Header />
-    <ErrorBoundaryProvider>
-      <div
-        className={`
-          mx-4 pb-8
+const Layout = () => {
+  const location = useLocation();
+  const isTopPage = location.pathname === '/';
 
-          md:mx-10
-        `}>
-        <Outlet />
-      </div>
-    </ErrorBoundaryProvider>
-  </>
-);
+  const data = useLoaderData() as Config | undefined;
+  const isMaintenance = data?.isMaintenance === true;
+
+  const children = isMaintenance && !isTopPage ? <Maintenance /> : <Outlet />;
+
+  return (
+    <>
+      <Header />
+      <ErrorBoundaryProvider>
+        <div
+          className={`
+            mx-4 pb-8
+            md:mx-10
+          `}>
+          {children}
+        </div>
+      </ErrorBoundaryProvider>
+    </>
+  );
+};
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
+    loader: getConfig,
     children: [
       {
         index: true,
