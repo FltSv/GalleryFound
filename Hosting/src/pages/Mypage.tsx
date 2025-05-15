@@ -886,7 +886,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
   const [previewImage, setPreviewImage] = useState<string>(
     exhibit?.imageUrl ?? '',
   );
-  const [selectedFile, setSelectedFile] = useState<File>();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<PlaceData | null>(null);
   const [gallery, setGallery] = useState<Gallery | null>(null);
@@ -1003,6 +1003,35 @@ const ExhibitForm = (props: ExhibitFormProps) => {
     [createLocationSelectHandler, gallery?.latLng, onInitialLoad],
   );
 
+  // ファイル選択の検証
+  const validateSelectedFiles = (fileList?: FileList) => {
+    if (!isAdd) {
+      return true;
+    }
+
+    return (fileList?.length ?? 0) > 0 || 'ファイルを選択してください。';
+  };
+
+  // 開始日時の検証
+  const validateStartDate = (dateString: string) =>
+    !isNaN(new Date(dateString).getDate()) || invalidDateMsg;
+
+  // 終了日時の検証
+  const validateEndDate = (dateString: string) => {
+    const endDate = new Date(dateString);
+    const startDate = new Date(getValues('startDateString'));
+
+    if (isNaN(endDate.getDate())) {
+      return invalidDateMsg;
+    }
+
+    if (endDate < startDate) {
+      return '終了日は開始日以降である必要があります。';
+    }
+
+    return true;
+  };
+
   const onValid: SubmitHandler<ExhibitFormValues> = useCallback(
     async data => {
       if (gallery === null) {
@@ -1030,10 +1059,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
 
       if (exhibit === undefined) {
         // 新規登録
-        if (!selectedFile) {
-          setError('selectedFiles', {
-            message: 'ファイルを選択してください。',
-          });
+        if (selectedFile === null) {
           return;
         }
 
@@ -1054,7 +1080,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         const updatedExhibit = await updateExhibit(
           user.uid,
           editedExhibit,
-          selectedFile,
+          selectedFile ?? undefined,
           (progress: number) => setUploadProgress(progress),
         );
 
@@ -1084,7 +1110,13 @@ const ExhibitForm = (props: ExhibitFormProps) => {
           md:flex-row
         `}>
         <div className="flex max-w-max basis-1/2 flex-col gap-2 p-2">
-          <FileInput accept="image/*" onChange={onFileChange} />
+          <FileInput
+            accept="image/*"
+            {...register('selectedFiles', {
+              validate: validateSelectedFiles,
+            })}
+            onChange={onFileChange}
+          />
           <p className="text-xs text-red-600">
             {errors.selectedFiles?.message}
           </p>
@@ -1121,7 +1153,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             label="開始日時"
             type="date"
             {...register('startDateString', {
-              validate: v => !isNaN(new Date(v).getDate()) || invalidDateMsg,
+              validate: validateStartDate,
             })}
           />
           <Textbox
@@ -1130,20 +1162,7 @@ const ExhibitForm = (props: ExhibitFormProps) => {
             label="終了日時"
             type="date"
             {...register('endDateString', {
-              validate: v => {
-                const endDate = new Date(v);
-                const startDate = new Date(getValues('startDateString'));
-
-                if (isNaN(endDate.getDate())) {
-                  return invalidDateMsg;
-                }
-
-                if (endDate < startDate) {
-                  return '終了日は開始日以降である必要があります。';
-                }
-
-                return true;
-              },
+              validate: validateEndDate,
             })}
           />
         </div>
