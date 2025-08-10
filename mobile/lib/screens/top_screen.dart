@@ -2,13 +2,13 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile/providers/navigate_provider.dart';
 import 'package:mobile/screens/creator_list_screen.dart';
 import 'package:mobile/screens/exhibit_list_screen.dart';
 import 'package:mobile/screens/map_screen.dart';
 import 'package:mobile/screens/product_list_screen.dart';
 import 'package:mobile/widgets/debug_db_button.dart';
 import 'package:mobile/widgets/feedback_button.dart';
+import 'package:mobile/widgets/paint_blob_button.dart';
 
 class TopScreen extends StatelessWidget {
   const TopScreen({super.key});
@@ -19,26 +19,26 @@ class TopScreen extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final paletteSize = screenSize.width * 0.9;
 
-    final props = <_ButtonProp>[
-      _ButtonProp(
+    final props = <ButtonProp>[
+      ButtonProp(
         Icons.brush,
         Colors.red,
         const Offset(0.1, 0.55),
         const ExhibitListScreen(),
       ),
-      _ButtonProp(
+      ButtonProp(
         Icons.person,
         Colors.purple,
         const Offset(0.2, 0.25),
         const CreatorListScreen(),
       ),
-      _ButtonProp(
+      ButtonProp(
         Icons.collections,
         Colors.green,
         const Offset(0.45, 0.15),
         const ProductListScreen(),
       ),
-      _ButtonProp(
+      ButtonProp(
         Icons.location_on,
         Colors.blue,
         const Offset(0.7, 0.35),
@@ -77,7 +77,7 @@ class TopScreen extends StatelessWidget {
                       return Positioned(
                         left: paletteSize * prop.pos.dx,
                         top: paletteSize * prop.pos.dy,
-                        child: _buildPaintBlob(context, prop, 72),
+                        child: PaintBlobButton(prop: prop, size: 72),
                       );
                     }),
                   ],
@@ -97,51 +97,6 @@ class TopScreen extends StatelessWidget {
                 child: DebugDBButton(),
               ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPaintBlob(BuildContext context, _ButtonProp prop, double size) {
-    final isEnable = prop.screen != null;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final ratio = isDark ? 0.2 : 0.3;
-    final lerpColor = Color.lerp(prop.color, Colors.white, ratio) ?? prop.color;
-
-    return GestureDetector(
-      onTap: isEnable
-          ? () {
-              NavigateProvider.push(context, prop.screen!);
-            }
-          : null,
-      child: Opacity(
-        opacity: isEnable ? 1.0 : 0.5,
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              center: const Alignment(-0.2, -0.2),
-              radius: 0.3,
-              colors: [
-                Colors.white.withValues(alpha: 0.8),
-                lerpColor,
-              ],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 8,
-                offset: const Offset(2, 4),
-              ),
-            ],
-          ),
-          child: Icon(
-            prop.icon,
-            size: size * 0.6,
-            color: Colors.white,
-          ),
         ),
       ),
     );
@@ -219,13 +174,4 @@ class PalettePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _ButtonProp {
-  _ButtonProp(this.icon, this.color, this.pos, this.screen);
-
-  final IconData icon;
-  final Color color;
-  final Offset pos;
-  final Widget? screen;
 }
