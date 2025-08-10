@@ -17,23 +17,19 @@ class FeedbackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Positioned(
-      bottom: 32,
-      right: 32,
-      child: ElevatedButton.icon(
-        onPressed: _launchFeedbackForm,
-        icon: Icon(
-          Icons.feedback_outlined,
-          color: theme.colorScheme.onPrimaryContainer,
-        ),
-        label: const Text('フィードバックはこちらから'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: theme.colorScheme.primaryContainer,
-          foregroundColor: theme.colorScheme.onPrimaryContainer,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+    return ElevatedButton.icon(
+      onPressed: _launchFeedbackForm,
+      icon: Icon(
+        Icons.feedback_outlined,
+        color: theme.colorScheme.onPrimaryContainer,
+      ),
+      label: const Text('フィードバックはこちらから'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primaryContainer,
+        foregroundColor: theme.colorScheme.onPrimaryContainer,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
     );
