@@ -57,26 +57,22 @@ class _DebugDBButtonState extends ConsumerState<DebugDBButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: 50,
-      right: 20,
-      child: ElevatedButton.icon(
-        icon: Icon(
-          _isRebootPending
-              ? Icons.refresh
-              : (_isDevelopDB ? Icons.bug_report : Icons.bug_report_outlined),
-        ),
-        label: Text(
-          _isRebootPending
-              ? '再起動が必要です'
-              : (_isDevelopDB ? 'DevelopDB: ON' : 'DevelopDB: OFF'),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _isDevelopDB ? Colors.red : Colors.grey,
-          foregroundColor: Colors.white,
-        ),
-        onPressed: _isRebootPending ? null : _toggleDevelopDB,
+    return ElevatedButton.icon(
+      icon: Icon(
+        _isRebootPending
+            ? Icons.refresh
+            : (_isDevelopDB ? Icons.bug_report : Icons.bug_report_outlined),
       ),
+      label: Text(
+        _isRebootPending
+            ? '再起動が必要です'
+            : (_isDevelopDB ? 'DevelopDB: ON' : 'DevelopDB: OFF'),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _isDevelopDB ? Colors.red : Colors.grey,
+        foregroundColor: Colors.white,
+      ),
+      onPressed: _isRebootPending ? null : _toggleDevelopDB,
     );
   }
 }
