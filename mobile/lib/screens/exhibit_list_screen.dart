@@ -67,7 +67,7 @@ class _ExhibitListScreenState extends ConsumerState<ExhibitListScreen> {
             child: item,
           ),
         )
-        .intersperse(const Gap(8))
+        .intersperse(const Divider())
         .toList();
 
     return results.isEmpty
