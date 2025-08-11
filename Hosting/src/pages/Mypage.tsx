@@ -560,14 +560,17 @@ export const Mypage = () => {
           </div>
           <table className="w-full">
             <tbody>
-              {creator?.exhibits.map(exhibit => (
-                <ExhibitRow
-                  data={exhibit}
-                  key={exhibit.id}
-                  onDelete={onDeleteExhibit}
-                  onEdit={onEditExhibit}
-                />
-              ))}
+              {creator?.exhibits
+                .slice()
+                .sort((a, b) => a.endDate.getTime() - b.endDate.getTime())
+                .map(exhibit => (
+                  <ExhibitRow
+                    data={exhibit}
+                    key={exhibit.id}
+                    onDelete={onDeleteExhibit}
+                    onEdit={onEditExhibit}
+                  />
+                ))}
             </tbody>
           </table>
         </div>
