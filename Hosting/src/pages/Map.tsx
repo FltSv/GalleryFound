@@ -14,6 +14,7 @@ import { Env } from 'src/Env';
 import {
   GalleryExhibits,
   getGalleryExhibits,
+  getGalleryExhibitsByExhibitId,
 } from 'src/application/GalleryMapService';
 import { ExpandableDisplay } from 'components/ExpandableDisplay';
 import { Gallery } from 'src/domain/entities';
@@ -97,29 +98,21 @@ const MapView = ({ coords, exhibitId }: MapViewProps) => {
 
   useEffect(() => {
     void (async () => {
-      const galleries = await getGalleryExhibits(TODAY);
       if (exhibitId !== undefined) {
-        // 一致するギャラリーを検索
-        const gallery = galleries.find(x =>
-          x.exhibits.find(x => x.id === exhibitId),
-        );
-
-        if (gallery !== undefined) {
-          const viewGallery = {
-            ...gallery,
-            exhibits: gallery.exhibits.filter(x => exhibitId === x.id),
-          };
-          setViewExhibit(viewGallery);
+        const view = await getGalleryExhibitsByExhibitId(exhibitId);
+        if (view !== undefined) {
+          setViewExhibit(view);
 
           // centerPosが更新されたときに地図の中心を移動
           if (mapRef.current) {
             mapRef.current.setZoom(15);
-            mapRef.current.panTo(gallery.gallery.latLng);
+            mapRef.current.panTo(view.gallery.latLng);
           }
           return;
         }
       }
 
+      const galleries = await getGalleryExhibits(TODAY);
       const conditionally = galleries
         .map(x => ({
           ...x,

@@ -1,6 +1,7 @@
 import { Exhibit, Gallery } from 'src/domain/entities';
 import { getActiveExhibits } from 'src/infra/firebase/CreatorRepo';
 import { galleryRepo } from 'src/infra/firebase/GalleryRepo';
+import { getExhibitById } from 'src/infra/firebase/ExhibitRepo';
 
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 type GalleryData = Optional<Gallery, 'id'>;
@@ -61,3 +62,20 @@ export const updateGallery = async (data: GalleryData): Promise<Gallery> => {
 /** ギャラリー情報の一覧を取得 */
 export const getGalleries = async (): Promise<Gallery[]> =>
   await galleryRepo.getGalleries();
+
+/** ExhibitIdに対応する展示と対応するギャラリーを取得 */
+export const getGalleryExhibitsByExhibitId = async (
+  exhibitId: string,
+): Promise<GalleryExhibits | undefined> => {
+  const exhibit = await getExhibitById(exhibitId);
+  if (exhibit === undefined) {
+    return undefined;
+  }
+
+  const gallery = await galleryRepo.getGallery(exhibit.galleryId);
+  if (gallery === undefined) {
+    return undefined;
+  }
+
+  return { gallery, exhibits: [exhibit] };
+};
