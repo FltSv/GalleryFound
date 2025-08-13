@@ -10,6 +10,7 @@ import {
   Product,
   getDatePeriod,
 } from 'src/domain/entities';
+import { OpeningHours } from 'src/domain/place';
 import {
   Creator as FirebaseCreator,
   Product as FirebaseProduct,
@@ -147,6 +148,7 @@ export const galleryConverter: FirestoreDataConverter<Gallery> = {
       ...data,
       id: snapshot.id,
       latLng: { lat: latitude, lng: longitude },
+      openingHours: OpeningHours.fromJson(data.openingHours),
     } satisfies Gallery;
   },
 
@@ -155,6 +157,7 @@ export const galleryConverter: FirestoreDataConverter<Gallery> = {
     return {
       ...gallery,
       latLng: new GeoPoint(lat, lng),
+      openingHours: gallery.openingHours?.toJson(),
     } satisfies FirebaseGallery;
   },
 };

@@ -44,11 +44,20 @@ mut_config.settings.minimumFetchIntervalMillis =
 
 export const getConfig = async (): Promise<Config> => {
   await fetchAndActivate(mut_config);
+
+  const maintenanceConfigString = getValue(
+    mut_config,
+    'maintenance_config',
+  ).asString();
+  const maintenanceConfig = JSON.parse(maintenanceConfigString);
+
   return {
     debugUserIds: JSON.parse(
       getValue(mut_config, 'debug_user_ids').asString(),
     ) as string[],
     genres: JSON.parse(getValue(mut_config, 'genres').asString()) as string[],
+    isMaintenance: maintenanceConfig['maintenance_enabled'],
+    maintenanceMessage: maintenanceConfig['message'],
   };
 };
 
@@ -136,10 +145,22 @@ export interface Gallery {
   name: string;
   location: string;
   latLng: GeoPoint;
+  placeId?: string;
+
+  /** 営業時間 */
+  openingHours?: string;
+
+  /** 取扱作品 */
+  artType?: string;
+
+  /** 運営形態 */
+  operationType?: string;
 }
 
 /** Remote Config */
-interface Config {
+export interface Config {
   debugUserIds: string[];
   genres: string[];
+  isMaintenance: boolean;
+  maintenanceMessage: string;
 }

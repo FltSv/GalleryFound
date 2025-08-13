@@ -28,13 +28,13 @@ class ExhibitItem extends StatelessWidget {
         Expanded(
           flex: 4,
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   exhibit.title,
-                  style: theme.textTheme.titleMedium,
+                  style: theme.textTheme.titleMedium?.copyWith(height: 1),
                 ),
                 const Gap(0),
                 Text(exhibit.location),

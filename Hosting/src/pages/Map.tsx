@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FaLocationCrosshairs } from 'react-icons/fa6';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaMap, FaDirections } from 'react-icons/fa';
 import {
   APIProvider,
   Map as GoogleMap,
@@ -14,7 +14,11 @@ import { Env } from 'src/Env';
 import {
   GalleryExhibits,
   getGalleryExhibits,
+  getGalleryExhibitsByExhibitId,
 } from 'src/application/GalleryMapService';
+import { ExpandableDisplay } from 'components/ExpandableDisplay';
+import { Gallery } from 'src/domain/entities';
+import { RiMapPin2Line, RiPaletteLine, RiTimeLine } from 'react-icons/ri';
 
 // 東京駅
 const TOKYO_POS = {
@@ -23,6 +27,27 @@ const TOKYO_POS = {
 } as const satisfies google.maps.LatLngLiteral;
 
 const TODAY = new Date();
+
+const createGoogleMapUrl = {
+  search: (gallery: Gallery): string => {
+    const query = encodeURIComponent(gallery.name);
+    const placeIdQuery =
+      (gallery.placeId?.length ?? 0) > 0
+        ? `&query_place_id=${gallery.placeId}`
+        : '';
+    return `https://www.google.com/maps/search/?api=1&query=${query}${placeIdQuery}`;
+  },
+
+  directions: (gallery: Gallery): string => {
+    const query = encodeURIComponent(gallery.name);
+    const baseUrl = `https://www.google.com/maps/dir/?api=1&destination=${query}`;
+    const placeIdQuery =
+      (gallery.placeId?.length ?? 0) > 0
+        ? `&destination_place_id=${gallery.placeId}`
+        : '';
+    return `${baseUrl}${placeIdQuery}`;
+  },
+};
 
 export const Map = () => {
   // 展示IDを取得
@@ -73,29 +98,21 @@ const MapView = ({ coords, exhibitId }: MapViewProps) => {
 
   useEffect(() => {
     void (async () => {
-      const galleries = await getGalleryExhibits(TODAY);
       if (exhibitId !== undefined) {
-        // 一致するギャラリーを検索
-        const gallery = galleries.find(x =>
-          x.exhibits.find(x => x.id === exhibitId),
-        );
-
-        if (gallery !== undefined) {
-          const viewGallery = {
-            ...gallery,
-            exhibits: gallery.exhibits.filter(x => exhibitId === x.id),
-          };
-          setViewExhibit(viewGallery);
+        const view = await getGalleryExhibitsByExhibitId(exhibitId);
+        if (view !== undefined) {
+          setViewExhibit(view);
 
           // centerPosが更新されたときに地図の中心を移動
           if (mapRef.current) {
             mapRef.current.setZoom(15);
-            mapRef.current.panTo(gallery.gallery.latLng);
+            mapRef.current.panTo(view.gallery.latLng);
           }
           return;
         }
       }
 
+      const galleries = await getGalleryExhibits(TODAY);
       const conditionally = galleries
         .map(x => ({
           ...x,
@@ -174,21 +191,75 @@ const GalleryMarker = (props: GalleryMarkerProps) => {
         <InfoWindow
           anchor={marker}
           headerContent={
-            <div>
-              <p className="text-base">{gallery.name}</p>
-              <p className="max-w-60">{gallery.location}</p>
-            </div>
+            <p className="max-w-52 align-middle">
+              <span className="text-base font-bold">{gallery.name}</span>
+              {(gallery.operationType?.length ?? 0) > 0 && (
+                <span
+                  className={`
+                    border-primary-500 text-primary-500 mx-2 h-fit w-fit
+                    rounded-full border px-2 text-nowrap
+                  `}>
+                  {gallery.operationType}
+                </span>
+              )}
+            </p>
           }
           onClose={onClose}>
-          {exhibits.map(x => (
-            <div className="flex gap-2 py-1" key={x.id}>
-              <img className="inline w-16" src={x.imageUrl} />
-              <div>
-                <p className="text-base font-bold">{x.title}</p>
-                <p>{x.getDatePeriod()}</p>
-              </div>
+          <div className="flex max-w-60 flex-col gap-2 pt-1">
+            <div className="flex items-center gap-2">
+              <RiMapPin2Line className="text-primary-500 h-6 w-full max-w-6" />
+              <p>{gallery.location}</p>
             </div>
-          ))}
+
+            {gallery.openingHours && (
+              <div className="flex w-full items-center gap-2">
+                <RiTimeLine className="text-primary-500 h-6 w-full max-w-6" />
+                <OpeningHoursDisplay gallery={gallery} />
+              </div>
+            )}
+            {(gallery.artType?.length ?? 0) > 0 && (
+              <div className="flex items-center gap-2">
+                <RiPaletteLine className="text-primary-500 h-6 w-full max-w-6" />
+                <p className="font-medium">取扱作品:</p>
+                <p className="text-xs">{gallery.artType}</p>
+              </div>
+            )}
+            <div
+              className={`
+                *:bg-primary-500 *:rounded-full *:px-4 *:py-2 *:text-center
+                *:text-xs *:text-white
+                flex gap-2 pt-2
+              `}>
+              <a
+                className="flex items-center justify-center gap-1"
+                href={createGoogleMapUrl.search(gallery)}
+                rel="noopener noreferrer"
+                target="_blank">
+                <FaMap />
+                詳細
+              </a>
+              <a
+                className="flex items-center justify-center gap-1"
+                href={createGoogleMapUrl.directions(gallery)}
+                rel="noopener noreferrer"
+                target="_blank">
+                <FaDirections />
+                ここへの経路
+              </a>
+            </div>
+            {exhibits.map(x => (
+              <div className="flex gap-2 py-1" key={x.id}>
+                <img className="inline w-16" src={x.imageUrl} />
+                <div>
+                  <p className="text-base font-bold">{x.title}</p>
+                  <p>{x.getDatePeriod()}</p>
+                </div>
+              </div>
+            ))}
+            <p className="text-[0.5rem]">
+              ※ 祝日は営業時間が異なる可能性があります。
+            </p>
+          </div>
         </InfoWindow>
       )}
     </AdvancedMarker>
@@ -221,4 +292,36 @@ const useGeolocation = (skip: boolean = false) => {
     error: error ?? undefined,
     isLoading,
   };
+};
+
+interface OpeningHoursDisplayProps {
+  gallery: Gallery;
+}
+
+const OpeningHoursDisplay = ({ gallery }: OpeningHoursDisplayProps) => {
+  // 今日の曜日を取得（0: 日曜日, 1: 月曜日, ..., 6: 土曜日）
+  const todayIndex = TODAY.getDay();
+  const descriptions = gallery.openingHours?.weekdayDescriptions ?? [];
+
+  const collapsedContent = (
+    <p className="text-xs">{descriptions[todayIndex]}</p>
+  );
+
+  const expandedContent = (
+    <div>
+      {descriptions.map((hours, i) => (
+        <p className="text-xs" key={i}>
+          {hours}
+        </p>
+      ))}
+    </div>
+  );
+
+  return (
+    <ExpandableDisplay
+      collapsedContent={collapsedContent}
+      expandedContent={expandedContent}
+      title="営業時間:"
+    />
+  );
 };

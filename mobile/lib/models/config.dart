@@ -8,6 +8,8 @@ class Config {
     required this.creatorsOrder,
     required this.productsOrder,
     required this.exhibitsOrder,
+    required this.isMaintenance,
+    required this.maintenanceMessage,
   });
 
   final String mapUrl;
@@ -17,6 +19,8 @@ class Config {
   final OrderConfig creatorsOrder;
   final OrderConfig productsOrder;
   final OrderConfig exhibitsOrder;
+  final bool isMaintenance;
+  final String maintenanceMessage;
 }
 
 /// 並び順の設定

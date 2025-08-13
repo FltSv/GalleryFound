@@ -1,3 +1,6 @@
+import { OpeningHours } from 'src/domain/place';
+import 'src/extensions/date.extensions';
+
 /** 作家 */
 export interface Creator {
   id: string;
@@ -82,11 +85,21 @@ export interface Gallery {
   name: string;
   location: string;
   latLng: google.maps.LatLngLiteral;
+  placeId?: string;
+
+  /** 営業時間 */
+  openingHours?: OpeningHours;
+
+  /** 取扱作品 */
+  artType?: string;
+
+  /** 運営形態 */
+  operationType?: string;
 }
 
 /** 日付の期間の表示値を返す */
 export const getDatePeriod = (start: Date, end: Date) => {
-  const startString = start.toLocaleDateString();
-  const endString = end.toLocaleDateString();
+  const startString = start.toDisplayDateString();
+  const endString = end.toDisplayDateString();
   return `${startString} ～ ${endString}`;
 };
