@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:mobile/models/exhibit.dart';
 import 'package:mobile/providers/config_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key, this.exhibit});
@@ -26,6 +27,19 @@ class _MapScreenState extends State<MapScreen> {
           ),
       body: InAppWebView(
         initialUrlRequest: URLRequest(url: WebUri(widget.url)),
+        shouldOverrideUrlLoading: (controller, navigationAction) async {
+          final uri = navigationAction.request.url;
+
+          if (uri == null) {
+            return NavigationActionPolicy.ALLOW;
+          }
+
+          // 外部アプリで開く
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+          // 外部アプリを起動したので、WebView内での読み込みはキャンセル
+          return NavigationActionPolicy.CANCEL;
+        },
         onWebViewCreated: (controller) async {
           final status = await Permission.locationWhenInUse.request();
 
