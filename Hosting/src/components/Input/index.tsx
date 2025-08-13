@@ -19,6 +19,7 @@ import {
   SwitchProps as MuiJoySwitchProps,
 } from '@mui/joy';
 import { FaCloudUploadAlt } from 'react-icons/fa';
+import 'src/extensions/date.extensions';
 
 export { HashtagTextarea } from './HashtagTextarea';
 export { Textarea } from './Textarea';
@@ -34,7 +35,7 @@ export const Textbox = forwardRef<HTMLInputElement, TextboxProps>(
   (props, ref) => {
     const { fieldError, defaultDateValue, ...others } = props;
     const isError = props.fieldError !== undefined;
-    const defaultDate = defaultDateValue?.toISOString().split('T')[0];
+    const defaultDate = defaultDateValue?.toInputDateString();
 
     return (
       <FormControl error={isError}>
