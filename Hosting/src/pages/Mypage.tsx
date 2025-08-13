@@ -1056,8 +1056,8 @@ const ExhibitForm = (props: ExhibitFormProps) => {
         title: data.title,
         location: updatedGallery.name,
         galleryId: updatedGallery.id,
-        startDate: new Date(data.startDateString + 'T00:00:00'),
-        endDate: new Date(data.endDateString + 'T23:59:59'),
+        startDate: new Date(data.startDateString),
+        endDate: new Date(data.endDateString),
       };
 
       if (exhibit === undefined) {
