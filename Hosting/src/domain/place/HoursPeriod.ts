@@ -15,7 +15,6 @@ export class HoursPeriod {
     void this._symbol;
 
     const closePoint = close ?? new HourPoint(24, 0);
-    this.validate(open, closePoint);
 
     this._open = open;
     this._close = closePoint;
@@ -27,16 +26,6 @@ export class HoursPeriod {
 
   get close(): HourPoint {
     return this._close;
-  }
-
-  private validate(open: HourPoint, close: HourPoint): void {
-    if (open.hour > close.hour) {
-      throw new Error('開始時間が終了時間よりも後になっています。');
-    }
-
-    if (open.hour === close.hour && open.minute >= close.minute) {
-      throw new Error('開始時間が終了時間よりも後になっています。');
-    }
   }
 
   toString(): string {
